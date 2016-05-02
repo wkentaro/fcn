@@ -17,11 +17,13 @@ Installation
 Usage
 -----
 
-.. image:: _images/2007_000129.jpg
-
 .. code-block:: bash
 
   ./scripts/forward.py
+
+**Result**
+
+.. image:: _images/2007_000129.jpg
 
 
 License
