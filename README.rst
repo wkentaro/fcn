@@ -1,8 +1,9 @@
+fcn - Fully Convolutional Networks
+==================================
+
 .. image:: https://travis-ci.org/wkentaro/fcn.svg?branch=master
     :target: https://travis-ci.org/wkentaro/fcn
 
-fcn - Fully Convolutional Networks
-==================================
 
 This is Chainer_ implementation of fcn.berkeleyvision.org_.
 
