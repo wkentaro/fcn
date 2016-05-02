@@ -26,8 +26,13 @@ Installation
 
   python setup.py install
 
-  # This downloads caffemodel and convert it to chainermodel
-  ./scripts/caffe_to_chainermodel.py
+.. _here: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
+
+You need to download pascal VOC2012 dataset from here_, and install it as below construction::
+
+  - fcn - data - pascal - VOC2012 -- JPEGImages
+                                   - SegmentationClass
+                                   - ...
 
 
 Usage
@@ -35,6 +40,10 @@ Usage
 
 .. code-block:: bash
 
+  # This downloads caffemodel and convert it to chainermodel
+  ./scripts/caffe_to_chainermodel.py
+
+  # forwarding of the networks
   ./scripts/forward.py
 
 **Result**
