@@ -1,2 +1,4 @@
 fcn.egg-info
 *.py[cdo]
+build/
+dist/
