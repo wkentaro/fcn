@@ -1,4 +1,4 @@
-FCN - Fully Convolutional Networks
+fcn - Fully Convolutional Networks
 ==================================
 
 This is Chainer_ implementation of fcn.berkeleyvision.org_.
@@ -21,8 +21,8 @@ Installation
 
 .. code-block:: bash
 
-  git clone https://github.com/wkentaro/FCN.git
-  cd FCN
+  git clone https://github.com/wkentaro/fcn.git
+  cd fcn
 
   # This downloads caffemodel and convert it to chainermodel
   ./scripts/caffe_to_chainermodel.py
