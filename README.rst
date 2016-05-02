@@ -24,6 +24,8 @@ Installation
   git clone https://github.com/wkentaro/fcn.git
   cd fcn
 
+  python setup.py install
+
   # This downloads caffemodel and convert it to chainermodel
   ./scripts/caffe_to_chainermodel.py
 
