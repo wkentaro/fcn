@@ -8,14 +8,14 @@ version = '1.0'
 
 
 setup(
-    name='apc2015or',
+    name='fcn',
     version=version,
     packages=find_packages(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
-    url='http://github.com/wkentaro/apc2015or',
+    url='http://github.com/wkentaro/FCN',
     license='MIT',
-    keywords='utility',
+    keywords='machine learning',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
