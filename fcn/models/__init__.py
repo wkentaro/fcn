@@ -1,2 +1,2 @@
-from apc2015or.models.fcn8s import *
-from apc2015or.models.vgg16 import *
+from fcn.models.fcn8s import FCN8s
+from fcn.models.vgg16 import VGG16
