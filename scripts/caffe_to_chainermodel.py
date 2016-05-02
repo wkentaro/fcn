@@ -4,6 +4,8 @@ from __future__ import print_function
 import argparse
 import os
 import os.path as osp
+import shlex
+import subprocess
 import sys
 
 import caffe
@@ -20,13 +22,12 @@ caffemodel_dir = osp.join(data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
 caffemodel = osp.join(caffemodel_dir, 'fcn8s-heavy-pascal.caffemodel')
 caffe_prototxt = osp.join(caffemodel_dir, 'deploy.prototxt')
 if not os.path.exists(caffemodel):
-    url_file = osp.join(caffemodel_dir, 'caffemodel-url')
-    msg = '''ERROR: Caffe model '{0}' not found. Please run below command:
-
-    wget $(cat {0}) -O {1}
-'''.format(url_file, caffemodel)
+    msg = "WARNING: Caffemodel '{0}' not found. Downloading..."
     print(msg, file=sys.stderr)
-    sys.exit(1)
+    url_file = osp.join(caffemodel_dir, 'caffemodel-url')
+    url = open(url_file).read().strip()
+    cmd = "wget '{0}' -O {1}".format(url, caffemodel)
+    subprocess.check_call(shlex.split(cmd))
 net = caffe.Net(caffe_prototxt, caffemodel, caffe.TEST)
 
 # TODO(pfnet): chainer CaffeFunction not support some layers
