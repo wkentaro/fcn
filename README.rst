@@ -1,6 +1,11 @@
 FCN - Fully Convolutional Networks
 ==================================
 
+This is chainer_ implementation of fcn.berkeleyvision.org_.
+
+.. _fcn.berkeleyvision.org: https://github.com/shelhamer/fcn.berkeleyvision.org.git
+.. _chainer: https://github.com/pfnet/chainer.git
+
 
 Installation
 ------------
