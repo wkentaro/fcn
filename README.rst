@@ -7,6 +7,15 @@ This is chainer_ implementation of fcn.berkeleyvision.org_.
 .. _chainer: https://github.com/pfnet/chainer.git
 
 
+Features
+--------
+
+- Provide FCN8s model for Chainer. [done]
+- Copy caffemodel to chainermodel. [done]
+- Forwarding with Chainer for pascal dataset. [done]
+- Training with chainer. [not yet]
+
+
 Installation
 ------------
 
