@@ -4,7 +4,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.0'
+version = '1.0.1'
 
 
 setup(
@@ -13,9 +13,9 @@ setup(
     packages=find_packages(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
-    url='http://github.com/wkentaro/FCN',
+    url='http://github.com/wkentaro/fcn',
     license='MIT',
-    keywords='machine learning',
+    keywords='Machine Learning',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
