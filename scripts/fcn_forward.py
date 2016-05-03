@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import argparse
 import os
 import os.path as osp
+import tempfile
 
 from chainer import cuda
 import chainer.serializers as S
@@ -16,8 +17,10 @@ if os.environ.get('DISPLAY', '') == '':
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.misc import imread
+from scipy.misc import imsave
 from skimage.color import label2rgb
 from skimage.transform import rescale
+from skimage.transform import resize
 
 import fcn
 from fcn.models import FCN8s
@@ -69,6 +72,11 @@ class Forwarding(object):
         cmap = fcn.util.labelcolormap(21)
         label_viz = label2rgb(label, img, colors=cmap[1:], bg_label=0)
         # plot image
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
+                            wspace=0, hspace=0)
+        plt.margins(0, 0)
+        plt.gca().xaxis.set_major_locator(plt.NullLocator())
+        plt.gca().yaxis.set_major_locator(plt.NullLocator())
         plt.axis('off')
         plt.imshow(label_viz)
         # plot legend
@@ -82,16 +90,24 @@ class Forwarding(object):
             plt_handlers.append(p)
             plt_titles.append(self.target_names[l])
         plt.legend(plt_handlers, plt_titles)
-        plt.tight_layout()
+        result_file = osp.join(tempfile.mkdtemp(), 'result.jpg')
+        plt.savefig(result_file, bbox_inches='tight', pad_inches=0)
+        # compose result
+        result_img = imread(result_file)
+        result_img = resize(result_img, img.shape, preserve_range=True)
+        result_img = result_img.astype(np.uint8)
         # save result
-        data_dir = fcn.get_data_dir()
-        basename = osp.splitext(osp.basename(img_file))[0]
-        save_dir = osp.join(data_dir, 'forward_out')
-        if not osp.exists(save_dir):
-            os.makedirs(save_dir)
-        result_file = osp.join(save_dir, basename + '.jpg')
-        plt.savefig(result_file)
-        print(' - result_file: {0}'.format(result_file))
+        save_dir = osp.join(fcn.get_data_dir(), 'forward_out')
+        height, width = img.shape[:2]
+        if height > width:
+            vline = np.ones((height, 3, 3), dtype=np.uint8) * 255
+            out_img = np.hstack((img, vline, result_img))
+        else:
+            hline = np.ones((3, width, 3), dtype=np.uint8) * 255
+            out_img = np.vstack((img, hline, result_img))
+        out_file = osp.join(save_dir, osp.basename(img_file))
+        imsave(out_file, out_img)
+        print(' - out_file: {0}'.format(out_file))
 
 
 def main():
