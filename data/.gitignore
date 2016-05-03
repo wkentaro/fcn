@@ -1,3 +1,6 @@
 *.chainermodel
 *.caffemodel
 pascal
+
+forward_in/
+forward_out/
