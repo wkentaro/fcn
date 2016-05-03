@@ -14,6 +14,7 @@ setup(
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
+    install_requires=open('requirements.txt').readlines(),
     license='MIT',
     keywords='Machine Learning',
     classifiers=[
