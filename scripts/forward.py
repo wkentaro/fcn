@@ -10,6 +10,9 @@ import os.path as osp
 from chainer import cuda
 import chainer.serializers as S
 from chainer import Variable
+import matplotlib
+if os.environ.get('DISPLAY', '') == '':
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.misc import imread
