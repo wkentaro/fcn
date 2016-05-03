@@ -1,9 +1,29 @@
+sudo: required
+
+dist: trusty
+
 language: python
 
 python: '2.7'
 
-install:
-- python setup.py install
+virtualenv:
+  system_site_packages: true
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.ccache
+
+# before_install:
+# - sudo apt-get install -y -qq liblapack-dev
+# - sudo apt-get install -y -qq python-numpy python-scipy
+# - sudo apt-get install -y -qq libhdf5-dev
+# - sudo apt-get install -y -qq python-skimage
+
+# install:
+# - pip freeze
+# - travis_wait travis_retry pip install -r requirements.txt
+# - travis_retry python setup.py develop
 
 script:
 - true
