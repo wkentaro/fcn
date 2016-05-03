@@ -14,10 +14,13 @@ This is Chainer_ implementation of fcn.berkeleyvision.org_.
 Features
 --------
 
-- Provide FCN8s model for Chainer. [done]
-- Copy caffemodel to chainermodel. [done]
-- Forwarding with Chainer for pascal dataset. [done]
-- Training with chainer. [not yet]
+- Provide FCN8s model for Chainer. [v1.0.0_]
+- Copy caffemodel to chainermodel. [v1.0.0_]
+- Forwarding with Chainer for pascal dataset. [v1.0.0_]
+- Training with Chainer for pascal dataset. [**not yet**]
+- Training for APC2015 dataset. [**not yet**]
+
+.. _v1.0.0: https://github.com/wkentaro/fcn/releases/tag/v1.0.0
 
 
 Installation
