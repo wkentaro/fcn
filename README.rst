@@ -52,7 +52,7 @@ Usage
 
 .. image:: _images/2007_000129.jpg
 
-(http://host.robots.ox.ac.uk/pascal/VOC/voc2012/)
+Original Image: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
 
 
 License
