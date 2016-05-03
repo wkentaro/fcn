@@ -49,7 +49,7 @@ class Forwarding(object):
         print('{0}:'.format(osp.realpath(img_file)))
         # setup image
         img = imread(img_file)
-        scale =  (400 * 400) / (img.shape[0] * img.shape[1])
+        scale =  (500 * 500) / (img.shape[0] * img.shape[1])
         if scale < 1:
             resizing_scale = np.sqrt(scale)
             print(' - resizing_scale: {0}'.format(resizing_scale))
