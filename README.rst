@@ -50,8 +50,6 @@ Usage
   # forwarding of the networks
   ./scripts/forward.py --img-files data/pascal/VOC2012/JPEGImages/2007_000129.jpg
 
-**Result**
-
 .. image:: _images/2007_000129.jpg
 
 (http://host.robots.ox.ac.uk/pascal/VOC/voc2012/)
