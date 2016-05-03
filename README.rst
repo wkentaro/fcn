@@ -48,7 +48,7 @@ Usage
   ./scripts/caffe_to_chainermodel.py
 
   # forwarding of the networks
-  ./scripts/forward.py
+  ./scripts/forward.py --img-files data/pascal/VOC2012/JPEGImages/2007_000129.jpg
 
 **Result**
 
