@@ -39,8 +39,8 @@ class Forwarding(object):
     def __init__(self, gpu):
         self.gpu = gpu
 
-        data_dir = fcn.get_data_dir()
-        chainermodel = osp.join(data_dir, 'fcn8s.chainermodel')
+        self.data_dir = fcn.get_data_dir()
+        chainermodel = osp.join(self.data_dir, 'fcn8s.chainermodel')
 
         self.target_names = fcn.pascal.get_target_names()
         self.model = FCN8s(n_class=len(self.target_names))
@@ -100,7 +100,10 @@ class Forwarding(object):
         result_img = resize(result_img, img.shape, preserve_range=True)
         result_img = result_img.astype(np.uint8)
         # save result
-        save_dir = osp.join(fcn.get_data_dir(), 'forward_out')
+        if self.save_dir is None:
+            save_dir = 'forward_out'
+        else:
+            save_dir = osp.join(self.data_dir, 'forward_out')
         if not osp.exists(save_dir):
             os.makedirs(save_dir)
         height, width = img.shape[:2]
