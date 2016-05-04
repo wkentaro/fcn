@@ -51,7 +51,7 @@ class Forwarding(object):
     def forward_img_file(self, img_file):
         print('{0}:'.format(osp.realpath(img_file)))
         # setup image
-        img = imread(img_file)
+        img = imread(img_file, mode='RGB')
         scale =  (500 * 500) / (img.shape[0] * img.shape[1])
         if scale < 1:
             resizing_scale = np.sqrt(scale)
@@ -96,7 +96,7 @@ class Forwarding(object):
         result_file = osp.join(tempfile.mkdtemp(), 'result.png')
         plt.savefig(result_file, bbox_inches='tight', pad_inches=0)
         # compose result
-        result_img = imread(result_file)
+        result_img = imread(result_file, mode='RGB')
         result_img = resize(result_img, img.shape, preserve_range=True)
         result_img = result_img.astype(np.uint8)
         # save result
