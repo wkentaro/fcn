@@ -23,7 +23,7 @@ if sys.argv[-1] == 'release':
         'git push origin master --tag',
     ]
     for cmd in commands:
-        subprocess.check_call(shlex.split(cmd))
+        subprocess.call(shlex.split(cmd))
     sys.exit(0)
 
 
