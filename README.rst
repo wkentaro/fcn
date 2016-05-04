@@ -28,6 +28,14 @@ Installation
 
 .. code-block:: bash
 
+  pip install fcn
+
+
+For Developers
+++++++++++++++
+
+.. code-block:: bash
+
   git clone https://github.com/wkentaro/fcn.git
   cd fcn
 
@@ -44,6 +52,21 @@ You need to download pascal VOC2012 dataset from here_, and install it as below 
 
 Usage
 -----
+
+.. code-block:: bash
+
+  # Download sample image
+  wget https://farm2.staticflickr.com/1522/26471792680_a485afb024_z_d.jpg -O sample.jpg
+
+  fcn_forward.py --img-files sample.jpg --gpu -1
+
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/26471792680.jpg
+
+Original Image: https://www.flickr.com/photos/faceme/26471792680/
+
+
+For Developers
+++++++++++++++
 
 .. code-block:: bash
 
