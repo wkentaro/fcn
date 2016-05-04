@@ -28,10 +28,16 @@ if sys.argv[-1] == 'release':
 
 class FcnBuildPyCommand(BuildPyCommand):
     def run(self):
-        output_dir = osp.join(self.build_lib, 'fcn/_data')
-        if not osp.exists(output_dir):
-            os.makedirs(output_dir)
-        output = osp.join(output_dir, 'fcn8s.chainermodel')
+        BuildPyCommand.run(self)
+        # create data dirs
+        data_dir = osp.join(self.build_lib, 'fcn/_data')
+        data_subdirs = ['forward_in', 'forward_out']
+        for dir_ in data_subdirs:
+            dir_ = osp.join(data_dir, dir_)
+            if not osp.exists(dir_):
+                os.makedirs(dir_)
+        # download chainermodel to the data dir
+        output = osp.join(data_dir, 'fcn8s.chainermodel')
         url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2veTdBQWZybENLWmM'
         cmd = "gdown -q '{0}' -O {1}".format(url, output)
         print("Downloading '{0}' by command '{1}'".format(output, cmd))
