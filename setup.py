@@ -1,10 +1,25 @@
 #!/usr/bin/env python
 
+import shlex
+import subprocess
+import sys
+
 from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.1.2'
+version = '1.1.3'
+
+
+if sys.argv[-1] == 'release':
+    commands = [
+        'python setup.py sdist upload',
+        'git tag v{0}'.format(version),
+        'git push origin master --tag',
+    ]
+    for cmd in commands:
+        subprocess.check_call(shlex.split(cmd))
+    sys.exit(0)
 
 
 setup(
@@ -20,7 +35,7 @@ setup(
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
     license='MIT',
-    keywords='Machine Learning',
+    keywords='machine-learning',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
