@@ -12,7 +12,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.1.3'
+version = '1.2.0'
 
 
 if sys.argv[-1] == 'release':
