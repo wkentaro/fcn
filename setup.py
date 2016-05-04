@@ -12,7 +12,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.2.0'
+version = '1.2.1'
 
 
 if sys.argv[-1] == 'release':
@@ -28,7 +28,6 @@ if sys.argv[-1] == 'release':
 
 class FcnBuildPyCommand(BuildPyCommand):
     def run(self):
-        BuildPyCommand.run(self)
         output_dir = osp.join(self.build_lib, 'fcn/_data')
         if not osp.exists(output_dir):
             os.makedirs(output_dir)
@@ -36,6 +35,7 @@ class FcnBuildPyCommand(BuildPyCommand):
         url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2veTdBQWZybENLWmM'
         print("Downloading '{0}' from '{1}'".format(output, url))
         subprocess.check_call(['gdown', '-q', url, '-O', output])
+        BuildPyCommand.run(self)
 
 
 setup(
