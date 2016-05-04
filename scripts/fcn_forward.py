@@ -36,14 +36,17 @@ def img_to_datum(img):
 
 class Forwarding(object):
 
-    def __init__(self):
+    def __init__(self, gpu):
+        self.gpu = gpu
+
         data_dir = fcn.get_data_dir()
         chainermodel = osp.join(data_dir, 'fcn8s.chainermodel')
 
         self.target_names = fcn.pascal.get_target_names()
         self.model = FCN8s(n_class=len(self.target_names))
         S.load_hdf5(chainermodel, self.model)
-        self.model.to_gpu()
+        if self.gpu != -1:
+            self.model.to_gpu(self.gpu)
 
     def forward_img_file(self, img_file):
         print('{0}:'.format(osp.realpath(img_file)))
@@ -58,7 +61,8 @@ class Forwarding(object):
         # setup input datum
         datum = img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
-        x_data = cuda.to_gpu(x_data)
+        if self.gpu != -1:
+            x_data = cuda.to_gpu(x_data, device=self.gpu)
         x = Variable(x_data, volatile=True)
         # forward
         self.model.train = False
@@ -111,12 +115,14 @@ class Forwarding(object):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu', default=0, help='if -1, use cpu only')
     parser.add_argument('-i', '--img-files', nargs='+', required=True)
     args = parser.parse_args()
 
     img_files = args.img_files
+    gpu = args.gpu
 
-    forwarding = Forwarding()
+    forwarding = Forwarding(gpu)
     for img_file in img_files:
         forwarding.forward_img_file(img_file)
 
