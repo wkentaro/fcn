@@ -33,8 +33,9 @@ class FcnBuildPyCommand(BuildPyCommand):
             os.makedirs(output_dir)
         output = osp.join(output_dir, 'fcn8s.chainermodel')
         url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2veTdBQWZybENLWmM'
-        print("Downloading '{0}' from '{1}'".format(output, url))
-        subprocess.check_call(['gdown', '-q', url, '-O', output])
+        cmd = "gdown -q '{0}' -O {1}".format(url, output)
+        print("Downloading '{0}' by command '{1}'".format(output, cmd))
+        subprocess.check_call(shlex.split(cmd))
         BuildPyCommand.run(self)
 
 
