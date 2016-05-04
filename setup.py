@@ -11,6 +11,8 @@ setup(
     name='fcn',
     version=version,
     packages=find_packages(),
+    package_data={'fcn': ['_data/fcn8s.chainermodel']}
+    install_requires=open('requirements.txt').readlines(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
