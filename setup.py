@@ -14,6 +14,8 @@ setup(
     package_data={'fcn': ['_data/fcn8s.chainermodel']},
     scripts=['scripts/fcn_forward.py'],
     install_requires=open('requirements.txt').readlines(),
+    description='Fully Convolutional Networks',
+    long_description=open('README.rst').read(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
