@@ -100,7 +100,7 @@ class Forwarding(object):
         result_img = resize(result_img, img.shape, preserve_range=True)
         result_img = result_img.astype(np.uint8)
         # save result
-        if self.save_dir is None:
+        if self.data_dir is None:
             save_dir = 'forward_out'
         else:
             save_dir = osp.join(self.data_dir, 'forward_out')
