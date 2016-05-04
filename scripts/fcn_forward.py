@@ -101,6 +101,8 @@ class Forwarding(object):
         result_img = result_img.astype(np.uint8)
         # save result
         save_dir = osp.join(fcn.get_data_dir(), 'forward_out')
+        if not osp.exists(save_dir):
+            os.makedirs(save_dir)
         height, width = img.shape[:2]
         if height > width:
             vline = np.ones((height, 3, 3), dtype=np.uint8) * 255
