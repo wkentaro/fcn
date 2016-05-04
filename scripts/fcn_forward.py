@@ -117,7 +117,8 @@ class Forwarding(object):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', default=0, help='if -1, use cpu only')
+    parser.add_argument('--gpu', default=0, type=int,
+                        help='if -1, use cpu only')
     parser.add_argument('-i', '--img-files', nargs='+', required=True)
     args = parser.parse_args()
 
