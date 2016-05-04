@@ -1,5 +1,6 @@
-from fcn.config import get_data_dir
+import fcn.config
+get_data_dir = fcn.config.get_data_dir
 
 import fcn.pascal
 
-from fcn.util import download_data
+import fcn.util

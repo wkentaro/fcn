@@ -64,7 +64,6 @@ def copy_chainermodel(src, dst):
 # -----------------------------------------------------------------------------
 
 def extract_file(path, to_directory='.'):
-    print("Extracting '{path}'...".format(path=path))
     if path.endswith('.zip'):
         opener, mode = zipfile.ZipFile, 'r'
     elif path.endswith('.tar.gz') or path.endswith('.tgz'):
@@ -85,23 +84,18 @@ def extract_file(path, to_directory='.'):
             file.close()
     finally:
         os.chdir(cwd)
-    print('...done')
 
 
 def download(client, url, output, quiet=False):
-    print("Downloading file from '{url}'...".format(url=url))
     cmd = '{client} {url} -O {output}'.format(client=client, url=url,
                                               output=output)
     if quiet:
         cmd += ' --quiet'
     subprocess.call(shlex.split(cmd))
-    print('...done')
 
 
-def check_md5sum(path, md5):
-    print("Checking md5sum of '{path}'...".format(path=path))
+def check_md5(path, md5):
     is_same = hashlib.md5(open(path, 'rb').read()).hexdigest() == md5
-    print('...done')
     return is_same
 
 
@@ -124,9 +118,11 @@ def download_data(pkg_name, path, url, md5, download_client=None,
         os.makedirs(cache_dir)
     cache_file = osp.join(cache_dir, osp.basename(path))
     # check if cache exists, and update if necessary
-    if not (osp.exists(cache_file) and check_md5sum(cache_file, md5)):
+    print("Checking md5 of '{path}'...".format(path=cache_file))
+    if not (osp.exists(cache_file) and check_md5(cache_file, md5)):
         if osp.exists(cache_file):
             os.remove(cache_file)
+        print("Downloading file from '{url}'...".format(url=url))
         download(download_client, url, cache_file, quiet=quiet)
     if osp.islink(path):
         # overwrite the link
@@ -141,6 +137,7 @@ def download_data(pkg_name, path, url, md5, download_client=None,
         sys.stderr.write("WARNING: '{0}' exists\n".format(path))
         return
     if extract:
+        print("Extracting '{path}'...".format(path=path))
         extract_file(path, to_directory=osp.dirname(path))
 
 
