@@ -100,12 +100,9 @@ class Forwarding(object):
         result_img = resize(result_img, img.shape, preserve_range=True)
         result_img = result_img.astype(np.uint8)
         # save result
-        if self.data_dir is None:
-            save_dir = 'forward_out'
-        else:
-            save_dir = osp.join(self.data_dir, 'forward_out')
+        save_dir = osp.join(self.data_dir, 'forward_out')
         if not osp.exists(save_dir):
-            os.makedirs(save_dir)
+            save_dir = 'forward_out'
         height, width = img.shape[:2]
         if height > width:
             vline = np.ones((height, 3, 3), dtype=np.uint8) * 255
