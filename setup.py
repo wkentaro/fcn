@@ -17,7 +17,8 @@ version = '1.2.4'
 
 if sys.argv[-1] == 'release':
     commands = [
-        'python setup.py sdist upload',
+        'python setup.py sdist',
+        'twine upload dist/fcn-{0}.tar.gz'.format(version),
         'git tag v{0}'.format(version),
         'git push origin master --tag',
     ]
