@@ -53,7 +53,7 @@ Usage
   # forwarding of the networks
   ./scripts/fcn_forward.py --img-files data/pascal/VOC2012/JPEGImages/2007_000129.jpg
 
-.. image:: _images/2007_000129.jpg
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/2007_000129.jpg
 
 Original Image: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
 
