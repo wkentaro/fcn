@@ -71,6 +71,7 @@ class Forwarding(object):
         # visualize
         cmap = fcn.util.labelcolormap(21)
         label_viz = label2rgb(label, img, colors=cmap[1:], bg_label=0)
+        label_viz[label == 0] = cmap[0]
         # plot image
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
                             wspace=0, hspace=0)
@@ -83,8 +84,6 @@ class Forwarding(object):
         plt_handlers = []
         plt_titles = []
         for l in np.unique(label):
-            if l == np.where(self.target_names == 'background')[0][0]:
-                continue  # skip background
             fc = cmap[l]
             p = plt.Rectangle((0, 0), 1, 1, fc=fc)
             plt_handlers.append(p)
