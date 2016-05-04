@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-from distutils.command.install_data import install_data
+from distutils.command.build_py import build_py as BuildPyCommand
+import os
+import os.path as osp
 import shlex
 import subprocess
 import sys
@@ -24,22 +26,26 @@ if sys.argv[-1] == 'release':
     sys.exit(0)
 
 
-class FcnInstallData(install_data):
+class FcnBuildPyCommand(BuildPyCommand):
     def run(self):
+        BuildPyCommand.run(self)
+        output_dir = osp.join(self.build_lib, 'fcn/_data')
+        if not osp.exists(output_dir):
+            os.makedirs(output_dir)
+        output = osp.join(output_dir, 'fcn8s.chainermodel')
         url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2veTdBQWZybENLWmM'
-        output = tempfile.mktemp()
+        print("Downloading '{0}' from '{1}'".format(output, url))
         subprocess.check_call(['gdown', '-q', url, '-O', output])
-        self.data_files.append(output)
-        super(__class__, self).run()
 
 
 setup(
     name='fcn',
     version=version,
     packages=find_packages(),
-    cmdclass={'install_data': install_data},
+    cmdclass={'build_py': FcnBuildPyCommand},
     scripts=['scripts/fcn_forward.py'],
     install_requires=open('requirements.txt').readlines(),
+    setup_requires=['gdown'],
     description='Fully Convolutional Networks',
     long_description=open('README.rst').read(),
     author='Kentaro Wada',
