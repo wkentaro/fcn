@@ -32,11 +32,8 @@ class FcnBuildPyCommand(BuildPyCommand):
         BuildPyCommand.run(self)
         # create data dirs
         data_dir = osp.join(self.build_lib, 'fcn/_data')
-        data_subdirs = ['forward_in', 'forward_out']
-        for dir_ in data_subdirs:
-            dir_ = osp.join(data_dir, dir_)
-            if not osp.exists(dir_):
-                os.makedirs(dir_)
+        if not osp.exists(data_dir):
+            os.makedirs(data_dir)
         # download chainermodel to the data dir
         output = osp.join(data_dir, 'fcn8s.chainermodel')
         url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2veTdBQWZybENLWmM'
