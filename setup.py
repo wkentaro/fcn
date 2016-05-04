@@ -12,6 +12,7 @@ setup(
     version=version,
     packages=find_packages(),
     package_data={'fcn': ['_data/fcn8s.chainermodel']},
+    scripts=['scripts/forward.py'],
     install_requires=open('requirements.txt').readlines(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
