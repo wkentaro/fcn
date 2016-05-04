@@ -58,7 +58,9 @@ Usage
   # Download sample image
   wget https://farm2.staticflickr.com/1522/26471792680_a485afb024_z_d.jpg -O sample.jpg
 
-  fcn_forward.py --img-files sample.jpg --gpu -1
+  # forwaring of the networks
+  fcn_forward.py --img-files sample.jpg --gpu -1  # cpu mode
+  fcn_forward.py --img-files sample.jpg  # gpu mode
 
 .. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/26471792680.jpg
 
