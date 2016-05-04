@@ -93,7 +93,7 @@ class Forwarding(object):
             plt_handlers.append(p)
             plt_titles.append(self.target_names[l])
         plt.legend(plt_handlers, plt_titles)
-        result_file = osp.join(tempfile.mkdtemp(), 'result.jpg')
+        result_file = osp.join(tempfile.mkdtemp(), 'result.png')
         plt.savefig(result_file, bbox_inches='tight', pad_inches=0)
         # compose result
         result_img = imread(result_file)
