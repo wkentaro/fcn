@@ -50,7 +50,6 @@ setup(
     cmdclass={'build_py': FcnBuildPyCommand},
     scripts=['scripts/fcn_forward.py'],
     install_requires=open('requirements.txt').readlines(),
-    setup_requires=['gdown'],
     description='Fully Convolutional Networks',
     long_description=open('README.rst').read(),
     author='Kentaro Wada',
