@@ -97,7 +97,7 @@ class Forwarding(object):
             p = plt.Rectangle((0, 0), 1, 1, fc=fc)
             plt_handlers.append(p)
             plt_titles.append(label_titles[i])
-        plt.legend(plt_handlers, plt_titles)
+        plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
         result_file = osp.join(tempfile.mkdtemp(), 'result.png')
         plt.savefig(result_file, bbox_inches='tight', pad_inches=0)
         # compose result
