@@ -69,9 +69,14 @@ class Forwarding(object):
         pred = self.model(x)
         pred_datum = cuda.to_cpu(pred.data)[0]
         label = np.argmax(pred_datum, axis=0)
-        unique_labels = np.unique(label)
-        print(' - unique_labels:', unique_labels)
-        print(' - target_names:', self.target_names[unique_labels])
+        unique_labels, label_counts = np.unique(label, return_counts=True)
+        print('- labels:')
+        label_titles = []
+        for i, l in enumerate(unique_labels):
+            l_region = label_counts[i] / label.size
+            title = '{0}:{1} = {2:.1%}'.format(l, self.target_names[l], l_region)
+            label_titles.append(title)
+            print('  - {0}'.format(title))
         # visualize
         cmap = fcn.util.labelcolormap(21)
         label_viz = label2rgb(label, img, colors=cmap[1:], bg_label=0)
@@ -87,11 +92,11 @@ class Forwarding(object):
         # plot legend
         plt_handlers = []
         plt_titles = []
-        for l in np.unique(label):
+        for i, l in enumerate(np.unique(label)):
             fc = cmap[l]
             p = plt.Rectangle((0, 0), 1, 1, fc=fc)
             plt_handlers.append(p)
-            plt_titles.append(self.target_names[l])
+            plt_titles.append(label_titles[i])
         plt.legend(plt_handlers, plt_titles)
         result_file = osp.join(tempfile.mkdtemp(), 'result.png')
         plt.savefig(result_file, bbox_inches='tight', pad_inches=0)
@@ -114,7 +119,7 @@ class Forwarding(object):
             out_img = np.vstack((img, hline, result_img))
         out_file = osp.join(save_dir, osp.basename(img_file))
         imsave(out_file, out_img)
-        print(' - out_file: {0}'.format(out_file))
+        print('- out_file: {0}'.format(out_file))
 
 
 def main():
