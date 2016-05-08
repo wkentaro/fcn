@@ -163,12 +163,8 @@ class FCN8s(chainer.Chain):
         if t is None:
             return self.pred
 
-        # testing with t
+        # testing with t or training
         self.accuracy = self.accuracy_score(score, t)
-        if not self.train:
-            return self.pred
-
-        # training stage
         self.loss = F.softmax_cross_entropy(h, t)
         if np.isnan(cuda.to_cpu(self.loss.data)).sum() != 0:
             raise RuntimeError('ERROR in FCN8s: loss.data contains nan')
