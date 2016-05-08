@@ -26,14 +26,6 @@ import fcn
 from fcn.models import FCN8s
 
 
-def img_to_datum(img):
-    datum = img.astype(np.float32)
-    datum = datum[:, :, ::-1]  # RGB -> BGR
-    datum -= np.array((104.00698793, 116.66876762, 122.67891434))
-    datum = datum.transpose((2, 0, 1))
-    return datum
-
-
 class Forwarding(object):
 
     def __init__(self, gpu):
@@ -42,7 +34,7 @@ class Forwarding(object):
         self.data_dir = fcn.get_data_dir()
         chainermodel = osp.join(self.data_dir, 'fcn8s.chainermodel')
 
-        self.target_names = fcn.pascal.SegmentationClassDataset().target_names
+        self.target_names = fcn.pascal.SegmentationClassDataset.target_names
         self.model = FCN8s(n_class=len(self.target_names))
         S.load_hdf5(chainermodel, self.model)
         if self.gpu != -1:
@@ -52,14 +44,14 @@ class Forwarding(object):
         print('{0}:'.format(osp.realpath(img_file)))
         # setup image
         img = imread(img_file, mode='RGB')
-        scale =  (500 * 500) / (img.shape[0] * img.shape[1])
+        scale = (500 * 500) / (img.shape[0] * img.shape[1])
         if scale < 1:
             resizing_scale = np.sqrt(scale)
             print(' - resizing_scale: {0}'.format(resizing_scale))
             img = rescale(img, resizing_scale, preserve_range=True)
             img = img.astype(np.uint8)
         # setup input datum
-        datum = img_to_datum(img.copy())
+        datum = fcn.pascal.SegmentationClassDataset.img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
         if self.gpu != -1:
             x_data = cuda.to_gpu(x_data, device=self.gpu)
@@ -74,7 +66,8 @@ class Forwarding(object):
         label_titles = []
         for i, l in enumerate(unique_labels):
             l_region = label_counts[i] / label.size
-            title = '{0}:{1} = {2:.1%}'.format(l, self.target_names[l], l_region)
+            title = '{0}:{1} = {2:.1%}'.format(
+                l, self.target_names[l], l_region)
             label_titles.append(title)
             print('  - {0}'.format(title))
         # visualize

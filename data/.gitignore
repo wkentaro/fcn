@@ -1,2 +1,4 @@
 *.chainermodel
 *.caffemodel
+
+SegmentationClassDataset_db
