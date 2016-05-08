@@ -42,7 +42,7 @@ class Forwarding(object):
         self.data_dir = fcn.get_data_dir()
         chainermodel = osp.join(self.data_dir, 'fcn8s.chainermodel')
 
-        self.target_names = fcn.pascal.get_target_names()
+        self.target_names = fcn.pascal.SegmentationClassDataset().target_names
         self.model = FCN8s(n_class=len(self.target_names))
         S.load_hdf5(chainermodel, self.model)
         if self.gpu != -1:
