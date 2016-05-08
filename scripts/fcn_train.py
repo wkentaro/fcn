@@ -104,6 +104,12 @@ class Trainer(object):
                       'mean_accuracy: {accuracy}'.format(**log))
                 with open(log_csv, 'a') as f:
                     f.write('{epoch},{type},{loss},{accuracy}\n'.format(**log))
+            if epoch % 10 == 0:
+                data_dir = fcn.get_data_dir()
+                chainermodel = osp.join(data_dir, 'fcn8s_{0}.chainermodel'.format(epoch))
+                optimizer_file = osp.join(data_dir, 'fcn8s_{0}.adam'.format(epoch))
+                S.save_hdf5(chainermodel, self.model)
+                S.save_hdf5(optimizer_file, self.optimizer)
 
 
 if __name__ == '__main__':
