@@ -12,8 +12,8 @@ nose==1.3.7
 numpy==1.11.0
 Pillow==3.2.0
 plyvel==0.9
-progressbar==2.3
 protobuf==2.6.1
+progressbar2==3.6.2
 pyparsing==2.1.1
 python-dateutil==2.5.3
 pytz==2016.4
