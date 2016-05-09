@@ -1,4 +1,3 @@
-git+https://github.com/wkentaro/chainer.git@fcn
 cycler==0.10.0
 Cython==0.24
 dask==0.8.2

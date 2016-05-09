@@ -15,12 +15,13 @@ before_install:
 - sudo apt-get install -y -qq libhdf5-dev
 - sudo apt-get install -y -qq python-skimage
 - sudo -H pip install -U pip setuptools
+- sudo -H pip install git+https://github.com/wkentaro/chainer.git@fcn
 
 install:
 - for req in $(cat requirements.txt); do
     sudo -H pip install $req;
   done
-- sudo python setup.py install
+- sudo python setup.py develop
 
 script:
 - true
