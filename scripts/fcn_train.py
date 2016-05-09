@@ -54,7 +54,7 @@ class Trainer(object):
 
         Args:
 
-            - type (str): train, trainval, or val
+            - type (str): 'train' or 'val'
 
         .. note::
 
@@ -96,7 +96,8 @@ class Trainer(object):
     def main_loop(self):
         log_csv = osp.join(fcn.get_data_dir(), 'log.csv')
         for epoch in xrange(100):
-            for type in ['train', 'trainval', 'val']:
+            self.epoch = epoch
+            for type in ['train', 'val']:
                 mean_loss, mean_accuracy = self.batch_loop(type=type)
                 log = dict(epoch=epoch, type=type, loss=mean_loss,
                            accuracy=mean_accuracy)
