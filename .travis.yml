@@ -11,9 +11,8 @@ cache:
 
 before_install:
 - sudo apt-get install -y -qq liblapack-dev
-- sudo apt-get install -y -qq python-numpy python-scipy
 - sudo apt-get install -y -qq libhdf5-dev
-- sudo apt-get install -y -qq python-skimage
+- sudo apt-get install -y -qq libleveldb-dev
 - sudo -H pip install -U pip setuptools
 - sudo -H pip install git+https://github.com/wkentaro/chainer.git@fcn
 
