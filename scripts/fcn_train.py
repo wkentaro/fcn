@@ -10,7 +10,7 @@ import chainer.optimizers as O
 import chainer.serializers as S
 from chainer import Variable
 import numpy as np
-import progressbar
+import tqdm
 
 import fcn
 from fcn.models import FCN8s
@@ -22,6 +22,7 @@ class Trainer(object):
 
     def __init__(self, gpu):
         self.gpu = gpu
+        self.epoch = 0
         # pretrained model
         pretrained_model = self._setup_pretrained_model()
         # dataset
@@ -63,9 +64,8 @@ class Trainer(object):
         self.model.train = True if type == 'train' else False
         N_data = len(self.dataset[type])
         sum_loss, sum_accuracy = 0, 0
-        pbar = progressbar.ProgressBar(max_value=N_data)
-        for i in xrange(0, N_data):
-            pbar.update(i+1)
+        desc = 'epoch{0}: {1} batch_loop'.format(self.epoch, type)
+        for i in tqdm.tqdm(xrange(0, N_data), ncols=80, desc=desc):
             # load batch
             batch = self.dataset.next_batch(batch_size=1, type=type)
             img, label = batch.img[0], batch.label[0]
@@ -88,7 +88,6 @@ class Trainer(object):
                 self.model(x, y)
             sum_loss += cuda.to_cpu(self.model.loss.data) * len(batch)
             sum_accuracy += self.model.accuracy * len(batch)
-        pbar.finish()
         mean_loss = sum_loss / N_data
         mean_accuracy = sum_accuracy / N_data
         return mean_loss, mean_accuracy
