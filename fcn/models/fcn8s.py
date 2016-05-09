@@ -113,13 +113,7 @@ class FCN8s(chainer.Chain):
         upscore2 = h  # 1/16
 
         # score_pool4c
-        # TODO(pfnet): Implement crop function
-        # h = F.crop(score_pool4, upscore2, axis=2, offset=5)
-        h = score_pool4
-        for axis in [2, 3]:
-            start = 5
-            end = start + upscore2.data.shape[axis]
-            _, h, _  = F.split_axis(h, [start, end], axis=axis)
+        h = F.crop(score_pool4, upscore2, axes=[2, 3], offset=5)
         score_pool4c = h  # 1/16
 
         # fuse_pool4
@@ -131,13 +125,7 @@ class FCN8s(chainer.Chain):
         upscore_pool4 = h  # 1/8
 
         # score_pool4c
-        # TODO(pfnet): Implement crop function
-        # h = F.crop(score_pool3, upscore_pool4, axis=2, offset=9)
-        h = score_pool3
-        for axis in [2, 3]:
-            start = 9
-            end = start + upscore_pool4.data.shape[axis]
-            _, h, _ = F.split_axis(h, [start, end], axis=axis)
+        h = F.crop(score_pool3, upscore_pool4, axes=[2, 3], offset=9)
         score_pool3c = h  # 1/8
 
         # fuse_pool3
@@ -149,13 +137,7 @@ class FCN8s(chainer.Chain):
         upscore8 = h  # 1/1
 
         # score
-        # TODO(pfnet): Implement crop function
-        # h = F.crop(upscore8, x, axis=2, offset=31)
-        h = upscore8
-        for axis in [2, 3]:
-            start = 31
-            end = start + x.data.shape[axis]
-            _, h, _ = F.split_axis(h, [start, end], axis=axis)
+        h = F.crop(upscore8, x, axes=[2, 3], offset=31)
         score = h  # 1/1
 
         # testing without t
@@ -175,5 +157,6 @@ class FCN8s(chainer.Chain):
         y_true = cuda.to_cpu(y_true.data)
         # reduce values along classes axis
         reduced_y_pred = np.argmax(y_pred, axis=1)
-        s = (reduced_y_pred == y_true).mean()
-        return s
+        assert reduced_y_pred.shape == y_true.shape
+        score = (reduced_y_pred == y_true).mean()
+        return score

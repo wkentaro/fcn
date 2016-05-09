@@ -10,7 +10,7 @@ import chainer.optimizers as O
 import chainer.serializers as S
 from chainer import Variable
 import numpy as np
-import progressbar
+import tqdm
 
 import fcn
 from fcn.models import FCN8s
@@ -22,6 +22,7 @@ class Trainer(object):
 
     def __init__(self, gpu):
         self.gpu = gpu
+        self.epoch = 0
         # pretrained model
         pretrained_model = self._setup_pretrained_model()
         # dataset
@@ -54,7 +55,7 @@ class Trainer(object):
 
         Args:
 
-            - type (str): train, trainval, or val
+            - type (str): 'train' or 'val'
 
         .. note::
 
@@ -63,11 +64,12 @@ class Trainer(object):
         self.model.train = True if type == 'train' else False
         N_data = len(self.dataset[type])
         sum_loss, sum_accuracy = 0, 0
-        pbar = progressbar.ProgressBar(max_value=N_data)
-        for i in xrange(0, N_data):
-            pbar.update(i+1)
+        desc = 'epoch{0}: {1} batch_loop'.format(self.epoch, type)
+        batch_size = 1
+        assert batch_size == 1  # FCN8s only supports 1 size batch
+        for i in tqdm.tqdm(xrange(0, N_data, batch_size), ncols=80, desc=desc):
             # load batch
-            batch = self.dataset.next_batch(batch_size=1, type=type)
+            batch = self.dataset.next_batch(batch_size=batch_size, type=type)
             img, label = batch.img[0], batch.label[0]
             # x
             x_datum = self.dataset.img_to_datum(img)
@@ -86,9 +88,8 @@ class Trainer(object):
                 self.optimizer.update(self.model, x, y)
             else:
                 self.model(x, y)
-            sum_loss += cuda.to_cpu(self.model.loss.data) * len(batch)
-            sum_accuracy += self.model.accuracy * len(batch)
-        pbar.finish()
+            sum_loss += cuda.to_cpu(self.model.loss.data) * batch_size
+            sum_accuracy += self.model.accuracy * batch_size
         mean_loss = sum_loss / N_data
         mean_accuracy = sum_accuracy / N_data
         return mean_loss, mean_accuracy
@@ -96,7 +97,8 @@ class Trainer(object):
     def main_loop(self):
         log_csv = osp.join(fcn.get_data_dir(), 'log.csv')
         for epoch in xrange(100):
-            for type in ['train', 'trainval', 'val']:
+            self.epoch = epoch
+            for type in ['train', 'val']:
                 mean_loss, mean_accuracy = self.batch_loop(type=type)
                 log = dict(epoch=epoch, type=type, loss=mean_loss,
                            accuracy=mean_accuracy)
@@ -104,6 +106,12 @@ class Trainer(object):
                       'mean_accuracy: {accuracy}'.format(**log))
                 with open(log_csv, 'a') as f:
                     f.write('{epoch},{type},{loss},{accuracy}\n'.format(**log))
+            if epoch % 10 == 0:
+                data_dir = fcn.get_data_dir()
+                chainermodel = osp.join(data_dir, 'fcn8s_{0}.chainermodel'.format(epoch))
+                optimizer_file = osp.join(data_dir, 'fcn8s_{0}.adam'.format(epoch))
+                S.save_hdf5(chainermodel, self.model)
+                S.save_hdf5(optimizer_file, self.optimizer)
 
 
 if __name__ == '__main__':
