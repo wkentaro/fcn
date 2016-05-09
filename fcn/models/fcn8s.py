@@ -157,5 +157,6 @@ class FCN8s(chainer.Chain):
         y_true = cuda.to_cpu(y_true.data)
         # reduce values along classes axis
         reduced_y_pred = np.argmax(y_pred, axis=1)
-        s = (reduced_y_pred == y_true).mean()
-        return s
+        assert reduced_y_pred.shape == y_true.shape
+        score = (reduced_y_pred == y_true).mean()
+        return score

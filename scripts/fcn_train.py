@@ -65,9 +65,11 @@ class Trainer(object):
         N_data = len(self.dataset[type])
         sum_loss, sum_accuracy = 0, 0
         desc = 'epoch{0}: {1} batch_loop'.format(self.epoch, type)
-        for i in tqdm.tqdm(xrange(0, N_data), ncols=80, desc=desc):
+        batch_size = 1
+        assert batch_size == 1  # FCN8s only supports 1 size batch
+        for i in tqdm.tqdm(xrange(0, N_data, batch_size), ncols=80, desc=desc):
             # load batch
-            batch = self.dataset.next_batch(batch_size=1, type=type)
+            batch = self.dataset.next_batch(batch_size=batch_size, type=type)
             img, label = batch.img[0], batch.label[0]
             # x
             x_datum = self.dataset.img_to_datum(img)
@@ -86,8 +88,8 @@ class Trainer(object):
                 self.optimizer.update(self.model, x, y)
             else:
                 self.model(x, y)
-            sum_loss += cuda.to_cpu(self.model.loss.data) * len(batch)
-            sum_accuracy += self.model.accuracy * len(batch)
+            sum_loss += cuda.to_cpu(self.model.loss.data) * batch_size
+            sum_accuracy += self.model.accuracy * batch_size
         mean_loss = sum_loss / N_data
         mean_accuracy = sum_accuracy / N_data
         return mean_loss, mean_accuracy
