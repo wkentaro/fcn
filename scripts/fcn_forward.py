@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import argparse
 import os
 import os.path as osp
+import subprocess
 import tempfile
 
 from chainer import cuda
@@ -55,10 +56,21 @@ class Forwarding(object):
         x_data = np.array([datum], dtype=np.float32)
         if self.gpu != -1:
             x_data = cuda.to_gpu(x_data, device=self.gpu)
-        x = Variable(x_data, volatile=True)
+        x = Variable(x_data, volatile=False)
         # forward
         self.model.train = False
         pred = self.model(x)
+        # generate computational_graph
+        psfile = osp.join(fcn.get_data_dir(), 'fcn8s_forward.ps')
+        if not osp.exists(psfile):
+            from chainer.computational_graph import build_computational_graph
+            dotfile = tempfile.mktemp()
+            with open(dotfile, 'w') as f:
+                f.write(build_computational_graph([pred]).dump())
+            cmd = 'dot -Tps {0} > {1}'.format(dotfile, psfile)
+            subprocess.call(cmd, shell=True)
+            print('- computational_graph: {0}'.format(psfile))
+        # visualize result
         pred_datum = cuda.to_cpu(pred.data)[0]
         label = np.argmax(pred_datum, axis=0)
         unique_labels, label_counts = np.unique(label, return_counts=True)
@@ -70,7 +82,7 @@ class Forwarding(object):
                 l, self.target_names[l], l_region)
             label_titles.append(title)
             print('  - {0}'.format(title))
-        # visualize
+        # label to rgb
         cmap = fcn.util.labelcolormap(21)
         label_viz = label2rgb(label, img, colors=cmap[1:], bg_label=0)
         label_viz[label == 0] = cmap[0]
