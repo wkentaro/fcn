@@ -34,7 +34,7 @@ class Trainer(object):
         if self.gpu != -1:
             self.model.to_gpu(self.gpu)
         # setup optimizer
-        self.optimizer = O.Adam()
+        self.optimizer = O.MomentumSGD(lr=1e-12, momentum=0.99)
         self.optimizer.setup(self.model)
 
     def _setup_pretrained_model(self):
@@ -90,6 +90,7 @@ class Trainer(object):
                 self.model(x, y)
             sum_loss += cuda.to_cpu(self.model.loss.data) * batch_size
             sum_accuracy += self.model.accuracy * batch_size
+            self.optimizer.weight_decay(0.0005)
         mean_loss = sum_loss / N_data
         mean_accuracy = sum_accuracy / N_data
         return mean_loss, mean_accuracy
@@ -106,10 +107,10 @@ class Trainer(object):
                       'mean_accuracy: {accuracy}'.format(**log))
                 with open(log_csv, 'a') as f:
                     f.write('{epoch},{type},{loss},{accuracy}\n'.format(**log))
-            if epoch % 10 == 0:
+            if epoch % 3 == 0:
                 data_dir = fcn.get_data_dir()
                 chainermodel = osp.join(data_dir, 'fcn8s_{0}.chainermodel'.format(epoch))
-                optimizer_file = osp.join(data_dir, 'fcn8s_{0}.adam'.format(epoch))
+                optimizer_file = osp.join(data_dir, 'fcn8s_{0}.momentumsgd'.format(epoch))
                 S.save_hdf5(chainermodel, self.model)
                 S.save_hdf5(optimizer_file, self.optimizer)
 
