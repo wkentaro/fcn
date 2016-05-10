@@ -1,3 +1,4 @@
 vgg16.chainermodel
+fcn8s.chainermodel
 
 SegmentationClassDataset_db
