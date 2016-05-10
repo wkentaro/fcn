@@ -129,7 +129,7 @@ if __name__ == '__main__':
     gpu = 0
     trainer = Trainer(
         weight_decay=0.0005,
-        test_interval=2000,
+        test_interval=1,
         max_iter=100000,
         snapshot=4000,
         gpu=gpu,
