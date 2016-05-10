@@ -10,7 +10,6 @@ import chainer.optimizers as O
 import chainer.serializers as S
 from chainer import Variable
 import numpy as np
-import tqdm
 
 import fcn
 from fcn.models import FCN8s
@@ -20,9 +19,12 @@ from fcn import pascal
 
 class Trainer(object):
 
-    def __init__(self, gpu):
+    def __init__(self, weight_decay, test_interval, max_iter, snapshot, gpu):
+        self.weight_decay = weight_decay
+        self.test_interval = test_interval
+        self.max_iter = max_iter
+        self.snapshot = snapshot
         self.gpu = gpu
-        self.epoch = 0
         # pretrained model
         pretrained_model = self._setup_pretrained_model()
         # dataset
@@ -34,7 +36,7 @@ class Trainer(object):
         if self.gpu != -1:
             self.model.to_gpu(self.gpu)
         # setup optimizer
-        self.optimizer = O.Adam()
+        self.optimizer = O.MomentumSGD(lr=1e-12, momentum=0.99)
         self.optimizer.setup(self.model)
 
     def _setup_pretrained_model(self):
@@ -50,71 +52,86 @@ class Trainer(object):
         S.load_hdf5(pretrained_model_path, pretrained_model)
         return pretrained_model
 
-    def batch_loop(self, type):
-        """Batch loop.
+    def _iterate_once(self, type):
+        """Iterate with train/val once."""
+        batch = self.dataset.next_batch(batch_size=1, type=type)
+        img, label = batch.img[0], batch.label[0]
+        # x
+        x_datum = self.dataset.img_to_datum(img)
+        x_data = np.array([x_datum], dtype=np.float32)
+        if self.gpu != -1:
+            x_data = cuda.to_gpu(x_data, device=self.gpu)
+        x = Variable(x_data, volatile=not self.model.train)
+        # y
+        y_data = np.array([label], dtype=np.int32)
+        if self.gpu != -1:
+            y_data = cuda.to_gpu(y_data, device=self.gpu)
+        y = Variable(y_data, volatile=not self.model.train)
+        # optimize
+        if self.model.train:
+            self.optimizer.zero_grads()
+            self.optimizer.update(self.model, x, y)
+        else:
+            self.model(x, y)
 
-        Args:
+    def iterate(self):
+        """Iterate with train/val data."""
+        f = open(osp.join(fcn.get_data_dir(), 'log.csv'), 'w')
+        f.write('i_iter,type,loss,accuracy\n')
+        log_templ = '{i_iter}: type={type}, loss={loss}, accuracy={accuracy}'
+        for i_iter in xrange(self.max_iter):
+            #########
+            # train #
+            #########
+            type = 'train'
+            self.model.train = True
+            self._iterate_once(type=type)
+            self.optimizer.weight_decay(self.weight_decay)
+            log = dict(
+                i_iter=i_iter,
+                type=type,
+                loss=float(self.model.loss.data),
+                accuracy=float(self.model.accuracy),
+            )
+            print(log_templ.format(**log))
+            f.write('{i_iter},{type},{loss},{accuracy}\n'.format(**log))
 
-            - type (str): 'train' or 'val'
-
-        .. note::
-
-            FCN8s does only supports one element batch.
-        """
-        self.model.train = True if type == 'train' else False
-        N_data = len(self.dataset[type])
-        sum_loss, sum_accuracy = 0, 0
-        desc = 'epoch{0}: {1} batch_loop'.format(self.epoch, type)
-        batch_size = 1
-        assert batch_size == 1  # FCN8s only supports 1 size batch
-        for i in tqdm.tqdm(xrange(0, N_data, batch_size), ncols=80, desc=desc):
-            # load batch
-            batch = self.dataset.next_batch(batch_size=batch_size, type=type)
-            img, label = batch.img[0], batch.label[0]
-            # x
-            x_datum = self.dataset.img_to_datum(img)
-            x_data = np.array([x_datum], dtype=np.float32)
-            if self.gpu != -1:
-                x_data = cuda.to_gpu(x_data, device=self.gpu)
-            x = Variable(x_data, volatile=not self.model.train)
-            # y
-            y_data = np.array([label], dtype=np.int32)
-            if self.gpu != -1:
-                y_data = cuda.to_gpu(y_data, device=self.gpu)
-            y = Variable(y_data, volatile=not self.model.train)
-            # optimize
-            if self.model.train:
-                self.optimizer.zero_grads()
-                self.optimizer.update(self.model, x, y)
-            else:
-                self.model(x, y)
-            sum_loss += cuda.to_cpu(self.model.loss.data) * batch_size
-            sum_accuracy += self.model.accuracy * batch_size
-        mean_loss = sum_loss / N_data
-        mean_accuracy = sum_accuracy / N_data
-        return mean_loss, mean_accuracy
-
-    def main_loop(self):
-        log_csv = osp.join(fcn.get_data_dir(), 'log.csv')
-        for epoch in xrange(100):
-            self.epoch = epoch
-            for type in ['train', 'val']:
-                mean_loss, mean_accuracy = self.batch_loop(type=type)
-                log = dict(epoch=epoch, type=type, loss=mean_loss,
-                           accuracy=mean_accuracy)
-                print('epoch{epoch}: type: {type}, mean_loss: {loss}, '
-                      'mean_accuracy: {accuracy}'.format(**log))
-                with open(log_csv, 'a') as f:
-                    f.write('{epoch},{type},{loss},{accuracy}\n'.format(**log))
-            if epoch % 10 == 0:
+            if i_iter % self.snapshot == 0:
                 data_dir = fcn.get_data_dir()
-                chainermodel = osp.join(data_dir, 'fcn8s_{0}.chainermodel'.format(epoch))
-                optimizer_file = osp.join(data_dir, 'fcn8s_{0}.adam'.format(epoch))
-                S.save_hdf5(chainermodel, self.model)
-                S.save_hdf5(optimizer_file, self.optimizer)
+                snapshot_model = osp.join(
+                    data_dir, 'fcn8s_model_{0}.chainermodel'.format(i_iter))
+                snapshot_optimizer = osp.join(
+                    data_dir, 'fcn8s_optimizer_{0}.h5'.format(i_iter))
+                S.save_hdf5(snapshot_model, self.model)
+                S.save_hdf5(snapshot_optimizer, self.optimizer)
+
+            if i_iter % self.test_interval != 0:
+                continue
+
+            ########
+            # test #
+            ########
+            type = 'val'
+            self.model.train = False
+            self._iterate_once(type=type)
+            log = dict(
+                i_iter=i_iter,
+                type=type,
+                loss=float(self.model.loss.data),
+                accuracy=float(self.model.accuracy),
+            )
+            print(log_templ.format(**log))
+            f.write('{i_iter},{type},{loss},{accuracy}\n'.format(**log))
+        f.close()
 
 
 if __name__ == '__main__':
     gpu = 0
-    trainer = Trainer(gpu=gpu)
-    trainer.main_loop()
+    trainer = Trainer(
+        weight_decay=0.0005,
+        test_interval=1,
+        max_iter=100000,
+        snapshot=4000,
+        gpu=gpu,
+    )
+    trainer.iterate()

@@ -72,6 +72,7 @@ class SegmentationClassDataset(Bunch):
     def _label_rgb_to_32sc1(self, label_rgb):
         assert label_rgb.dtype == np.uint8
         label = np.zeros(label_rgb.shape[:2], dtype=np.int32)
+        label.fill(-1)
         cmap = fcn.util.labelcolormap(len(self.target_names))
         cmap = (cmap * 255).astype(np.uint8)
         for l, rgb in enumerate(cmap):
