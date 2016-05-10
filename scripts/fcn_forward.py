@@ -66,7 +66,13 @@ class Forwarding(object):
             from chainer.computational_graph import build_computational_graph
             dotfile = tempfile.mktemp()
             with open(dotfile, 'w') as f:
-                f.write(build_computational_graph([pred]).dump())
+                variable_style = {'shape': 'octagon', 'fillcolor': '#E0E0E0', 'style': 'filled'}
+                function_style = {'shape': 'record', 'fillcolor': '#6495ED', 'style': 'filled'}
+                f.write(build_computational_graph(
+                    [pred],
+                    variable_style=variable_style,
+                    function_style=function_style,
+                ).dump())
             cmd = 'dot -Tps {0} > {1}'.format(dotfile, psfile)
             subprocess.call(cmd, shell=True)
             print('- computational_graph: {0}'.format(psfile))
