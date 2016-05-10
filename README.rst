@@ -53,7 +53,7 @@ You need to download pascal VOC2012 dataset from here_, and install it as below 
 Usage
 -----
 
-Forwarding is done as below, and computation graph is `here <https://github.com/wkentaro/fcn/blob/colorized-graph/_images/fcn8s_forward.jpg>`_.
+Forwarding is done as below, and computation graph is `here <https://github.com/wkentaro/fcn/blob/master/_images/fcn8s_forward.jpg>`_.
 
 .. code-block:: bash
 
