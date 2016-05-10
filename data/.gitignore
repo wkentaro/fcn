@@ -1,4 +1,3 @@
-*.chainermodel
-*.caffemodel
+vgg16.chainermodel
 
 SegmentationClassDataset_db
