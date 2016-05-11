@@ -91,10 +91,12 @@ class FCN8s(chainer.Chain):
 
         # fc6
         h = F.relu(self.fc6(pool5))
+        h = F.dropout(h, ratio=.5, train=self.train)
         fc6 = h  # 1/32
 
         # fc7
         h = F.relu(self.fc7(fc6))
+        h = F.dropout(h, ratio=.5, train=self.train)
         fc7 = h  # 1/32
 
         # score_fr
