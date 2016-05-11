@@ -80,10 +80,11 @@ class SegmentationClassDataset(Bunch):
             label[mask] = l
         return label
 
-    def next_batch(self, batch_size, type):
+    def next_batch(self, batch_size, type, indices=None):
         """Generate next batch whose size is the specified batch_size."""
         ids = getattr(self, type)
-        indices = np.random.randint(0, len(ids), batch_size)
+        if indices is None:
+            indices = np.random.randint(0, len(ids), batch_size)
         batch = Bunch(img=[], label=[])
         for id in ids[indices]:
             datum = self._load_datum(id, type)
