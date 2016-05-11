@@ -2,6 +2,7 @@ import chainer
 from chainer import cuda
 import chainer.functions as F
 import chainer.links as L
+from chainer import Variable
 import numpy as np
 
 
@@ -157,7 +158,8 @@ class FCN8s(chainer.Chain):
         y_true = cuda.to_cpu(y_true.data)
         # reduce values along classes axis
         reduced_y_pred = np.argmax(y_pred, axis=1)
+        assert reduced_y_pred.ndim == 3
         assert reduced_y_pred.shape == y_true.shape
         mask = y_true != -1
         score = (reduced_y_pred[mask] == y_true[mask]).mean()
-        return score
+        return Variable(np.array([score]), volatile=True)

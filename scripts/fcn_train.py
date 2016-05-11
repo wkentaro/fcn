@@ -91,7 +91,7 @@ class Trainer(object):
                 i_iter=i_iter,
                 type=type,
                 loss=float(self.model.loss.data),
-                accuracy=float(self.model.accuracy),
+                accuracy=float(self.model.accuracy.data),
             )
             print(log_templ.format(**log))
             f.write('{i_iter},{type},{loss},{accuracy}\n'.format(**log))
@@ -118,7 +118,7 @@ class Trainer(object):
                 i_iter=i_iter,
                 type=type,
                 loss=float(self.model.loss.data),
-                accuracy=float(self.model.accuracy),
+                accuracy=float(self.model.accuracy.data),
             )
             print(log_templ.format(**log))
             f.write('{i_iter},{type},{loss},{accuracy}\n'.format(**log))
