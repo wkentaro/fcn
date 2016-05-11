@@ -51,6 +51,7 @@ class Trainer(object):
         self.log_dir = osp.join(fcn.get_data_dir(), 'logs', timestamp)
         if not osp.exists(self.log_dir):
             os.makedirs(self.log_dir)
+            print("Created '{0}'".format(self.log_dir))
         self.logfile = open(osp.join(self.log_dir, 'log.csv'), 'w')
         self.logfile.write('i_iter,type,loss,accuracy\n')
 
