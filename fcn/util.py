@@ -1,3 +1,4 @@
+from __future__ import print_function
 import hashlib
 import os
 import os.path as osp
@@ -34,6 +35,7 @@ def copy_chainermodel(src, dst):
     from chainer import link
     assert isinstance(src, link.Chain)
     assert isinstance(dst, link.Chain)
+    print('Copying..', end='')
     for child in src.children():
         if child.name not in dst.__dict__:
             continue
@@ -56,7 +58,8 @@ def copy_chainermodel(src, dst):
                 continue
             for a, b in zip(child.namedparams(), dst_child.namedparams()):
                 b[1].data = a[1].data
-            print('Copy %s' % child.name)
+            print('. %s .' % child.name, end='')
+    print('..done.')
 
 
 # -----------------------------------------------------------------------------

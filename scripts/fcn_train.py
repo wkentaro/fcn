@@ -36,7 +36,6 @@ class Trainer(object):
         self.dataset = pascal.SegmentationClassDataset()
         # setup fcn8s
         self.model = FCN8s(n_class=len(self.dataset.target_names))
-        print('Copying pretrained_model...')
         fcn.util.copy_chainermodel(pretrained_model, self.model)
         if self.gpu != -1:
             self.model.to_gpu(self.gpu)
