@@ -52,7 +52,7 @@ class SegmentationClassDataset(Bunch):
             ids = [id_.strip() for id_ in open(id_list_file)]
             setattr(self, type, np.array(ids))
 
-    def _load_datum(self, id, type):
+    def _load_datum(self, id):
         # check cache
         datum = self.db.get(str(id))
         if datum is not None:
@@ -87,7 +87,7 @@ class SegmentationClassDataset(Bunch):
             indices = np.random.randint(0, len(ids), batch_size)
         batch = Bunch(img=[], label=[])
         for id in ids[indices]:
-            datum = self._load_datum(id, type)
+            datum = self._load_datum(id)
             batch.img.append(datum.img)
             batch.label.append(datum.label)
         return batch
