@@ -47,8 +47,7 @@ class Trainer(object):
         self.logfile.close()
 
     def _setup_logging(self):
-        timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        self.log_dir = osp.join(fcn.get_data_dir(), 'logs', timestamp)
+        self.log_dir = 'snapshot'
         if not osp.exists(self.log_dir):
             os.makedirs(self.log_dir)
             print("Created '{0}'".format(self.log_dir))
