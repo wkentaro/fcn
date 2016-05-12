@@ -15,7 +15,7 @@ import numpy as np
 import tqdm
 
 import fcn
-from fcn.models import FCN8s
+from fcn.models import FCN32s
 from fcn.models import VGG16
 from fcn import pascal
 
@@ -35,12 +35,12 @@ class Trainer(object):
         # dataset
         self.dataset = pascal.SegmentationClassDataset()
         # setup fcn8s
-        self.model = FCN8s(n_class=len(self.dataset.target_names))
+        self.model = FCN32s(n_class=len(self.dataset.target_names))
         fcn.util.copy_chainermodel(pretrained_model, self.model)
         if self.gpu != -1:
             self.model.to_gpu(self.gpu)
         # setup optimizer
-        self.optimizer = O.MomentumSGD(lr=1e-12, momentum=0.99)
+        self.optimizer = O.MomentumSGD(lr=1e-10, momentum=0.99)
         self.optimizer.setup(self.model)
 
     def __del__(self):
