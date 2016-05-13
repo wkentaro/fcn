@@ -3,6 +3,7 @@
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+from collections import defaultdict
 from datetime import datetime
 import os
 import os.path as osp
@@ -18,6 +19,7 @@ import fcn
 from fcn.models import FCN32s
 from fcn.models import VGG16
 from fcn import pascal
+from fcn import util
 
 
 class Trainer(object):
@@ -52,7 +54,7 @@ class Trainer(object):
             os.makedirs(self.log_dir)
             print("Created '{0}'".format(self.log_dir))
         self.logfile = open(osp.join(self.log_dir, 'log.csv'), 'w')
-        self.logfile.write('i_iter,type,loss,accuracy\n')
+        self.logfile.write('i_iter,type,loss,acc,acc_cls,iu,fwavacc\n')
 
     def _setup_pretrained_model(self):
         pretrained_model_path = osp.join(
@@ -87,12 +89,20 @@ class Trainer(object):
         if self.model.train:
             self.optimizer.zero_grads()
             self.optimizer.update(self.model, x, y)
+            self.optimizer.weight_decay(self.weight_decay)
         else:
             self.model(x, y)
+        # evaluate
+        label_pred = np.argmax(cuda.to_cpu(self.model.score.data), axis=1)
+        acc, acc_cls, iu, fwavacc = util.label_accuracy_score(
+            label, label_pred, self.model.n_class)
+        loss = float(cuda.to_cpu(self.model.loss.data))
+        return loss, acc, acc_cls, iu, fwavacc
 
     def train(self):
         """Iterate with train data."""
-        log_templ = '{i_iter}: type={type}, loss={loss}, accuracy={accuracy}'
+        log_templ = ('{i_iter}: type={type}, loss={loss}, acc={acc}, '
+                     'acc_cls={acc_cls}, iu={iu}, fwavacc={fwavacc}')
         for i_iter in xrange(self.max_iter):
             self.i_iter = i_iter
 
@@ -101,17 +111,13 @@ class Trainer(object):
 
             type = 'train'
             self.model.train = True
-            self._iterate_once(type=type)
-            self.optimizer.weight_decay(self.weight_decay)
-            log = dict(
-                i_iter=i_iter,
-                type=type,
-                loss=float(self.model.loss.data),
-                accuracy=float(self.model.accuracy.data),
-            )
+            loss, acc, acc_cls, iu, fwavacc = self._iterate_once(type=type)
+            log = dict(i_iter=self.i_iter, type=type, loss=loss, acc=acc,
+                       acc_cls=acc_cls, iu=iu, fwavacc=fwavacc)
             print(log_templ.format(**log))
             self.logfile.write(
-                '{i_iter},{type},{loss},{accuracy}\n'.format(**log))
+                '{i_iter},{type},{loss},{acc},{acc_cls},{iu},{fwavacc}\n'
+                .format(**log))
 
             if i_iter % self.snapshot == 0:
                 print('{0}: saving snapshot...'.format(i_iter))
@@ -125,27 +131,34 @@ class Trainer(object):
 
     def validate(self):
         """Validate training with data."""
-        log_templ = \
-            '{i_iter}: type={type}, mean_loss={loss}, mean_accuracy={accuracy}'
+        log_templ = ('{i_iter}: type={type}, loss={loss}, acc={acc}, '
+                     'acc_cls={acc_cls}, iu={iu}, fwavacc={fwavacc}')
         type = 'val'
         self.model.train = False
         N_data = len(self.dataset.val)
-        sum_loss, sum_accuracy = 0, 0
+        result = defaultdict(list)
         desc = '{0}: validating'.format(self.i_iter)
         for indice in tqdm.tqdm(xrange(N_data), ncols=80, desc=desc):
-            self._iterate_once(type=type, indices=[indice])
-            sum_loss += float(self.model.loss.data)
-            sum_accuracy += float(self.model.accuracy.data)
-        mean_loss = sum_loss / N_data
-        mean_accuray = sum_accuracy / N_data
+            loss, acc, acc_cls, iu, fwavacc = self._iterate_once(
+                type=type, indices=[indice])
+            result['loss'].append(loss)
+            result['acc'].append(acc)
+            result['acc_cls'].append(acc_cls)
+            result['iu'].append(iu)
+            result['fwavacc'].append(fwavacc)
         log = dict(
             i_iter=self.i_iter,
             type=type,
-            loss=mean_loss,
-            accuracy=mean_accuray,
+            loss=np.array(result['loss']).mean(),
+            acc=np.array(result['acc']).mean(),
+            acc_cls=np.array(result['acc_cls']).mean(),
+            iu=np.array(result['iu']).mean(),
+            fwavacc=np.array(result['fwavacc']).mean(),
         )
         print(log_templ.format(**log))
-        self.logfile.write('{i_iter},{type},{loss},{accuracy}\n'.format(**log))
+        self.logfile.write(
+            '{i_iter},{type},{loss},{acc},{acc_cls},{iu},{fwavacc}\n'
+            .format(**log))
 
 
 if __name__ == '__main__':

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import hashlib
 import os
@@ -175,3 +177,32 @@ def visualize_labelcolormap(cmap):
     for i in xrange(n_colors):
         ret[i, ...] = cmap[i]
     return ret.reshape((n_colors * 10, 10, 3))
+
+
+# -----------------------------------------------------------------------------
+# Evaluation
+# -----------------------------------------------------------------------------
+def _fast_hist(a, b, n):
+    k = (a >= 0) & (a < n)
+    hist = np.bincount(n * a[k].astype(int) +
+                       b[k], minlength=n**2).reshape(n, n)
+    return hist
+
+
+def label_accuracy_score(label_true, label_pred, n_class):
+    """Returns accuracy score evaluation result.
+
+      - overall accuracy
+      - mean accuracy
+      - mean IU
+      - fwavacc
+    """
+    hist = _fast_hist(label_true.flatten(), label_pred.flatten(), n_class)
+    acc = np.diag(hist).sum() / hist.sum()
+    acc_cls = np.diag(hist) / hist.sum(axis=1)
+    acc_cls = np.nanmean(acc_cls)
+    iu = np.diag(hist) / (hist.sum(axis=1) + hist.sum(axis=0) - np.diag(hist))
+    mean_iu = np.nanmean(iu)
+    freq = hist.sum(axis=1) / hist.sum()
+    fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
+    return acc, acc_cls, mean_iu, fwavacc

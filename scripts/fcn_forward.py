@@ -59,7 +59,8 @@ class Forwarding(object):
         x = Variable(x_data, volatile=False)
         # forward
         self.model.train = False
-        pred = self.model(x)
+        self.model(x)
+        pred = self.model.score
         # generate computational_graph
         psfile = osp.join(fcn.get_data_dir(), 'fcn8s_forward.ps')
         if not osp.exists(psfile):

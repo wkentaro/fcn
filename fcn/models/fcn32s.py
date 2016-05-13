@@ -102,27 +102,8 @@ class FCN32s(chainer.Chain):
 
         # score
         h = F.crop(upscore, x, axes=[2, 3], offset=19)
-        score = h  # 1/1
-
-        # testing without t
-        self.pred = score
-        if t is None:
-            return self.pred
+        self.score = h  # 1/1
 
         # testing with t or training
-        self.accuracy = self.accuracy_score(self.pred, t)
-        self.loss = F.softmax_cross_entropy(self.pred, t, normalize=False)
-        if np.isnan(cuda.to_cpu(self.loss.data)).sum() != 0:
-            raise RuntimeError('ERROR in FCN8s: loss.data contains nan')
+        self.loss = F.softmax_cross_entropy(self.score, t, normalize=False)
         return self.loss
-
-    def accuracy_score(self, y_pred, y_true):
-        y_pred = cuda.to_cpu(y_pred.data)
-        y_true = cuda.to_cpu(y_true.data)
-        # reduce values along classes axis
-        reduced_y_pred = np.argmax(y_pred, axis=1)
-        assert reduced_y_pred.ndim == 3
-        assert reduced_y_pred.shape == y_true.shape
-        mask = y_true != -1
-        score = (reduced_y_pred[mask] == y_true[mask]).mean()
-        return Variable(np.array([score]), volatile=True)
