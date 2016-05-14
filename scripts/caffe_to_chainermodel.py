@@ -17,8 +17,8 @@ from fcn.models import FCN8s
 
 
 def main():
-    chainermodel = osp.join(fcn.data_dir, 'fcn8s.chainermodel')
-    md5 = '4780397b1e1f2ceb98bfa6b03b18dfea'
+    chainermodel = osp.join(fcn.data_dir, 'fcn8s_from_caffe.chainermodel')
+    md5 = 'a1083db5a47643b112af69bfa59954f9'
     print("Checking md5: '{0}' for '{1}'".format(md5, chainermodel))
     if osp.exists(chainermodel) and fcn.util.check_md5(chainermodel, md5):
         print("'{0}' is already newest version.".format(chainermodel))

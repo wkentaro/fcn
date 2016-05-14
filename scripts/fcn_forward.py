@@ -29,7 +29,8 @@ class Forwarding(object):
         self.n_class = len(self.target_names)
 
         if chainermodel is None:
-            chainermodel = osp.join(fcn.data_dir, 'fcn8s.chainermodel')
+            chainermodel = osp.join(fcn.data_dir,
+                                    'fcn8s_from_caffe.chainermodel')
             self.model_name = 'fcn8s'
             self.model = FCN8s(n_class=self.n_class)
         elif osp.basename(chainermodel).startswith('fcn8s'):

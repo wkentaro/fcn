@@ -34,6 +34,6 @@ def download_fcn8s_caffemodel():
         pkg_name='fcn',
         path=caffemodel,
         url=open(url_file).read().strip(),
-        md5 = '4780397b1e1f2ceb98bfa6b03b18dfea',
+        md5 = 'c03b2953ebd846c270da1a8e8f200c09',
     )
     return caffemodel
