@@ -23,7 +23,7 @@ def download_vgg16_chainermodel():
     fcn.util.download_data(
         pkg_name='fcn',
         path=path,
-        url='https://www.dropbox.com/s/oubwxgmqzep24yq/VGG.model?dl=0',
+        url='https://drive.google.com/uc?id=0B9P1L--7Wd2vSlFjQlJFQjM5TEk',
         md5='292e6472062392f5de02ef431bba4a48',
     )
     return path
