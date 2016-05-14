@@ -29,11 +29,22 @@ from fcn.models import FCN8s
 
 class Forwarding(object):
 
-    def __init__(self, gpu):
+    def __init__(self, gpu, chainermodel=None):
         self.gpu = gpu
 
         self.data_dir = fcn.get_data_dir()
-        chainermodel = osp.join(self.data_dir, 'fcn8s.chainermodel')
+        if chainermodel is None:
+            chainermodel = osp.join(self.data_dir, 'fcn8s.chainermodel')
+            model_name = 'fcn8s'
+        elif chainermodel.startswith('fcn8s'):
+            model_name = 'fcn8s'
+        elif chainermodel.startswith('fcn16s'):
+            model_name = 'fcn16s'
+        elif chainermodel.startswith('fcn32s'):
+            model_name = 'fcn32s'
+        else:
+            raise ValueError('Chainer model filename must start with fcn8s, '
+                             'fcn16s or fcn32s')
 
         self.target_names = fcn.pascal.SegmentationClassDataset.target_names
         self.model = FCN8s(n_class=len(self.target_names))
@@ -62,7 +73,7 @@ class Forwarding(object):
         self.model(x)
         pred = self.model.score
         # generate computational_graph
-        psfile = osp.join(fcn.get_data_dir(), 'fcn8s_forward.ps')
+        psfile = osp.join(fcn.get_data_dir(), '{0}_forward.ps'.format(model_name))
         if not osp.exists(psfile):
             from chainer.computational_graph import build_computational_graph
             dotfile = tempfile.mktemp()
@@ -138,13 +149,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', default=0, type=int,
                         help='if -1, use cpu only')
+    parser.add_argument('-c', '--chainermodel')
     parser.add_argument('-i', '--img-files', nargs='+', required=True)
     args = parser.parse_args()
 
     img_files = args.img_files
     gpu = args.gpu
+    chainermodel = args.chainermodel
 
-    forwarding = Forwarding(gpu)
+    forwarding = Forwarding(gpu, chainermodel)
     for img_file in img_files:
         forwarding.forward_img_file(img_file)
 
