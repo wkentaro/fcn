@@ -1,6 +1,8 @@
 fcn - Fully Convolutional Networks
 ==================================
 
+.. image:: https://badge.fury.io/gh/wkentaro%2Ffcn.svg
+    :target: https://badge.fury.io/gh/wkentaro%2Ffcn
 .. image:: https://travis-ci.org/wkentaro/fcn.svg?branch=master
     :target: https://travis-ci.org/wkentaro/fcn
 
