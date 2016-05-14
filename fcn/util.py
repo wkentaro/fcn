@@ -31,6 +31,19 @@ def apply_mask(img, mask, crop=False):
     return img
 
 
+def resize_img_with_max_size(img, max_size=500*500):
+    """Resize image with max size (height x width)"""
+    from skimage.transform import rescale
+    height, width = img.shape[:2]
+    scale = max_size / (height * width)
+    resizing_scale = 1
+    if scale < 1:
+        resizing_scale = np.sqrt(scale)
+        img = rescale(img, resizing_scale, preserve_range=True)
+        img = img.astype(np.uint8)
+    return img, resizing_scale
+
+
 # -----------------------------------------------------------------------------
 # Chainer Util
 # -----------------------------------------------------------------------------

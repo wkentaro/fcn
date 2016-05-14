@@ -63,12 +63,8 @@ class Forwarding(object):
         print('{0}:'.format(osp.realpath(img_file)))
         # setup image
         img = imread(img_file, mode='RGB')
-        scale = (500 * 500) / (img.shape[0] * img.shape[1])
-        if scale < 1:
-            resizing_scale = np.sqrt(scale)
-            print(' - resizing_scale: {0}'.format(resizing_scale))
-            img = rescale(img, resizing_scale, preserve_range=True)
-            img = img.astype(np.uint8)
+        img, resizing_scale = fcn.util.resize_img_with_max_size(img)
+        print(' - resizing_scale: {0}'.format(resizing_scale))
         # setup input datum
         datum = fcn.pascal.SegmentationClassDataset.img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
