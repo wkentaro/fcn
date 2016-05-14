@@ -24,17 +24,9 @@ def main():
         print("'{0}' is already newest version.".format(chainermodel))
         sys.exit(0)
 
-    caffemodel_dir = osp.join(fcn.data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
-    caffemodel = osp.join(caffemodel_dir, 'fcn8s-heavy-pascal.caffemodel')
-    caffe_prototxt = osp.join(caffemodel_dir, 'deploy.prototxt')
-    if not os.path.exists(caffemodel):
-        msg = "WARNING: Caffemodel '{0}' not found. Downloading...".format(
-            caffemodel)
-        print(msg, file=sys.stderr)
-        url_file = osp.join(caffemodel_dir, 'caffemodel-url')
-        url = open(url_file).read().strip()
-        cmd = "wget '{0}' -O {1}".format(url, caffemodel)
-        subprocess.check_call(shlex.split(cmd))
+    caffe_prototxt = osp.join(
+        fcn.data_dir, 'fcn.berkeleyvision.org/voc-fcn8s/deploy.prototxt')
+    caffemodel = fcn.setup.download_fcn8s_caffemodel()
     net = caffe.Net(caffe_prototxt, caffemodel, caffe.TEST)
 
     model = FCN8s()

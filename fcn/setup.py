@@ -15,7 +15,7 @@ def _get_data_dir():
     return ''
 
 
-def download_vgg16():
+def download_vgg16_chainermodel():
     path = osp.join(fcn.data_dir, 'vgg16.chainermodel')
     fcn.util.download_data(
         pkg_name='fcn',
@@ -24,3 +24,16 @@ def download_vgg16():
         md5='292e6472062392f5de02ef431bba4a48',
     )
     return path
+
+
+def download_fcn8s_caffemodel():
+    caffemodel_dir = osp.join(fcn.data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
+    caffemodel = osp.join(caffemodel_dir, 'fcn8s-heavy-pascal.caffemodel')
+    url_file = osp.join(caffemodel_dir, 'caffemodel-url')
+    fcn.util.download_data(
+        pkg_name='fcn',
+        path=caffemodel,
+        url=open(url_file).read().strip(),
+        md5 = '4780397b1e1f2ceb98bfa6b03b18dfea',
+    )
+    return caffemodel

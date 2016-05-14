@@ -57,7 +57,7 @@ class Trainer(object):
         self.logfile.write('i_iter,type,loss,acc,acc_cls,iu,fwavacc\n')
 
     def _setup_pretrained_model(self):
-        pretrained_model_path = fcn.setup.download_vgg16()
+        pretrained_model_path = fcn.setup.download_vgg16_chainermodel()
         pretrained_model = VGG16()
         print('Loading pretrained model: {0}'.format(pretrained_model_path))
         S.load_hdf5(pretrained_model_path, pretrained_model)
