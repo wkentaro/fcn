@@ -57,12 +57,7 @@ class Trainer(object):
         self.logfile.write('i_iter,type,loss,acc,acc_cls,iu,fwavacc\n')
 
     def _setup_pretrained_model(self):
-        pretrained_model_path = osp.join(fcn.data_dir, 'vgg16.chainermodel')
-        md5 = '292e6472062392f5de02ef431bba4a48'
-        if not (osp.exists(pretrained_model_path) and
-                fcn.util.check_md5(pretrained_model_path, md5)):
-            url = 'https://www.dropbox.com/s/oubwxgmqzep24yq/VGG.model?dl=0'
-            fcn.util.download_data('fcn', pretrained_model_path, url, md5)
+        pretrained_model_path = fcn.setup.download_vgg16()
         pretrained_model = VGG16()
         print('Loading pretrained model: {0}'.format(pretrained_model_path))
         S.load_hdf5(pretrained_model_path, pretrained_model)
