@@ -31,7 +31,7 @@ class VGG16(chainer.Chain):
         )
         self.train = False
 
-    def __call__(self, x, t):
+    def __call__(self, x, t=None):
         h = F.relu(self.conv1_1(x))
         h = F.relu(self.conv1_2(h))
         h = F.max_pooling_2d(h, 2, stride=2)
@@ -58,12 +58,16 @@ class VGG16(chainer.Chain):
         h = F.dropout(F.relu(self.fc6(h)), train=self.train, ratio=0.5)
         h = F.dropout(F.relu(self.fc7(h)), train=self.train, ratio=0.5)
         h = self.fc8(h)
+        fc8 = h
 
-        self.loss = F.softmax_cross_entropy(h, t)
-        self.acc = F.accuracy(h, t)
+        self.pred = F.softmax(h)
+
+        if t is None:
+            assert not self.train
+            return
+
+        self.loss = F.softmax_cross_entropy(fc8, t)
+        self.acc = F.accuracy(self.pred, t)
 
         if self.train:
             return self.loss
-
-        self.pred = F.softmax(h)
-        return self.pred
