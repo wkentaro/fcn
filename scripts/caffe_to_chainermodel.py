@@ -28,7 +28,8 @@ def main():
     caffemodel = osp.join(caffemodel_dir, 'fcn8s-heavy-pascal.caffemodel')
     caffe_prototxt = osp.join(caffemodel_dir, 'deploy.prototxt')
     if not os.path.exists(caffemodel):
-        msg = "WARNING: Caffemodel '{0}' not found. Downloading..."
+        msg = "WARNING: Caffemodel '{0}' not found. Downloading...".format(
+            caffemodel)
         print(msg, file=sys.stderr)
         url_file = osp.join(caffemodel_dir, 'caffemodel-url')
         url = open(url_file).read().strip()
