@@ -122,7 +122,7 @@ class Trainer(object):
                 print('{0}: saving snapshot...'.format(i_iter))
                 snapshot_model = osp.join(
                     self.log_dir,
-                    'fcn8s_model_{0}.chainermodel'.format(i_iter))
+                    'fcn8s_{0}.chainermodel'.format(i_iter))
                 snapshot_optimizer = osp.join(
                     self.log_dir, 'fcn8s_optimizer_{0}.h5'.format(i_iter))
                 S.save_hdf5(snapshot_model, self.model)

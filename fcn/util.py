@@ -282,15 +282,20 @@ def draw_label(label, img, n_class, label_titles, bg_label=0):
     plt.gca().xaxis.set_major_locator(plt.NullLocator())
     plt.gca().yaxis.set_major_locator(plt.NullLocator())
     plt.axis('off')
+    # plot image
     plt.imshow(label_viz)
+    # plot legend
     plt_handlers = []
     plt_titles = []
-    for i, l in enumerate(np.unique(label)):
-        fc = cmap[l]
+    for label_value in np.unique(label):
+        if label_value not in label_titles:
+            continue
+        fc = cmap[label_value]
         p = plt.Rectangle((0, 0), 1, 1, fc=fc)
         plt_handlers.append(p)
-        plt_titles.append(label_titles[i])
+        plt_titles.append(label_titles[label_value])
     plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
+    # convert plotted figure to np.ndarray
     f = StringIO.StringIO()
     plt.savefig(f, bbox_inches='tight', pad_inches=0)
     result_img_pil = Image.open(f)

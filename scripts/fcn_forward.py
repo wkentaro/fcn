@@ -80,12 +80,14 @@ class Forwarding(object):
         # visualize result
         unique_labels, label_counts = np.unique(label, return_counts=True)
         print('- labels:')
-        label_titles = []
-        for i, l in enumerate(unique_labels):
-            l_region = label_counts[i] / label.size
+        label_titles = {}
+        for label_value, label_count in zip(unique_labels, label_counts):
+            label_region = label_count / label.size
+            if label_region < 0.001:
+                continue
             title = '{0}:{1} = {2:.1%}'.format(
-                l, self.target_names[l], l_region)
-            label_titles.append(title)
+                label_value, self.target_names[label_value], label_region)
+            label_titles[label_value] = title
             print('  - {0}'.format(title))
         result_img = fcn.util.draw_label(
             label, img, n_class=self.n_class, label_titles=label_titles)

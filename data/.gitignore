@@ -2,5 +2,6 @@ vgg16.chainermodel
 fcn8s.chainermodel
 
 fcn8s_forward.ps
+fcn32s_forward.ps
 
 SegmentationClassDataset_db

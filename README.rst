@@ -23,35 +23,26 @@ Features
 .. _v1.0.0: https://github.com/wkentaro/fcn/releases/tag/v1.0.0
 
 
+License
+-------
+| Copyright (C) 2016 Kentaro Wada
+| Released under the MIT license
+| http://opensource.org/licenses/mit-license.php
+
+
+For Beginners
+-------------
+
 Installation
-------------
+++++++++++++
 
 .. code-block:: bash
 
   pip install fcn
 
 
-For Developers
-++++++++++++++
-
-.. code-block:: bash
-
-  git clone https://github.com/wkentaro/fcn.git
-  cd fcn
-
-  python setup.py install
-
-.. _here: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
-
-You need to download pascal VOC2012 dataset from here_, and install it as below construction::
-
-  - fcn - data - pascal - VOC2012 -- JPEGImages
-                                   - SegmentationClass
-                                   - ...
-
-
-Usage
------
+Forwarding
+++++++++++
 
 Forwarding is done as below, and computation graph is `here <https://github.com/wkentaro/fcn/blob/master/_images/fcn8s_forward.jpg>`_.
 
@@ -70,7 +61,29 @@ Original Image: https://www.flickr.com/photos/faceme/26471792680/
 
 
 For Developers
-++++++++++++++
+--------------
+
+
+Installation
+++++++++++++
+
+.. code-block:: bash
+
+  git clone https://github.com/wkentaro/fcn.git
+  cd fcn
+
+  python setup.py install
+
+.. _here: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
+
+You need to download pascal VOC2012 dataset from here_, and install it as below construction::
+
+  - fcn - data - pascal - VOC2012 -- JPEGImages
+                                   - SegmentationClass
+                                   - ...
+
+Fowarding
++++++++++
 
 .. code-block:: bash
 
@@ -85,8 +98,18 @@ For Developers
 Original Image: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
 
 
-License
--------
-| Copyright (C) 2016 Kentaro Wada
-| Released under the MIT license
-| http://opensource.org/licenses/mit-license.php
+Training
+++++++++
+
+.. code-block:: bash
+
+  ./scripts/fcn_train.py
+
+Currently we support only training FCN32s.
+The learning curve looks like below:
+
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn32s_learning_curve.png
+
+Forwarding with ``fcn32s_60000.chainermodel`` ends with below result:
+
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn32s_2007_000129.jpg
