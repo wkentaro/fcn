@@ -74,9 +74,8 @@ Installation
 
   python setup.py install
 
-.. _here: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
-
-You need to download pascal VOC2012 dataset from here_, and install it as below construction::
+You need to download pascal VOC2012 dataset from `here <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/>`_,
+and install it as below construction::
 
   - fcn - data - pascal - VOC2012 -- JPEGImages
                                    - SegmentationClass
