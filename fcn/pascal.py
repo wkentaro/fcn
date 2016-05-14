@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import cPickle as pickle
 import os.path as osp
 
@@ -39,10 +43,9 @@ class SegmentationClassDataset(Bunch):
     def __init__(self, db_path=None):
         super(self.__class__, self).__init__()
         if db_path is None:
-            db_path = osp.join(fcn.get_data_dir(),
-                               'SegmentationClassDataset_db')
+            db_path = osp.join(fcn.data_dir, 'SegmentationClassDataset_db')
         self.db = plyvel.DB(db_path, create_if_missing=True)
-        self.pascal_dir = osp.join(fcn.get_data_dir(), 'pascal/VOC2012')
+        self.pascal_dir = osp.join(fcn.data_dir, 'pascal/VOC2012')
         self._load_segmentation_files()
 
     def _load_segmentation_files(self):

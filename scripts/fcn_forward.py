@@ -13,8 +13,8 @@ from chainer import cuda
 import chainer.serializers as S
 from chainer import Variable
 import matplotlib
-if os.environ.get('DISPLAY', '') == '':
-    matplotlib.use('Agg')
+if os.environ.get('DISPLAY', '') == '':  # NOQA
+    matplotlib.use('Agg')  # NOQA
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.misc import imread
@@ -25,6 +25,8 @@ from skimage.transform import resize
 
 import fcn
 from fcn.models import FCN8s
+from fcn.models import FCN16s
+from fcn.models import FCN32s
 
 
 class Forwarding(object):
@@ -32,22 +34,27 @@ class Forwarding(object):
     def __init__(self, gpu, chainermodel=None):
         self.gpu = gpu
 
-        self.data_dir = fcn.get_data_dir()
-        if chainermodel is None:
-            chainermodel = osp.join(self.data_dir, 'fcn8s.chainermodel')
-            model_name = 'fcn8s'
-        elif chainermodel.startswith('fcn8s'):
-            model_name = 'fcn8s'
-        elif chainermodel.startswith('fcn16s'):
-            model_name = 'fcn16s'
-        elif chainermodel.startswith('fcn32s'):
-            model_name = 'fcn32s'
-        else:
-            raise ValueError('Chainer model filename must start with fcn8s, '
-                             'fcn16s or fcn32s')
-
         self.target_names = fcn.pascal.SegmentationClassDataset.target_names
-        self.model = FCN8s(n_class=len(self.target_names))
+        n_class = len(self.target_names)
+
+        if chainermodel is None:
+            chainermodel = osp.join(fcn.data_dir, 'fcn8s.chainermodel')
+            self.model_name = 'fcn8s'
+            self.model = FCN8s(n_class=n_class)
+        elif osp.basename(chainermodel).startswith('fcn8s'):
+            self.model_name = 'fcn8s'
+            self.model = FCN8s(n_class=n_class)
+        elif osp.basename(chainermodel).startswith('fcn16s'):
+            self.model_name = 'fcn16s'
+            self.model = FCN16s(n_class=n_class)
+        elif osp.basename(chainermodel).startswith('fcn32s'):
+            self.model_name = 'fcn32s'
+            self.model = FCN32s(n_class=n_class)
+        else:
+            raise ValueError(
+                'Chainer model filename must start with fcn8s, '
+                'fcn16s or fcn32s: {0}'.format(osp.basename(chainermodel)))
+
         S.load_hdf5(chainermodel, self.model)
         if self.gpu != -1:
             self.model.to_gpu(self.gpu)
@@ -73,7 +80,7 @@ class Forwarding(object):
         self.model(x)
         pred = self.model.score
         # generate computational_graph
-        psfile = osp.join(fcn.get_data_dir(), '{0}_forward.ps'.format(model_name))
+        psfile = osp.join(fcn.data_dir, '{0}_forward.ps'.format(self.model_name))
         if not osp.exists(psfile):
             from chainer.computational_graph import build_computational_graph
             dotfile = tempfile.mktemp()
@@ -128,7 +135,7 @@ class Forwarding(object):
         result_img = resize(result_img, img.shape, preserve_range=True)
         result_img = result_img.astype(np.uint8)
         # save result
-        save_dir = osp.join(self.data_dir, 'forward_out')
+        save_dir = osp.join(fcn.data_dir, 'forward_out')
         if not osp.exists(save_dir):
             save_dir = 'forward_out'
             if not osp.exists(save_dir):

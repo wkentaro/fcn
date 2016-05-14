@@ -57,8 +57,7 @@ class Trainer(object):
         self.logfile.write('i_iter,type,loss,acc,acc_cls,iu,fwavacc\n')
 
     def _setup_pretrained_model(self):
-        pretrained_model_path = osp.join(
-            fcn.get_data_dir(), 'vgg16.chainermodel')
+        pretrained_model_path = osp.join(fcn.data_dir, 'vgg16.chainermodel')
         md5 = '292e6472062392f5de02ef431bba4a48'
         if not (osp.exists(pretrained_model_path) and
                 fcn.util.check_md5(pretrained_model_path, md5)):
