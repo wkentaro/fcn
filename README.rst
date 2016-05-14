@@ -58,7 +58,7 @@ Forwarding is done as below, and computation graph is `here <https://github.com/
   fcn_forward.py --img-files sample.jpg --gpu -1  # cpu mode
   fcn_forward.py --img-files sample.jpg  # gpu mode
 
-.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/26471792680.jpg
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn8s_26471792680.jpg
 
 Original Image: https://www.flickr.com/photos/faceme/26471792680/
 
@@ -97,7 +97,7 @@ Forwarding with trained model in caffe is done as below:
   # forwarding of the networks
   ./scripts/fcn_forward.py --img-files data/pascal/VOC2012/JPEGImages/2007_000129.jpg
 
-.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/2007_000129.jpg
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn8s_2007_000129.jpg
 
 Original Image: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
 
