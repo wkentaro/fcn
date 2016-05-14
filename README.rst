@@ -96,3 +96,20 @@ Fowarding
 .. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/2007_000129.jpg
 
 Original Image: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
+
+
+Training
+++++++++
+
+.. code-block:: bash
+
+  ./scripts/fcn_train.py
+
+Currently we support only training FCN32s.
+The learning curve looks like below:
+
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn32s_learning_curve.png
+
+Forwarding with ``fcn32s_60000.chainermodel`` ends with below result:
+
+.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn32s_2007_000129.jpg
