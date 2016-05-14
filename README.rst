@@ -84,6 +84,8 @@ and install it as below construction::
 Fowarding
 +++++++++
 
+Forwarding with trained model in caffe is done as below:
+
 .. code-block:: bash
 
   # This downloads caffemodel and convert it to chainermodel
