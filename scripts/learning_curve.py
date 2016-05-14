@@ -3,7 +3,10 @@
 import argparse
 
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def learning_curve(csv_file):
@@ -11,41 +14,70 @@ def learning_curve(csv_file):
     df_train  = df.query("type == 'train'")
     df_val = df.query("type == 'val'")
 
-    plt.figure()
+    colors = sns.husl_palette(3, l=.5, s=.5)
+
+    plt.figure(figsize=(12, 6), dpi=500)
+
+    #########
+    # TRAIN #
+    #########
 
     # train loss
-    plt.subplot(221)
-    plt.semilogy(df_train.i_iter, df_train.loss, 'o', markersize=1, color='r',
-                 alpha=.5, label='train loss')
-    plt.title('train loss')
+    plt.subplot(231)
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    plt.plot(df_train.i_iter, df_train.loss, '-', markersize=1, color=colors[0],
+             alpha=.5, label='train loss')
     plt.xlabel('iteration')
-    plt.ylabel('loss')
-
-    # val loss
-    plt.subplot(222)
-    plt.semilogy(df_val.i_iter, df_val.loss, 'o-', color='r',
-                 alpha=.5, label='val loss')
-    plt.title('val loss')
-    plt.xlabel('iteration')
-    plt.ylabel('loss')
+    plt.ylabel('train loss')
 
     # train accuracy
-    plt.subplot(223)
-    plt.plot(df_train.i_iter, df_train.accuracy, 'o', markersize=1, color='g',
+    plt.subplot(232)
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.plot(df_train.i_iter, df_train.acc, '-', markersize=1, color=colors[1],
              alpha=.5, label='train accuracy')
-    plt.title('train accuracy')
     plt.xlabel('iteration')
-    plt.ylabel('accuracy')
+    plt.ylabel('train overall accuracy')
+
+    # train mean iu
+    plt.subplot(233)
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.plot(df_train.i_iter, df_train.iu, '-', markersize=1, color=colors[2],
+             alpha=.5, label='train accuracy')
+    plt.xlabel('iteration')
+    plt.ylabel('train mean IU')
+
+    #######
+    # VAL #
+    #######
+
+    # val loss
+    plt.subplot(234)
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    plt.plot(df_val.i_iter, df_val.loss, 'o-', color=colors[0],
+             alpha=.5, label='val loss')
+    plt.xlabel('iteration')
+    plt.ylabel('val loss')
 
     # val accuracy
-    plt.subplot(224)
-    plt.plot(df_val.i_iter, df_val.accuracy, 'o-', color='g',
+    plt.subplot(235)
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.plot(df_val.i_iter, df_val.acc, 'o-', color=colors[1],
              alpha=.5, label='val accuracy')
-    plt.title('val accuracy')
     plt.xlabel('iteration')
-    plt.ylabel('accuracy')
+    plt.ylabel('val overall accuracy')
 
-    plt.show()
+    # val mean iu
+    plt.subplot(236)
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.plot(df_val.i_iter, df_val.iu, 'o-', color=colors[2],
+             alpha=.5, label='val mean IU')
+    plt.xlabel('iteration')
+    plt.ylabel('val mean IU')
+
+    plt.savefig('plot.png')
+    print('Saved plot.png')
 
 
 def main():
