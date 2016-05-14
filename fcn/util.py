@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import cStringIO as StringIO
 import hashlib
 import os
 import os.path as osp
@@ -13,6 +14,10 @@ import tarfile
 import tempfile
 import zipfile
 
+import matplotlib
+if os.environ.get('DISPLAY', '') == '':  # NOQA
+    matplotlib.use('Agg')  # NOQA
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -251,3 +256,45 @@ def label_accuracy_score(label_true, label_pred, n_class):
     freq = hist.sum(axis=1) / hist.sum()
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
     return acc, acc_cls, mean_iu, fwavacc
+
+
+# -----------------------------------------------------------------------------
+# Visualization
+# -----------------------------------------------------------------------------
+def draw_label(label, img, n_class, label_titles, bg_label=0):
+    """Convert label to rgb with label titles.
+
+    @param labeltitle: label title for each labels.
+    """
+    from PIL import Image
+    from scipy.misc import fromimage
+    from skimage.color import label2rgb
+    from skimage.transform import resize
+    cmap = labelcolormap(n_class)
+    label_viz = label2rgb(label, img, colors=cmap[1:], bg_label=bg_label)
+    # label 0 color: (0, 0, 0, 0) -> (0, 0, 0, 255)
+    label_viz[label == 0] = cmap[0]
+
+    # plot label titles on image using matplotlib
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
+                        wspace=0, hspace=0)
+    plt.margins(0, 0)
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    plt.axis('off')
+    plt.imshow(label_viz)
+    plt_handlers = []
+    plt_titles = []
+    for i, l in enumerate(np.unique(label)):
+        fc = cmap[l]
+        p = plt.Rectangle((0, 0), 1, 1, fc=fc)
+        plt_handlers.append(p)
+        plt_titles.append(label_titles[i])
+    plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
+    f = StringIO.StringIO()
+    plt.savefig(f, bbox_inches='tight', pad_inches=0)
+    result_img_pil = Image.open(f)
+    result_img = fromimage(result_img_pil, mode='RGB')
+    result_img = resize(result_img, img.shape, preserve_range=True)
+    result_img = result_img.astype(img.dtype)
+    return result_img
