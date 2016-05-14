@@ -15,8 +15,11 @@ def _get_data_dir():
     return ''
 
 
+data_dir = _get_data_dir()
+
+
 def download_vgg16_chainermodel():
-    path = osp.join(fcn.data_dir, 'vgg16.chainermodel')
+    path = osp.join(data_dir, 'vgg16.chainermodel')
     fcn.util.download_data(
         pkg_name='fcn',
         path=path,
@@ -27,7 +30,7 @@ def download_vgg16_chainermodel():
 
 
 def download_fcn8s_caffemodel():
-    caffemodel_dir = osp.join(fcn.data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
+    caffemodel_dir = osp.join(data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
     caffemodel = osp.join(caffemodel_dir, 'fcn8s-heavy-pascal.caffemodel')
     url_file = osp.join(caffemodel_dir, 'caffemodel-url')
     fcn.util.download_data(
@@ -37,3 +40,23 @@ def download_fcn8s_caffemodel():
         md5 = 'c03b2953ebd846c270da1a8e8f200c09',
     )
     return caffemodel
+
+
+class FCN8sFromCaffeChainerModel(object):
+
+    path = osp.join(data_dir, 'fcn8s_from_caffe.chainermodel')
+    url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2vTXU0QzUwSkVwOFk'
+    md5 = 'a1083db5a47643b112af69bfa59954f9'
+
+    def exists(self):
+        return (osp.exists(self.path) and
+                fcn.util.check_md5(self.path, self.md5))
+
+    def download(self):
+        fcn.util.download_data(
+            pkg_name='fcn',
+            path=self.path,
+            url=self.url,
+            md5=self.md5
+        )
+        return self.path

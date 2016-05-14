@@ -36,7 +36,7 @@ class FcnBuildPyCommand(BuildPyCommand):
             os.makedirs(data_dir)
         # download chainermodel to the data dir
         output = osp.join(data_dir, 'fcn8s_from_caffe.chainermodel')
-        url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2veTdBQWZybENLWmM'
+        url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2vTXU0QzUwSkVwOFk'
         cmd = "gdown -q '{0}' -O {1}".format(url, output)
         print("Downloading '{0}' by command '{1}'".format(output, cmd))
         subprocess.check_call(shlex.split(cmd))

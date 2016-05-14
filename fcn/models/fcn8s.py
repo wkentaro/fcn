@@ -143,6 +143,10 @@ class FCN8s(chainer.Chain):
         h = F.crop(upscore8, x, axes=[2, 3], offset=31)
         self.score = h  # 1/1
 
+        if t is None:
+            assert not self.train
+            return
+
         # testing with t or training
         self.loss = F.softmax_cross_entropy(self.score, t, normalize=False)
         return self.loss

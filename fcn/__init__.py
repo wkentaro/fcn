@@ -7,4 +7,4 @@ import fcn.pascal
 import fcn.util
 
 
-data_dir = fcn.setup._get_data_dir()
+data_dir = fcn.setup.data_dir

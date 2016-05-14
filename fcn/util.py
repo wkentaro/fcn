@@ -174,23 +174,37 @@ def download_data(pkg_name, path, url, md5, download_client=None,
     cache_file = osp.join(cache_dir, osp.basename(path))
     # check if cache exists, and update if necessary
     print("Checking md5 of '{path}'...".format(path=cache_file))
-    if not (osp.exists(cache_file) and check_md5(cache_file, md5)):
-        if osp.exists(cache_file):
-            os.remove(cache_file)
-        print("Downloading file from '{url}'...".format(url=url))
-        download(download_client, url, cache_file, quiet=quiet)
-    if osp.islink(path):
-        # overwrite the link
-        os.remove(path)
-        os.symlink(cache_file, path)
-    elif not osp.exists(path):
-        if not osp.exists(osp.dirname(path)):
-            os.makedirs(osp.dirname(path))
-        os.symlink(cache_file, path)  # create link
+    # check real path
+    if osp.exists(path):
+        if check_md5(path, md5):
+            print("File '{0}' is newest.".format(path))
+            if extract:
+                print("Extracting '{path}'...".format(path=path))
+                extract_file(path, to_directory=osp.dirname(path))
+            return
+        else:
+            if not osp.islink(path):
+                # not link and exists so skipping
+                sys.stderr.write("WARNING: '{0}' exists\n".format(path))
+                return
+            os.remove(path)
     else:
-        # not link and exists so skipping
-        sys.stderr.write("WARNING: '{0}' exists\n".format(path))
-        return
+        if osp.islink(path):
+            os.remove(path)
+    # check cache path
+    if osp.exists(cache_file):
+        if check_md5(cache_file, md5):
+            print("Cache file '{0}' is newest.".format(cache_file))
+            os.symlink(cache_file, path)
+            if extract:
+                print("Extracting '{path}'...".format(path=path))
+                extract_file(path, to_directory=osp.dirname(path))
+            return
+        else:
+            os.remove(cache_file)
+    print("Downloading file from '{url}'...".format(url=url))
+    download(download_client, url, cache_file, quiet=quiet)
+    os.symlink(cache_file, path)
     if extract:
         print("Extracting '{path}'...".format(path=path))
         extract_file(path, to_directory=osp.dirname(path))
