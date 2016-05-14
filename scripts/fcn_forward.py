@@ -72,9 +72,12 @@ class Forwarding(object):
         if not osp.exists(psfile):
             fcn.util.draw_computational_graph([pred], output=psfile)
             print('- computational_graph: {0}'.format(psfile))
-        # visualize result
         pred_datum = cuda.to_cpu(pred.data)[0]
         label = np.argmax(pred_datum, axis=0)
+        return img, label
+
+    def visualize_label(self, img, label):
+        # visualize result
         unique_labels, label_counts = np.unique(label, return_counts=True)
         print('- labels:')
         label_titles = []
@@ -87,11 +90,6 @@ class Forwarding(object):
         result_img = fcn.util.draw_label(
             label, img, n_class=self.n_class, label_titles=label_titles)
         # save result
-        save_dir = osp.join(fcn.data_dir, 'forward_out')
-        if not osp.exists(save_dir):
-            save_dir = 'forward_out'
-            if not osp.exists(save_dir):
-                os.makedirs(save_dir)
         height, width = img.shape[:2]
         if height > width:
             vline = np.ones((height, 3, 3), dtype=np.uint8) * 255
@@ -99,9 +97,7 @@ class Forwarding(object):
         else:
             hline = np.ones((3, width, 3), dtype=np.uint8) * 255
             out_img = np.vstack((img, hline, result_img))
-        out_file = osp.join(save_dir, osp.basename(img_file))
-        imsave(out_file, out_img)
-        print('- out_file: {0}'.format(out_file))
+        return out_img
 
 
 def main():
@@ -116,9 +112,18 @@ def main():
     gpu = args.gpu
     chainermodel = args.chainermodel
 
+    save_dir = osp.join(fcn.data_dir, 'forward_out')
+    if not osp.exists(save_dir):
+        os.makedirs(save_dir)
+
     forwarding = Forwarding(gpu, chainermodel)
     for img_file in img_files:
-        forwarding.forward_img_file(img_file)
+        img, label = forwarding.forward_img_file(img_file)
+        out_img = forwarding.visualize_label(img, label)
+
+        out_file = osp.join(save_dir, osp.basename(img_file))
+        imsave(out_file, out_img)
+        print('- out_file: {0}'.format(out_file))
 
 
 if __name__ == '__main__':
