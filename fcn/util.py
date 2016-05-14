@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+import cStringIO as StringIO
 import hashlib
 import os
 import os.path as osp
@@ -9,8 +11,13 @@ import shlex
 import subprocess
 import sys
 import tarfile
+import tempfile
 import zipfile
 
+import matplotlib
+if os.environ.get('DISPLAY', '') == '':  # NOQA
+    matplotlib.use('Agg')  # NOQA
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -27,6 +34,19 @@ def apply_mask(img, mask, crop=False):
         img = img[y_start:y_stop, x_start:x_stop]
 
     return img
+
+
+def resize_img_with_max_size(img, max_size=500*500):
+    """Resize image with max size (height x width)"""
+    from skimage.transform import rescale
+    height, width = img.shape[:2]
+    scale = max_size / (height * width)
+    resizing_scale = 1
+    if scale < 1:
+        resizing_scale = np.sqrt(scale)
+        img = rescale(img, resizing_scale, preserve_range=True)
+        img = img.astype(np.uint8)
+    return img, resizing_scale
 
 
 # -----------------------------------------------------------------------------
@@ -62,6 +82,36 @@ def copy_chainermodel(src, dst):
                 b[1].data = a[1].data
             print('. %s .' % child.name, end='')
     print('..done.')
+
+
+def draw_computational_graph(*args, **kwargs):
+    """
+    @param output: output ps file.
+    """
+    from chainer.computational_graph import build_computational_graph
+    output = kwargs['output']
+    if len(args) > 2:
+        variable_style = args[2]
+    else:
+        variable_style = kwargs.get(
+            'variable_style',
+            {'shape': 'octagon', 'fillcolor': '#E0E0E0', 'style': 'filled'},
+        )
+        kwargs['variable_style'] = variable_style
+    if len(args) > 3:
+        function_style = args[3]
+    else:
+        function_style = kwargs.get(
+            'function_style',
+            {'shape': 'record', 'fillcolor': '#6495ED', 'style': 'filled'},
+        )
+        kwargs['function_style'] = function_style
+    dotfile = tempfile.mktemp()
+    with open(dotfile, 'w') as f:
+        f.write(build_computational_graph(*args, **kwargs).dump())
+    ext = osp.splitext(output)[-1]
+    cmd = 'dot -T{0} {1} > {2}'.format(ext, dotfile, output)
+    subprocess.call(cmd, shell=True)
 
 
 # -----------------------------------------------------------------------------
@@ -206,3 +256,45 @@ def label_accuracy_score(label_true, label_pred, n_class):
     freq = hist.sum(axis=1) / hist.sum()
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
     return acc, acc_cls, mean_iu, fwavacc
+
+
+# -----------------------------------------------------------------------------
+# Visualization
+# -----------------------------------------------------------------------------
+def draw_label(label, img, n_class, label_titles, bg_label=0):
+    """Convert label to rgb with label titles.
+
+    @param labeltitle: label title for each labels.
+    """
+    from PIL import Image
+    from scipy.misc import fromimage
+    from skimage.color import label2rgb
+    from skimage.transform import resize
+    cmap = labelcolormap(n_class)
+    label_viz = label2rgb(label, img, colors=cmap[1:], bg_label=bg_label)
+    # label 0 color: (0, 0, 0, 0) -> (0, 0, 0, 255)
+    label_viz[label == 0] = cmap[0]
+
+    # plot label titles on image using matplotlib
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
+                        wspace=0, hspace=0)
+    plt.margins(0, 0)
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    plt.axis('off')
+    plt.imshow(label_viz)
+    plt_handlers = []
+    plt_titles = []
+    for i, l in enumerate(np.unique(label)):
+        fc = cmap[l]
+        p = plt.Rectangle((0, 0), 1, 1, fc=fc)
+        plt_handlers.append(p)
+        plt_titles.append(label_titles[i])
+    plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
+    f = StringIO.StringIO()
+    plt.savefig(f, bbox_inches='tight', pad_inches=0)
+    result_img_pil = Image.open(f)
+    result_img = fromimage(result_img_pil, mode='RGB')
+    result_img = resize(result_img, img.shape, preserve_range=True)
+    result_img = result_img.astype(img.dtype)
+    return result_img

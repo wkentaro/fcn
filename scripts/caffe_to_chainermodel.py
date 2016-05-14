@@ -17,16 +17,14 @@ from fcn.models import FCN8s
 
 
 def main():
-    data_dir = fcn.get_data_dir()
-
-    chainermodel = osp.join(data_dir, 'fcn8s.chainermodel')
+    chainermodel = osp.join(fcn.data_dir, 'fcn8s.chainermodel')
     md5 = '4780397b1e1f2ceb98bfa6b03b18dfea'
     print("Checking md5: '{0}' for '{1}'".format(md5, chainermodel))
     if osp.exists(chainermodel) and fcn.util.check_md5(chainermodel, md5):
         print("'{0}' is already newest version.".format(chainermodel))
         sys.exit(0)
 
-    caffemodel_dir = osp.join(data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
+    caffemodel_dir = osp.join(fcn.data_dir, 'fcn.berkeleyvision.org/voc-fcn8s')
     caffemodel = osp.join(caffemodel_dir, 'fcn8s-heavy-pascal.caffemodel')
     caffe_prototxt = osp.join(caffemodel_dir, 'deploy.prototxt')
     if not os.path.exists(caffemodel):
