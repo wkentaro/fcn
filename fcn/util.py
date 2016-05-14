@@ -10,6 +10,7 @@ import shlex
 import subprocess
 import sys
 import tarfile
+import tempfile
 import zipfile
 
 import numpy as np
@@ -63,6 +64,36 @@ def copy_chainermodel(src, dst):
                 b[1].data = a[1].data
             print('. %s .' % child.name, end='')
     print('..done.')
+
+
+def draw_computational_graph(*args, **kwargs):
+    """
+    @param output: output ps file.
+    """
+    from chainer.computational_graph import build_computational_graph
+    output = kwargs['output']
+    if len(args) > 2:
+        variable_style = args[2]
+    else:
+        variable_style = kwargs.get(
+            'variable_style',
+            {'shape': 'octagon', 'fillcolor': '#E0E0E0', 'style': 'filled'},
+        )
+        kwargs['variable_style'] = variable_style
+    if len(args) > 3:
+        function_style = args[3]
+    else:
+        function_style = kwargs.get(
+            'function_style',
+            {'shape': 'record', 'fillcolor': '#6495ED', 'style': 'filled'},
+        )
+        kwargs['function_style'] = function_style
+    dotfile = tempfile.mktemp()
+    with open(dotfile, 'w') as f:
+        f.write(build_computational_graph(*args, **kwargs).dump())
+    ext = osp.splitext(output)[-1]
+    cmd = 'dot -T{0} {1} > {2}'.format(ext, dotfile, output)
+    subprocess.call(cmd, shell=True)
 
 
 # -----------------------------------------------------------------------------

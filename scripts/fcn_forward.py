@@ -82,18 +82,7 @@ class Forwarding(object):
         # generate computational_graph
         psfile = osp.join(fcn.data_dir, '{0}_forward.ps'.format(self.model_name))
         if not osp.exists(psfile):
-            from chainer.computational_graph import build_computational_graph
-            dotfile = tempfile.mktemp()
-            with open(dotfile, 'w') as f:
-                variable_style = {'shape': 'octagon', 'fillcolor': '#E0E0E0', 'style': 'filled'}
-                function_style = {'shape': 'record', 'fillcolor': '#6495ED', 'style': 'filled'}
-                f.write(build_computational_graph(
-                    [pred],
-                    variable_style=variable_style,
-                    function_style=function_style,
-                ).dump())
-            cmd = 'dot -Tps {0} > {1}'.format(dotfile, psfile)
-            subprocess.call(cmd, shell=True)
+            fcn.util.draw_computational_graph([pred], output=psfile)
             print('- computational_graph: {0}'.format(psfile))
         # visualize result
         pred_datum = cuda.to_cpu(pred.data)[0]
