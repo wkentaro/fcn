@@ -25,8 +25,9 @@ import numpy as np
 # CV Util
 # -----------------------------------------------------------------------------
 
-def apply_mask(img, mask, crop=False):
-    img[mask == 0] = 0
+def apply_mask(img, mask, crop=False, fill_black=True):
+    if fill_black:
+        img[mask == 0] = 0
 
     if crop:
         where = np.argwhere(mask)
