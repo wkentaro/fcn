@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import cStringIO as StringIO
 import hashlib
+import math
 import os
 import os.path as osp
 import re
@@ -84,7 +85,8 @@ def copy_chainermodel(src, dst):
 
 
 def draw_computational_graph(*args, **kwargs):
-    """
+    """Draw computational graph.
+
     @param output: output ps file.
     """
     from chainer.computational_graph import build_computational_graph
@@ -316,3 +318,94 @@ def draw_label(label, img, n_class, label_titles, bg_label=0):
     result_img = resize(result_img, img.shape, preserve_range=True)
     result_img = result_img.astype(img.dtype)
     return result_img
+
+
+def centerize(src, dst_shape):
+    """Centerize image for specified image size
+
+    @param src: image to centerize
+    @param dst_shape: image shape (height, width) or (height, width, channel)
+    """
+    if src.shape[:2] == dst_shape[:2]:
+        return src
+    centerized = np.zeros(dst_shape, dtype=src.dtype)
+    pad_vertical, pad_horizontal = 0, 0
+    h, w = src.shape[:2]
+    dst_h, dst_w = dst_shape[:2]
+    if h < dst_h:
+        pad_vertical = (dst_h - h) // 2
+    if w < dst_w:
+        pad_horizontal = (dst_w - w) // 2
+    centerized[pad_vertical:pad_vertical+h,
+               pad_horizontal:pad_horizontal+w] = src
+    return centerized
+
+
+def _tile_images(imgs, tile_shape, concatenated_image):
+    """Concatenate images whose sizes are same.
+
+    @param imgs: image list which should be concatenated
+    @param tile_shape: shape for which images should be concatenated
+    @param concatenated_image: returned image.
+        if it is None, new image will be created.
+    """
+    x_num, y_num = tile_shape
+    one_width = imgs[0].shape[1]
+    one_height = imgs[0].shape[0]
+    if concatenated_image is None:
+        if len(imgs[0].shape) == 3:
+            concatenated_image = np.zeros(
+                (one_height * y_num, one_width * x_num, 3), dtype=np.uint8)
+        else:
+            concatenated_image = np.zeros(
+                (one_height * y_num, one_width * x_num), dtype=np.uint8)
+    for y in range(y_num):
+        for x in range(x_num):
+            i = x + y * x_num
+            if i >= len(imgs):
+                pass
+            else:
+                concatenated_image[y*one_height:(y+1)*one_height,
+                                   x*one_width:(x+1)*one_width, ] = imgs[i]
+    return concatenated_image
+
+
+def get_tile_image(imgs, tile_shape=None, result_img=None):
+    """Concatenate images whose sizes are different.
+
+    @param imgs: image list which should be concatenated
+    @param tile_shape: shape for which images should be concatenated
+    @param result_img: numpy array to put result image
+    """
+    from skimage.transform import resize
+
+    def get_tile_shape(img_num):
+        x_num = 0
+        y_num = int(math.sqrt(img_num))
+        while x_num * y_num < img_num:
+            x_num += 1
+        return x_num, y_num
+
+    if tile_shape is None:
+        tile_shape = get_tile_shape(len(imgs))
+
+    # get max tile size to which each image should be resized
+    max_height, max_width = np.inf, np.inf
+    for img in imgs:
+        max_height = min([max_height, img.shape[0]])
+        max_width = min([max_width, img.shape[1]])
+
+    # resize and concatenate images
+    for i, img in enumerate(imgs):
+        h, w = img.shape[:2]
+        dtype = img.dtype
+        h_scale, w_scale = max_height / h, max_width / w
+        scale = min([h_scale, w_scale])
+        h, w = int(scale * h), int(scale * w)
+        img = resize(img, (w, h), preserve_range=True).astype(dtype)
+        if len(img.shape) == 3:
+            img = centerize(img, (max_height, max_width, 3))
+        else:
+            img = centerize(img, (max_height, max_width))
+        imgs[i] = img
+    return _tile_images(imgs, tile_shape, result_img)
