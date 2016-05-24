@@ -123,7 +123,7 @@ class APC2015(Bunch):
                 self.mask_files.append(mask_files)
                 self.target.append(label_value)
 
-    def rgb_to_blob(self, rgb):
+    def img_to_datum(self, rgb):
         rgb = rgb.astype(np.float32)
         blob = rgb[:, :, ::-1]  # RGB-> BGR
         blob -= self.mean_bgr
@@ -131,7 +131,7 @@ class APC2015(Bunch):
         blob = blob.transpose((2, 0, 1))
         return blob
 
-    def blob_to_rgb(self, blob):
+    def datum_to_img(self, blob):
         bgr = blob.transpose((1, 2, 0))
         bgr += self.mean_bgr
         rgb = bgr[:, :, ::-1]  # BGR -> RGB
