@@ -81,7 +81,7 @@ class APC2015(Bunch):
 
         seed = np.random.RandomState(123)
         indices = np.arange(len(self.ids))
-        self.train, self.test = train_test_split(
+        self.train, self.val = train_test_split(
             indices, test_size=0.2, random_state=seed)
 
     def _load_berkeley(self):
@@ -155,7 +155,7 @@ class APC2015(Bunch):
         return img, label
 
     def next_batch(self, batch_size, type, type_indices=None):
-        assert type in ('train', 'test')
+        assert type in ('train', 'val')
         indices = getattr(self, type)
         n_data = len(indices)
         if type_indices is None:
