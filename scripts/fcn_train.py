@@ -67,7 +67,7 @@ class Trainer(object):
         """Iterate with train/val once."""
         batch = self.dataset.next_batch(
             batch_size=1, type=type, indices=indices)
-        img, label = batch.img[0], batch.label[0]
+        img, label = batch[0]
         # x
         x_datum = self.dataset.img_to_datum(img)
         x_data = np.array([x_datum], dtype=np.float32)

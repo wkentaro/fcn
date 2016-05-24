@@ -67,7 +67,7 @@ class SegmentationClassDataset(Bunch):
             self.pascal_dir, 'SegmentationClass', id + '.png')
         label_rgb = imread(label_rgb_file, mode='RGB')
         label = self._label_rgb_to_32sc1(label_rgb)
-        datum = Bunch(img=img, label=label)
+        datum = (img, label)
         # save cache
         self.db.put(str(id), pickle.dumps(datum))
         return datum
@@ -88,11 +88,10 @@ class SegmentationClassDataset(Bunch):
         ids = getattr(self, type)
         if indices is None:
             indices = np.random.randint(0, len(ids), batch_size)
-        batch = Bunch(img=[], label=[])
+        batch = []
         for id in ids[indices]:
             datum = self._load_datum(id)
-            batch.img.append(datum.img)
-            batch.label.append(datum.label)
+            batch.append(datum)
         return batch
 
     @staticmethod
