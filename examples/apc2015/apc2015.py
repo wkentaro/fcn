@@ -165,7 +165,7 @@ class APC2015(Bunch):
             datum = self.db.get(str(id_))
             if datum is not None:
                 # use cached data
-                datum = pickle.loads(inputs)
+                datum = pickle.loads(datum)
             else:
                 datum = self._load_datum(index, type=type)
                 if datum is None:
