@@ -20,6 +20,8 @@ class Trainer(object):
     def __init__(self, dataset, model, optimizer, weight_decay,
                  test_interval, max_iter, snapshot, gpu):
         self.dataset = dataset
+        self.model = model
+        self.optimizer = optimizer
         self.weight_decay = weight_decay
         self.test_interval = test_interval
         self.max_iter = max_iter
