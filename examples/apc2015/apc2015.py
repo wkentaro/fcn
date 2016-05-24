@@ -139,7 +139,7 @@ class APC2015(Bunch):
 
     def _load_datum(self, index, type):
         """Get inputs with global index (global means self.ids[index] works)"""
-        max_size = 1000 * 2000
+        max_size = 500 * 1000
         label_value = self.target[index]
         img = imread(self.img_files[index], mode='RGB')
         img, _ = fcn.util.resize_img_with_max_size(img, max_size=max_size)
