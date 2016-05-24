@@ -79,10 +79,9 @@ class APC2015(Bunch):
         self.mask_files = np.array(self.mask_files)
         self.target = np.array(self.target)
 
-        seed = np.random.RandomState(123)
-        indices = np.arange(len(self.ids))
+        seed = np.random.RandomState(1234)
         self.train, self.val = train_test_split(
-            indices, test_size=0.2, random_state=seed)
+            self.ids, test_size=0.2, random_state=seed)
 
     def _load_berkeley(self):
         """Load APC2015berkeley dataset"""
@@ -154,16 +153,15 @@ class APC2015(Bunch):
             label[mask == 255] = label_value
         return img, label
 
-    def next_batch(self, batch_size, type, type_indices=None):
+    def next_batch(self, batch_size, type, indices=None):
         assert type in ('train', 'val')
-        indices = getattr(self, type)
-        n_data = len(indices)
-        if type_indices is None:
-            type_indices = np.random.randint(0, n_data, batch_size)
-        type_selected = indices[type_indices]
+        ids = getattr(self, type)
+        n_data = len(ids)
+        if indices is None:
+            indices = np.random.randint(0, n_data, batch_size)
         batch = []
-        for index in type_selected:
-            id_ = self.ids[index]
+        for id_ in ids[indices]:
+            index = np.where(self.ids == id_)[0][0]
             datum = self.db.get(str(id_))
             if datum is not None:
                 # use cached data
