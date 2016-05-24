@@ -127,7 +127,6 @@ class APC2015(Bunch):
         rgb = rgb.astype(np.float32)
         blob = rgb[:, :, ::-1]  # RGB-> BGR
         blob -= self.mean_bgr
-        blob = skimage.transform.resize(blob, (224, 224), preserve_range=True)
         blob = blob.transpose((2, 0, 1))
         return blob
 
