@@ -146,11 +146,20 @@ class APC2015(Bunch):
         img = imread(self.img_files[index], mode='RGB')
         img, _ = fcn.util.resize_img_with_max_size(img, max_size=max_size)
         label = np.zeros(img.shape[:2], dtype=np.int32)  # bg_label is 0
+        height, width = img.shape[:2]
+        translation = (int(0.3 * np.random.random() * height),
+                       int(0.3 * np.random.random() * width))
+        tform = skimage.transform.SimilarityTransform(translation=translation)
+        img = skimage.transform.warp(
+            img, tform, mode='constant', preserve_range=True).astype(np.uint8)
         for label_value, mask_file in enumerate(self.mask_files[index]):
             if mask_file is None:
                 continue
             mask = imread(mask_file, mode='L')
             mask, _ = fcn.util.resize_img_with_max_size(mask, max_size)
+            mask = skimage.transform.warp(
+                mask, tform, mode='constant',
+                preserve_range=True).astype(np.uint8)
             label[mask == 255] = label_value
         return img, label
 
