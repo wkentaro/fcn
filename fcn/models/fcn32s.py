@@ -1,3 +1,5 @@
+import math
+
 import chainer
 from chainer import cuda
 import chainer.functions as F
@@ -110,4 +112,6 @@ class FCN32s(chainer.Chain):
 
         # testing with t or training
         self.loss = F.softmax_cross_entropy(self.score, t, normalize=False)
+        if math.isnan(self.loss.data):
+            raise ValueError('loss value is nan')
         return self.loss

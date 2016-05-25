@@ -68,7 +68,7 @@ class APC2015(Bunch):
         self.rois = []
 
         self.datasets = defaultdict(list)
-        # self._load_berkeley()
+        self._load_berkeley()
         self._load_rbo()
         for name, ids in self.datasets.items():
             print('Loaded {0}: {1}'.format(name, len(ids)))
@@ -121,6 +121,8 @@ class APC2015(Bunch):
             where = np.argwhere(bin_mask)
             roi = where.min(0), where.max(0) + 1
             id_ = osp.join('rbo', basename)
+            dataset_index = len(self.ids) - 1
+            self.datasets['rbo'].append(dataset_index)
             mask_glob = re.sub('.jpg$', '_*.pbm', img_file)
             mask_files = [None] * self.n_class
             for mask_file in glob.glob(mask_glob):
