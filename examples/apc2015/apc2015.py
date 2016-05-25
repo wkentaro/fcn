@@ -152,7 +152,7 @@ class APC2015(Bunch):
 
     def _load_datum(self, index, type):
         """Get inputs with global index (global means self.ids[index] works)"""
-        max_size = 500 * 1000
+        max_size = 500 * 500
         roi = self.rois[index]
         img = imread(self.img_files[index], mode='RGB')
         if roi is not None:
