@@ -90,6 +90,8 @@ class APC2015(Bunch):
             img_file_glob = osp.join(
                 dataset_dir, label_name, '*.jpg')
             for i, img_file in enumerate(glob.glob(img_file_glob)):
+                if i % 30 != 0:
+                    continue
                 img_id = re.sub('.jpg$', '', osp.basename(img_file))
                 mask_file = osp.join(dataset_dir, label_name, 'masks',
                                      img_id + '_mask.jpg')
@@ -180,12 +182,10 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from skimage.color import label2rgb
     dataset = APC2015(tempfile.mktemp())
-    print('berkeley data:',
-          len([id_ for id_ in dataset.ids if id_.startswith('berkeley/')]))
-    print('rbo data:',
-          len([id_ for id_ in dataset.ids if id_.startswith('rbo/')]))
     batch = dataset.next_batch(batch_size=1, type='train')
     img, label = batch[0]
+    print(np.unique(label))
+    print(np.array(dataset.target_names)[np.unique(label)])
     label_viz = label2rgb(label, img, bg_label=0)
     plt.imshow(label_viz)
     plt.show()
