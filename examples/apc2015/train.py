@@ -52,7 +52,7 @@ def main():
         model.to_gpu(gpu)
 
     # setup optimizer
-    optimizer = O.MomentumSGD(lr=1e-10, momentum=0.99)
+    optimizer = O.MomentumSGD(lr=1e-23, momentum=0.9)
     optimizer.setup(model)
 
     # train
