@@ -10,6 +10,8 @@ from chainer import cuda
 import chainer.serializers as S
 from chainer import Variable
 import numpy as np
+from scipy.misc import imsave
+from skimage.color import label2rgb
 import tqdm
 
 from fcn import util
@@ -118,6 +120,12 @@ class Trainer(object):
             result['acc_cls'].append(acc_cls)
             result['iu'].append(iu)
             result['fwavacc'].append(fwavacc)
+        # visualize predicted label
+        blob = cuda.to_cpu(self.model.x.data)
+        img = self.dataset.datum_to_img(blob)
+        label = cuda.to_cpu(self.model.score.data).argmax(axis=1)
+        imsave(osp.join(self.log_dir, 'visualize_{0}.jpg'.format(self.i_iter)),
+               label2rgb(label, img, bg_label=0))
         log = dict(
             i_iter=self.i_iter,
             type=type,
