@@ -80,7 +80,8 @@ class Trainer(object):
         for i_iter in xrange(self.max_iter):
             self.i_iter = i_iter
 
-            if i_iter % self.test_interval == 0:
+            if (self.test_interval is not None) and \
+               (i_iter % self.test_interval == 0):
                 self.validate()
 
             type = 'train'
@@ -121,9 +122,9 @@ class Trainer(object):
             result['iu'].append(iu)
             result['fwavacc'].append(fwavacc)
         # visualize predicted label
-        blob = cuda.to_cpu(self.model.x.data)
+        blob = cuda.to_cpu(self.model.x.data)[0]
         img = self.dataset.datum_to_img(blob)
-        label = cuda.to_cpu(self.model.score.data).argmax(axis=1)
+        label = cuda.to_cpu(self.model.score.data).argmax(axis=1)[0]
         imsave(osp.join(self.log_dir, 'visualize_{0}.jpg'.format(self.i_iter)),
                label2rgb(label, img, bg_label=0))
         log = dict(
