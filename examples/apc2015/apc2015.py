@@ -65,19 +65,22 @@ class APC2015(Bunch):
         self.ids = []
         self.img_files = []
         self.mask_files = []
-        self.target = []
+        self.rois = []
 
         self.datasets = defaultdict(list)
-        self._load_berkeley()
+        # self._load_berkeley()
         self._load_rbo()
         for name, ids in self.datasets.items():
             print('Loaded {0}: {1}'.format(name, len(ids)))
-        assert len(self.ids) == len(set(self.ids))
+        n_ids = len(self.ids)
+        assert n_ids == len(set(self.ids))
+        assert n_ids == len(self.img_files)
+        assert n_ids == len(self.mask_files)
+        assert n_ids == len(self.rois)
 
         self.ids = np.array(self.ids)
         self.img_files = np.array(self.img_files)
         self.mask_files = np.array(self.mask_files)
-        self.target = np.array(self.target)
 
         seed = np.random.RandomState(1234)
         self.train, self.val = train_test_split(
@@ -96,34 +99,40 @@ class APC2015(Bunch):
                 mask_file = osp.join(dataset_dir, label_name, 'masks',
                                      img_id + '_mask.jpg')
                 id_ = osp.join('berkeley', label_name, img_id)
-                self.ids.append(id_)
                 dataset_index = len(self.ids) - 1
                 self.datasets['berkeley'].append(dataset_index)
-                self.img_files.append(img_file)
                 mask_files = [None] * self.n_class
                 mask_files[label_value] = mask_file
+                self.ids.append(id_)
+                self.rois.append(None)
+                self.img_files.append(img_file)
                 self.mask_files.append(mask_files)
-                self.target.append(label_value)
 
     def _load_rbo(self):
         """Load APC2015rbo dataset"""
-        dataset_dir = osp.join(this_dir, 'dataset/APC2015rbo/berlin_selected')
-        for label_value, label_name in enumerate(self.target_names):
-            mask_file_glob = osp.join(dataset_dir, label_name,
-                                      '*_{0}.pbm'.format(label_name))
-            for mask_file in glob.glob(mask_file_glob):
-                img_id = re.sub('_{0}.pbm'.format(label_name), '',
-                                osp.basename(mask_file))
-                img_file = osp.join(dataset_dir, label_name, img_id + '.jpg')
-                id_ = osp.join('rbo', label_name, img_id)
-                self.ids.append(id_)
-                dataset_index = len(self.ids) - 1
-                self.datasets['rbo'].append(dataset_index)
-                self.img_files.append(img_file)
-                mask_files = [None] * self.n_class
-                mask_files[label_value] = mask_file
-                self.mask_files.append(mask_files)
-                self.target.append(label_value)
+        dataset_dir = osp.join(this_dir, 'dataset/APC2015rbo/berlin_samples')
+        img_glob = osp.join(dataset_dir, '*_bin_[A-L].jpg')
+        for img_file in glob.glob(img_glob):
+            basename = osp.splitext(osp.basename(img_file))[0]
+            # apply mask, crop and save
+            bin_mask_file = re.sub('.jpg$', '.pbm', img_file)
+            bin_mask = imread(bin_mask_file, mode='L')
+            img = imread(img_file, mode='RGB')
+            where = np.argwhere(bin_mask)
+            roi = where.min(0), where.max(0) + 1
+            id_ = osp.join('rbo', basename)
+            mask_glob = re.sub('.jpg$', '_*.pbm', img_file)
+            mask_files = [None] * self.n_class
+            for mask_file in glob.glob(mask_glob):
+                mask_basename = osp.splitext(osp.basename(mask_file))[0]
+                label_name = re.sub(basename + '_', '', mask_basename)
+                if label_name == 'shelf':
+                    continue
+                mask_files[self.target_names.index(label_name)] = mask_file
+            self.ids.append(id_)
+            self.rois.append(roi)
+            self.img_files.append(img_file)
+            self.mask_files.append(mask_files)
 
     def img_to_datum(self, rgb):
         rgb = rgb.astype(np.float32)
@@ -142,13 +151,15 @@ class APC2015(Bunch):
     def _load_datum(self, index, type):
         """Get inputs with global index (global means self.ids[index] works)"""
         max_size = 500 * 1000
-        label_value = self.target[index]
+        roi = self.rois[index]
         img = imread(self.img_files[index], mode='RGB')
+        if roi is not None:
+            img = img[roi[0][0]:roi[1][0], roi[1][0]:roi[1][1]]
         img, _ = fcn.util.resize_img_with_max_size(img, max_size=max_size)
         label = np.zeros(img.shape[:2], dtype=np.int32)  # bg_label is 0
         height, width = img.shape[:2]
-        translation = (int(0.3 * np.random.random() * height),
-                       int(0.3 * np.random.random() * width))
+        translation = (int(0 * np.random.random() * height),
+                       int(0 * np.random.random() * width))
         tform = skimage.transform.SimilarityTransform(translation=translation)
         img = skimage.transform.warp(
             img, tform, mode='constant', preserve_range=True).astype(np.uint8)
@@ -156,6 +167,8 @@ class APC2015(Bunch):
             if mask_file is None:
                 continue
             mask = imread(mask_file, mode='L')
+            if roi is not None:
+                mask = mask[roi[0][0]:roi[1][0], roi[1][0]:roi[1][1]]
             mask, _ = fcn.util.resize_img_with_max_size(mask, max_size)
             mask = skimage.transform.warp(
                 mask, tform, mode='constant',
