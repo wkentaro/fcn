@@ -29,7 +29,6 @@ class APC2015(Bunch):
 
     def __init__(self, db_path):
         self.n_transforms = 6
-        self.transform_random_range = 0.1
         self.db = plyvel.DB(db_path, create_if_missing=True)
 
         self.target_names = [
@@ -96,6 +95,8 @@ class APC2015(Bunch):
             desc = 'berkeley:%s' % label_name
             for img_file in tqdm.tqdm(glob.glob(img_file_glob),
                                       ncols=80, desc=desc):
+                if np.random.randint(30) != 0:
+                    continue
                 img_id = re.sub('.jpg$', '', osp.basename(img_file))
                 mask_file = osp.join(dataset_dir, label_name, 'masks',
                                      img_id + '_mask.jpg')
@@ -106,8 +107,7 @@ class APC2015(Bunch):
                 mask_files[label_value] = mask_file
                 # compute roi
                 img = imread(img_file, mode='RGB')
-                y_min = int(np.random.random() * img.shape[0] / 2)
-                x_min = int(np.random.random() * img.shape[1] / 2)
+                y_min, x_min = img.shape[0] // 4, img.shape[1] // 4
                 y_max, x_max = y_min + img.shape[0]//2, x_min + img.shape[1]//2
                 roi = (y_min, x_min), (y_max, x_max)
                 del img
@@ -170,8 +170,8 @@ class APC2015(Bunch):
         img, _ = fcn.util.resize_img_with_max_size(img, max_size=max_size)
         label = np.zeros(img.shape[:2], dtype=np.int32)  # bg_label is 0
         height, width = img.shape[:2]
-        translation = (int(0 * np.random.random() * height),
-                       int(0 * np.random.random() * width))
+        translation = (int(0.1 * np.random.random() * height),
+                       int(0.1 * np.random.random() * width))
         tform = skimage.transform.SimilarityTransform(translation=translation)
         img = skimage.transform.warp(
             img, tform, mode='constant', preserve_range=True).astype(np.uint8)
