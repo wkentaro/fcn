@@ -103,8 +103,15 @@ class APC2015(Bunch):
                 self.datasets['berkeley'].append(dataset_index)
                 mask_files = [None] * self.n_class
                 mask_files[label_value] = mask_file
+                # compute roi
+                img = imread(img_file, mode='RGB')
+                y_min, x_min = img.shape[0] // 4, img.shape[1] // 4
+                y_max, x_max = y_min + img.shape[0]//2, x_min + img.shape[1]//2
+                roi = (y_min, x_min), (y_max, x_max)
+                del img
+                # set to data fields
                 self.ids.append(id_)
-                self.rois.append(None)
+                self.rois.append(roi)
                 self.img_files.append(img_file)
                 self.mask_files.append(mask_files)
 
@@ -156,7 +163,8 @@ class APC2015(Bunch):
         roi = self.rois[index]
         img = imread(self.img_files[index], mode='RGB')
         if roi is not None:
-            img = img[roi[0][0]:roi[1][0], roi[1][0]:roi[1][1]]
+            (y_min, x_min), (y_max, x_max) = roi
+            img = img[y_min:y_max, x_min:x_max]
         img, _ = fcn.util.resize_img_with_max_size(img, max_size=max_size)
         label = np.zeros(img.shape[:2], dtype=np.int32)  # bg_label is 0
         height, width = img.shape[:2]
@@ -170,7 +178,8 @@ class APC2015(Bunch):
                 continue
             mask = imread(mask_file, mode='L')
             if roi is not None:
-                mask = mask[roi[0][0]:roi[1][0], roi[1][0]:roi[1][1]]
+                (y_min, x_min), (y_max, x_max) = roi
+                mask = mask[y_min:y_max, x_min:x_max]
             mask, _ = fcn.util.resize_img_with_max_size(mask, max_size)
             mask = skimage.transform.warp(
                 mask, tform, mode='constant',
