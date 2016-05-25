@@ -19,7 +19,7 @@ def download_vgg16_chainermodel():
     this_dir = osp.dirname(osp.abspath(__file__))
     vgg16_path = osp.join(this_dir, 'vgg16.chainermodel')
     fcn.util.download_data(
-        pkg_name='fcn',
+        pkg_name='fcn/example/apc2015',
         path=vgg16_path,
         url='https://drive.google.com/uc?id=0B9P1L--7Wd2vQ2tCN1hoYV84eHM',
         md5='4a48c2f39234e46937759f4cc43bb257',
