@@ -101,7 +101,7 @@ class FCN32s(chainer.Chain):
         upscore = h  # 1
 
         # score
-        h = upscore[:, :, 19+x.data.shape[2], 19+x.data.shape[3]]
+        h = upscore[:, :, 19:19+x.data.shape[2], 19:19+x.data.shape[3]]
         self.score = h  # 1/1
 
         if t is None:
