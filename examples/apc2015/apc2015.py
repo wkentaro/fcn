@@ -93,8 +93,6 @@ class APC2015(Bunch):
             img_file_glob = osp.join(
                 dataset_dir, label_name, '*.jpg')
             for i, img_file in enumerate(glob.glob(img_file_glob)):
-                if i % 30 != 0:
-                    continue
                 img_id = re.sub('.jpg$', '', osp.basename(img_file))
                 mask_file = osp.join(dataset_dir, label_name, 'masks',
                                      img_id + '_mask.jpg')
@@ -105,7 +103,8 @@ class APC2015(Bunch):
                 mask_files[label_value] = mask_file
                 # compute roi
                 img = imread(img_file, mode='RGB')
-                y_min, x_min = img.shape[0] // 4, img.shape[1] // 4
+                y_min = int(np.random.random() * img.shape[0] / 2)
+                x_min = int(np.random.random() * img.shape[1] / 2)
                 y_max, x_max = y_min + img.shape[0]//2, x_min + img.shape[1]//2
                 roi = (y_min, x_min), (y_max, x_max)
                 del img
