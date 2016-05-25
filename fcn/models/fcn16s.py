@@ -108,7 +108,8 @@ class FCN16s(chainer.Chain):
         score_pool4 = h
 
         # score_pool4c
-        h = F.crop(score_pool4, upscore2, axes=[2, 3], offset=5)
+        h = score_pool4[:, :,
+                        5:5+upscore2.data.shape[2], 5:5+upscore2.data.shape[3]]
         score_pool4c = h
 
         # fuse_pool4
@@ -120,7 +121,7 @@ class FCN16s(chainer.Chain):
         upscore16 = h
 
         # score
-        h = F.crop(upscore16, x, axes=[2, 3], offset=27)
+        h = upscore16[:, :, 27:27+x.data.shape[2], 27:27+x.data.shape[3]]
         self.score = h  # 1/1
 
         # testing with t or training

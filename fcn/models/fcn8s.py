@@ -116,7 +116,8 @@ class FCN8s(chainer.Chain):
         upscore2 = h  # 1/16
 
         # score_pool4c
-        h = F.crop(score_pool4, upscore2, axes=[2, 3], offset=5)
+        h = score_pool4[:, :,
+                        5:5+upscore2.data.shape[2], 5:5+upscore2.data.shape[3]]
         score_pool4c = h  # 1/16
 
         # fuse_pool4
@@ -128,7 +129,9 @@ class FCN8s(chainer.Chain):
         upscore_pool4 = h  # 1/8
 
         # score_pool4c
-        h = F.crop(score_pool3, upscore_pool4, axes=[2, 3], offset=9)
+        h = score_pool3[:, :,
+                        9:9+upscore_pool4.data.shape[2],
+                        9:9+upscore_pool4.data.shape[3]]
         score_pool3c = h  # 1/8
 
         # fuse_pool3
@@ -140,7 +143,7 @@ class FCN8s(chainer.Chain):
         upscore8 = h  # 1/1
 
         # score
-        h = F.crop(upscore8, x, axes=[2, 3], offset=31)
+        h = upscore8[:, :, 31:31+x.data.shape[2], 31:31+x.data.shape[3]]
         self.score = h  # 1/1
 
         if t is None:

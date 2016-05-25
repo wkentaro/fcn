@@ -101,7 +101,7 @@ class FCN32s(chainer.Chain):
         upscore = h  # 1
 
         # score
-        h = F.crop(upscore, x, axes=[2, 3], offset=19)
+        h = upscore[:, :, 19+x.data.shape[2], 19+x.data.shape[3]]
         self.score = h  # 1/1
 
         if t is None:
