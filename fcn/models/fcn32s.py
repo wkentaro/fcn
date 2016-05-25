@@ -44,6 +44,9 @@ class FCN32s(chainer.Chain):
         self.train = False
 
     def __call__(self, x, t=None):
+        self.x = x
+        self.t = t
+
         # conv1
         h = F.relu(self.conv1_1(x))
         conv1_1 = h
