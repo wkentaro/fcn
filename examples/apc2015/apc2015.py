@@ -8,7 +8,7 @@ import cPickle as pickle
 import glob
 import os.path as osp
 import re
-import sys
+import tempfile
 
 import numpy as np
 import plyvel
@@ -17,6 +17,7 @@ import skimage.morphology
 import skimage.transform
 from sklearn.cross_validation import train_test_split
 from sklearn.datasets.base import Bunch
+import tqdm
 
 import fcn
 
@@ -92,7 +93,9 @@ class APC2015(Bunch):
         for label_value, label_name in enumerate(self.target_names):
             img_file_glob = osp.join(
                 dataset_dir, label_name, '*.jpg')
-            for i, img_file in enumerate(glob.glob(img_file_glob)):
+            desc = 'berkeley:%s' % label_name
+            for img_file in tqdm.tqdm(glob.glob(img_file_glob),
+                                      ncols=80, desc=desc):
                 img_id = re.sub('.jpg$', '', osp.basename(img_file))
                 mask_file = osp.join(dataset_dir, label_name, 'masks',
                                      img_id + '_mask.jpg')
@@ -118,12 +121,12 @@ class APC2015(Bunch):
         """Load APC2015rbo dataset"""
         dataset_dir = osp.join(this_dir, 'dataset/APC2015rbo/berlin_samples')
         img_glob = osp.join(dataset_dir, '*_bin_[A-L].jpg')
-        for img_file in glob.glob(img_glob):
+        desc = 'rbo'
+        for img_file in tqdm.tqdm(glob.glob(img_glob), ncols=80, desc=desc):
             basename = osp.splitext(osp.basename(img_file))[0]
             # apply mask, crop and save
             bin_mask_file = re.sub('.jpg$', '.pbm', img_file)
             bin_mask = imread(bin_mask_file, mode='L')
-            img = imread(img_file, mode='RGB')
             where = np.argwhere(bin_mask)
             roi = where.min(0), where.max(0) + 1
             id_ = osp.join('rbo', basename)
@@ -210,7 +213,6 @@ class APC2015(Bunch):
 
 
 if __name__ == '__main__':
-    import tempfile
     import matplotlib.pyplot as plt
     from skimage.color import label2rgb
     dataset = APC2015(tempfile.mktemp())
