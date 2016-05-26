@@ -107,8 +107,8 @@ class APC2015(Bunch):
                 mask_files[label_value] = mask_file
                 # compute roi
                 img = imread(img_file, mode='RGB')
-                y_min, x_min = img.shape[0] // 4, img.shape[1] // 4
-                y_max, x_max = y_min + img.shape[0]//2, x_min + img.shape[1]//2
+                y_min, x_min = img.shape[0] // 3, img.shape[1] // 3
+                y_max, x_max = y_min + img.shape[0]//3, x_min + img.shape[1]//3
                 roi = (y_min, x_min), (y_max, x_max)
                 del img
                 # set to data fields
