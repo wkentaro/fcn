@@ -2,6 +2,8 @@
 
 import argparse
 
+import os.path as osp
+
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
@@ -76,8 +78,9 @@ def learning_curve(csv_file):
     plt.xlabel('iteration')
     plt.ylabel('val mean IU')
 
-    plt.savefig('plot.png')
-    print('Saved plot.png')
+    fig_file = osp.splitext(csv_file)[0] + '.png'
+    plt.savefig(fig_file)
+    print('Saved to %s' % fig_file)
 
 
 def main():
