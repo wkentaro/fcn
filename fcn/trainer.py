@@ -124,9 +124,11 @@ class Trainer(object):
         # visualize predicted label
         blob = cuda.to_cpu(self.model.x.data)[0]
         img = self.dataset.datum_to_img(blob)
-        label = cuda.to_cpu(self.model.score.data).argmax(axis=1)[0]
+        label = cuda.to_cpu(self.model.score.data)[0].argmax(axis=0)
+        label_viz = label2rgb(label, img, bg_label=0)
+        label_viz[label == 0] = 0
         imsave(osp.join(self.log_dir, 'visualize_{0}.jpg'.format(self.i_iter)),
-               label2rgb(label, img, bg_label=0))
+               np.vstack([img, label_viz]))
         log = dict(
             i_iter=self.i_iter,
             type=type,
