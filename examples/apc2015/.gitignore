@@ -1,5 +1,6 @@
 leveldb
 snapshot/
 forward_out/
+logs/
 
 vgg16.chainermodel
