@@ -95,7 +95,7 @@ class APC2015(Bunch):
             desc = 'berkeley:%s' % label_name
             for img_file in tqdm.tqdm(glob.glob(img_file_glob),
                                       ncols=80, desc=desc):
-                if np.random.randint(30) != 0:
+                if np.random.randint(100) != 0:
                     continue
                 img_id = re.sub('.jpg$', '', osp.basename(img_file))
                 mask_file = osp.join(dataset_dir, label_name, 'masks',
