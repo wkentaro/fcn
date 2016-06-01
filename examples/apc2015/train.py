@@ -62,7 +62,7 @@ def main():
         optimizer=optimizer,
         weight_decay=0.0005,
         test_interval=1000,
-        max_iter=100000,
+        max_iter=1000000,
         snapshot=4000,
         gpu=gpu,
     )
