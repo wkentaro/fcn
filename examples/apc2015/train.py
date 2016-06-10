@@ -15,21 +15,9 @@ from fcn.models import FCN32s
 from fcn.models import VGG16
 
 
-def download_vgg16_chainermodel():
-    this_dir = osp.dirname(osp.abspath(__file__))
-    vgg16_path = osp.join(this_dir, 'vgg16.chainermodel')
-    fcn.util.download_data(
-        pkg_name='fcn/example/apc2015',
-        path=vgg16_path,
-        url='https://drive.google.com/uc?id=0B9P1L--7Wd2vQ2tCN1hoYV84eHM',
-        md5='4a48c2f39234e46937759f4cc43bb257',
-    )
-    return vgg16_path
-
-
 def get_vgg16_pretrained_model(n_class):
-    vgg16_path = download_vgg16_chainermodel()
-    vgg16 = VGG16(n_class)
+    vgg16_path = fcn.setup.download_vgg16_chainermodel()
+    vgg16 = VGG16()
     print('Loading vgg16 model: {0}'.format(vgg16_path))
     S.load_hdf5(vgg16_path, vgg16)
     return vgg16
