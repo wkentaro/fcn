@@ -68,7 +68,7 @@ class APC2015(Bunch):
         self.rois = []
 
         self.datasets = defaultdict(list)
-        self._load_berkeley()
+        # self._load_berkeley()
         self._load_rbo()
         for name, ids in self.datasets.items():
             print('Loaded {0}: {1}'.format(name, len(ids)))
