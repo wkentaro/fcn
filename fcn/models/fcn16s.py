@@ -45,6 +45,9 @@ class FCN16s(chainer.Chain):
         self.train = False
 
     def __call__(self, x, t=None):
+        self.x = x
+        self.t = t
+
         # conv1
         h = F.relu(self.conv1_1(x))
         conv1_1 = h
@@ -100,25 +103,25 @@ class FCN16s(chainer.Chain):
         score_fr = h  # 1/32
 
         # upscore2
-        h = self.upscore(score_fr)
+        h = self.upscore2(score_fr)
         upscore2 = h  # 1/16
 
         # score_pool4
         h = self.score_pool4(pool4)
-        score_pool4 = h
+        score_pool4 = h  # 1/16
 
         # score_pool4c
         h = score_pool4[:, :,
                         5:5+upscore2.data.shape[2], 5:5+upscore2.data.shape[3]]
-        score_pool4c = h
+        score_pool4c = h  # 1/16
 
         # fuse_pool4
         h = upscore2 + score_pool4c
-        fuse_pool4 = h
+        fuse_pool4 = h  # 1/16
 
         # upscore16
         h = self.upscore16(fuse_pool4)
-        upscore16 = h
+        upscore16 = h  # 1/1
 
         # score
         h = upscore16[:, :, 27:27+x.data.shape[2], 27:27+x.data.shape[3]]

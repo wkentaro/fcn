@@ -247,10 +247,11 @@ def visualize_labelcolormap(cmap):
 # -----------------------------------------------------------------------------
 # Evaluation
 # -----------------------------------------------------------------------------
-def _fast_hist(a, b, n):
-    k = (a >= 0) & (a < n)
-    hist = np.bincount(n * a[k].astype(int) +
-                       b[k], minlength=n**2).reshape(n, n)
+def _fast_hist(label_true, label_pred, n_class):
+    mask = (label_true >= 0) & (label_true < n_class)
+    hist = np.bincount(
+        n_class * label_true[mask].astype(int) +
+        label_pred[mask], minlength=n_class**2).reshape(n_class, n_class)
     return hist
 
 

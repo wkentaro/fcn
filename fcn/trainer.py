@@ -10,6 +10,8 @@ from chainer import cuda
 import chainer.serializers as S
 from chainer import Variable
 import numpy as np
+from scipy.misc import imsave
+from skimage.color import label2rgb
 import tqdm
 
 from fcn import util
@@ -20,6 +22,8 @@ class Trainer(object):
     def __init__(self, dataset, model, optimizer, weight_decay,
                  test_interval, max_iter, snapshot, gpu):
         self.dataset = dataset
+        self.model = model
+        self.optimizer = optimizer
         self.weight_decay = weight_decay
         self.test_interval = test_interval
         self.max_iter = max_iter
@@ -63,7 +67,7 @@ class Trainer(object):
         else:
             self.model(x, y)
         # evaluate
-        label_pred = np.argmax(cuda.to_cpu(self.model.score.data), axis=1)
+        label_pred = cuda.to_cpu(self.model.score.data).argmax(axis=1)[0]
         acc, acc_cls, iu, fwavacc = util.label_accuracy_score(
             label, label_pred, self.model.n_class)
         loss = float(cuda.to_cpu(self.model.loss.data))
@@ -76,7 +80,8 @@ class Trainer(object):
         for i_iter in xrange(self.max_iter):
             self.i_iter = i_iter
 
-            if i_iter % self.test_interval == 0:
+            if (self.test_interval is not None) and \
+               (i_iter % self.test_interval == 0):
                 self.validate()
 
             type = 'train'
@@ -116,6 +121,22 @@ class Trainer(object):
             result['acc_cls'].append(acc_cls)
             result['iu'].append(iu)
             result['fwavacc'].append(fwavacc)
+        # visualize predicted label
+        blob = cuda.to_cpu(self.model.x.data)[0]
+        label_true = cuda.to_cpu(self.model.t.data)[0]
+        img = self.dataset.datum_to_img(blob)
+        label_true_viz = label2rgb(label_true, img, bg_label=0)
+        label_true_viz[label_true == 0] = 0
+        label_true_viz = (label_true_viz * 255).astype(np.uint8)
+        label = cuda.to_cpu(self.model.score.data)[0].argmax(axis=0)
+        label_viz = label2rgb(label, img, bg_label=0)
+        label_viz[label == 0] = 0
+        label_viz = (label_viz * 255).astype(np.uint8)
+        hline = np.zeros((5, img.shape[1], 3), dtype=np.uint8)
+        hline.fill(255)
+        imsave(
+            osp.join(self.log_dir, 'visualize_{0}.jpg'.format(self.i_iter)),
+            np.vstack([img, hline, label_true_viz, hline, label_viz, hline]))
         log = dict(
             i_iter=self.i_iter,
             type=type,
