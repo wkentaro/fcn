@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import argparse
 import os
 import os.path as osp
+import sys
 
 from chainer import cuda
 import chainer.serializers as S
@@ -74,7 +75,7 @@ class Forwarding(object):
             print('- computational_graph: {0}'.format(psfile))
         pred_datum = cuda.to_cpu(pred.data)[0]
         label = np.argmax(pred_datum, axis=0)
-        return img, label
+        return img, label, pred_datum
 
     def visualize_label(self, img, label):
         # visualize result
@@ -120,7 +121,7 @@ def main():
 
     forwarding = Forwarding(gpu, chainermodel)
     for img_file in img_files:
-        img, label = forwarding.forward_img_file(img_file)
+        img, label, _ = forwarding.forward_img_file(img_file)
         out_img = forwarding.visualize_label(img, label)
 
         out_file = osp.join(save_dir, osp.basename(img_file))

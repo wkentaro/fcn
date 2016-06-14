@@ -27,40 +27,41 @@ this_dir = osp.dirname(osp.realpath(__file__))
 
 class APC2015(Bunch):
 
+    target_names = [
+        'background',
+        'champion_copper_plus_spark_plug',
+        'cheezit_big_original',
+        'crayola_64_ct',
+        'dr_browns_bottle_brush',
+        'elmers_washable_no_run_school_glue',
+        'expo_dry_erase_board_eraser',
+        'feline_greenies_dental_treats',
+        'first_years_take_and_toss_straw_cup',
+        'genuine_joe_plastic_stir_sticks',
+        'highland_6539_self_stick_notes',
+        'kong_air_dog_squeakair_tennis_ball',
+        'kong_duck_dog_toy',
+        'kong_sitting_frog_dog_toy',
+        'kyjen_squeakin_eggs_plush_puppies',
+        'laugh_out_loud_joke_book',
+        'mark_twain_huckleberry_finn',
+        'mead_index_cards',
+        'mommys_helper_outlet_plugs',
+        'munchkin_white_hot_duck_bath_toy',
+        'oreo_mega_stuf',
+        'paper_mate_12_count_mirado_black_warrior',
+        'rolodex_jumbo_pencil_cup',
+        'safety_works_safety_glasses',
+        'sharpie_accent_tank_style_highlighters',
+        'stanley_66_052',
+    ]
+    n_class = len(target_names)
+    mean_bgr = np.array((104.00698793, 116.66876762, 122.67891434))
+
+
     def __init__(self, db_path):
         self.n_transforms = 6
         self.db = plyvel.DB(db_path, create_if_missing=True)
-
-        self.target_names = [
-            'background',
-            'champion_copper_plus_spark_plug',
-            'cheezit_big_original',
-            'crayola_64_ct',
-            'dr_browns_bottle_brush',
-            'elmers_washable_no_run_school_glue',
-            'expo_dry_erase_board_eraser',
-            'feline_greenies_dental_treats',
-            'first_years_take_and_toss_straw_cup',
-            'genuine_joe_plastic_stir_sticks',
-            'highland_6539_self_stick_notes',
-            'kong_air_dog_squeakair_tennis_ball',
-            'kong_duck_dog_toy',
-            'kong_sitting_frog_dog_toy',
-            'kyjen_squeakin_eggs_plush_puppies',
-            'laugh_out_loud_joke_book',
-            'mark_twain_huckleberry_finn',
-            'mead_index_cards',
-            'mommys_helper_outlet_plugs',
-            'munchkin_white_hot_duck_bath_toy',
-            'oreo_mega_stuf',
-            'paper_mate_12_count_mirado_black_warrior',
-            'rolodex_jumbo_pencil_cup',
-            'safety_works_safety_glasses',
-            'sharpie_accent_tank_style_highlighters',
-            'stanley_66_052',
-        ]
-        self.n_class = len(self.target_names)
-        self.mean_bgr = np.array((104.00698793, 116.66876762, 122.67891434))
 
         self.ids = []
         self.img_files = []
