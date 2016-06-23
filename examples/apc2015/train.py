@@ -6,8 +6,10 @@ from __future__ import print_function
 
 import os.path as osp
 
+import chainer
 import chainer.optimizers as O
 import chainer.serializers as S
+
 
 import apc2015
 import fcn
@@ -40,8 +42,9 @@ def main():
         model.to_gpu(gpu)
 
     # setup optimizer
-    optimizer = O.MomentumSGD(lr=1e-8, momentum=0.99)
+    optimizer = O.Adam(alpha=1e-5)
     optimizer.setup(model)
+    optimizer.add_hook(chainer.optimizer.GradientClipping(5))
 
     # train
     trainer = fcn.Trainer(
