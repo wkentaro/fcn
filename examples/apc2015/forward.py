@@ -24,10 +24,10 @@ import apc2015
 
 class Forwarding(object):
 
-    def __init__(self, gpu, chainermodel=None):
+    def __init__(self, gpu, target_names, chainermodel=None):
         self.gpu = gpu
 
-        self.target_names = apc2015.APC2015('/tmp/apc2015').target_names
+        self.target_names = target_names
         self.n_class = len(self.target_names)
 
         if chainermodel is None:
@@ -119,7 +119,8 @@ def main():
     if not osp.exists(save_dir):
         os.makedirs(save_dir)
 
-    forwarding = Forwarding(gpu, chainermodel)
+    target_names = apc2015.APC2015.target_names
+    forwarding = Forwarding(gpu, target_names, chainermodel)
     for img_file in img_files:
         img, label, _ = forwarding.forward_img_file(img_file)
         out_img = forwarding.visualize_label(img, label)
