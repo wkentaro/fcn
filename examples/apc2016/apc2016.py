@@ -105,7 +105,7 @@ class APC2016Dataset(object):
 
     def view_dataset(self):
         for datum in self.val:
-            rgb, label = self._load_datum(datum, train=False)
+            rgb, label = self.load_datum(datum, train=False)
             label_viz = label2rgb(label, rgb, bg_label=0)
             plt.imshow(label_viz)
             plt.show()
@@ -124,7 +124,7 @@ class APC2016Dataset(object):
         rgb = rgb.astype(np.uint8)
         return rgb
 
-    def _load_datum(self, datum, train):
+    def load_datum(self, datum, train):
         max_size = 500 * 500
         rgb = ndi.imread(datum['img_file'], mode='RGB')
         rgb, _ = fcn.util.resize_img_with_max_size(rgb, max_size=max_size)
@@ -173,7 +173,7 @@ class APC2016Dataset(object):
                 # use cached data
                 inputs = pickle.loads(inputs)
             else:
-                inputs = self._load_datum(datum, train=type == 'train')
+                inputs = self.load_datum(datum, train=type == 'train')
                 # save to db
                 self.db.put(datum['id'], pickle.dumps(inputs))
             batch.append(inputs)
