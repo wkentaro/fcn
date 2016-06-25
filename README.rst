@@ -43,6 +43,7 @@ Installation
 .. code-block:: bash
 
   pip install fcn
+  fcn_install_trained_data.py
 
 
 Forwarding
@@ -77,6 +78,7 @@ Installation
   cd fcn
 
   python setup.py install
+  fcn_install_trained_data.py
 
 You need to download pascal VOC2012 dataset from `here <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/>`_,
 and install it as below construction::
