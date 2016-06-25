@@ -76,7 +76,7 @@ class APC2016Dataset(object):
         self.db = plyvel.DB(db_path, create_if_missing=True)
 
     def scrape(self):
-        dataset_dir = osp.realpath(osp.join(this_dir, 'dataset/APC2016seg'))
+        dataset_dir = osp.realpath(osp.join(this_dir, 'dataset/APC2016rbo'))
         dataset = []
         for file_ in os.listdir(dataset_dir):
             match = re.match('.*_[0-9]*_bin_[a-l].jpg$', file_)
