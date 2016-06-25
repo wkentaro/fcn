@@ -90,7 +90,7 @@ def draw_computational_graph(*args, **kwargs):
     @param output: output ps file.
     """
     from chainer.computational_graph import build_computational_graph
-    output = kwargs['output']
+    output = kwargs.pop('output')
     if len(args) > 2:
         variable_style = args[2]
     else:
