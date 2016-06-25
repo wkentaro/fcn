@@ -27,28 +27,11 @@ if sys.argv[-1] == 'release':
     sys.exit(0)
 
 
-class FcnBuildPyCommand(BuildPyCommand):
-    def run(self):
-        BuildPyCommand.run(self)
-        # create data dirs
-        data_dir = osp.join(self.build_lib, 'fcn/_data')
-        if not osp.exists(data_dir):
-            os.makedirs(data_dir)
-        # download chainermodel to the data dir
-        output = osp.join(data_dir, 'fcn8s_from_caffe.chainermodel')
-        url = 'https://drive.google.com/uc?id=0B9P1L--7Wd2vTXU0QzUwSkVwOFk'
-        cmd = "gdown -q '{0}' -O {1}".format(url, output)
-        print("Downloading '{0}' by command '{1}'".format(output, cmd))
-        subprocess.check_call(shlex.split(cmd))
-        BuildPyCommand.run(self)
-
-
 setup(
     name='fcn',
     version=version,
     packages=find_packages(),
-    cmdclass={'build_py': FcnBuildPyCommand},
-    scripts=['scripts/fcn_forward.py'],
+    scripts=['scripts/fcn_forward.py', 'scripts/fcn_install_trained_data.py'],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
     long_description=open('README.rst').read(),
