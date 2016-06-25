@@ -9,10 +9,11 @@ import fcn
 
 def _get_data_dir():
     this_dir = osp.dirname(osp.abspath(__file__))
+    # 1. python setup.py develop
     data_dir = osp.realpath(osp.join(this_dir, '_data'))
-    if osp.exists(data_dir):
-        return data_dir
-    return ''
+    if not osp.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
 
 
 data_dir = _get_data_dir()
