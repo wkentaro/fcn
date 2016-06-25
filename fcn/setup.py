@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import os.path as osp
 
 import fcn
@@ -38,7 +39,7 @@ def download_fcn8s_caffemodel():
         pkg_name='fcn',
         path=caffemodel,
         url=open(url_file).read().strip(),
-        md5 = 'c03b2953ebd846c270da1a8e8f200c09',
+        md5='c03b2953ebd846c270da1a8e8f200c09',
     )
     return caffemodel
 
