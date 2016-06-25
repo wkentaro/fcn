@@ -110,7 +110,7 @@ def draw_computational_graph(*args, **kwargs):
     dotfile = tempfile.mktemp()
     with open(dotfile, 'w') as f:
         f.write(build_computational_graph(*args, **kwargs).dump())
-    ext = osp.splitext(output)[-1]
+    ext = osp.splitext(output)[-1][1:]  # ex) .ps -> ps
     cmd = 'dot -T{0} {1} > {2}'.format(ext, dotfile, output)
     subprocess.call(cmd, shell=True)
 
