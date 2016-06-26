@@ -140,6 +140,8 @@ class APC2016Dataset(object):
         return rgb
 
     def load_datum(self, datum, train):
+        rgb = ndi.imread(datum['img_file'], mode='RGB')
+        rgb, _ = fcn.util.resize_img_with_max_size(rgb, max_size=500*500)
         # # translate
         # height, width = rgb.shape[:2]
         # translation = (int(0.1 * np.random.random() * height),
@@ -148,14 +150,11 @@ class APC2016Dataset(object):
         # rgb = skimage.transform.warp(
         #     rgb, tform, mode='constant', preserve_range=True)
         # rgb = rgb.astype(np.uint8)
-        rgb = ndi.imread(datum['img_file'], mode='RGB')
         if datum['annotate_type'] == 'MaskImageList':
-            max_size = 500 * 500
-            rgb, _ = fcn.util.resize_img_with_max_size(rgb, max_size=max_size)
             # bin_mask
             bin_mask = ndi.imread(datum['bin_mask_file'], mode='L')
-            bin_mask, _ = fcn.util.resize_img_with_max_size(
-                bin_mask, max_size=max_size)
+            bin_mask = skimage.transform.resize(
+                bin_mask, rgb.shape[:2], preserve_range=True).astype(np.uint8)
             # bin_mask = skimage.transform.warp(
             #     bin_mask, tform, mode='constant', preserve_range=True)
             # bin_mask = bin_mask.astype(np.uint8)
@@ -165,19 +164,23 @@ class APC2016Dataset(object):
                 if mask_file is None:
                     continue
                 mask = ndi.imread(mask_file, mode='L')
-                mask, _ = fcn.util.resize_img_with_max_size(
-                    mask, max_size=max_size)
+                mask = skimage.transform.resize(
+                    mask, rgb.shape[:2], preserve_range=True).astype(np.uint8)
                 # mask = skimage.transform.warp(
                 #     mask, tform, mode='constant', preserve_range=True)
                 # mask = mask.astype(np.uint8)
                 label[mask != 0] = label_value
             label[bin_mask == 0] = -1
-            target_names = np.array(self.target_names.tolist() + ['unlabeled'])
         elif datum['annotate_type'] == 'LabelImage':
             label = ndi.imread(datum['label_file'], mode='L')
             label = label.astype(np.int32)
             label[label == 255] = -1
-            target_names = np.array(self.target_names.tolist() + ['unlabeled'])
+            # resize label carefully
+            unique_labels = np.unique(label)
+            label = skimage.transform.resize(
+                label, rgb.shape[:2], order=0,
+                preserve_range=True).astype(np.int32)
+            np.testing.assert_array_equal(unique_labels, np.unique(label))
         return rgb, label
 
     def next_batch(self, batch_size, type, indices=None):

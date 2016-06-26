@@ -10,6 +10,7 @@ import os.path as osp
 import sys
 
 import fcn
+import numpy as np
 import scipy.ndimage as ndi
 import skimage.io
 import skimage.transform
@@ -48,6 +49,12 @@ def main():
     for datum in dataset.val:
         img, label_true = dataset.load_datum(datum, train=False)
         img, label_pred, _ = forwarding.forward_img_file(datum['img_file'])
+
+        unique_labels = np.unique(label_true)
+        label_true = skimage.transform.resize(
+            label_true, label_pred.shape,
+            order=0, preserve_range=True).astype(np.int32)
+        np.testing.assert_array_equal(unique_labels, np.unique(label_true))
 
         label_pred[label_true == -1] = -1
 
