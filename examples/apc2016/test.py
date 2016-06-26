@@ -49,12 +49,7 @@ def main():
         img, label_true = dataset.load_datum(datum, train=False)
         img, label_pred, _ = forwarding.forward_img_file(datum['img_file'])
 
-        bin_mask_path = datum['bin_mask_file']
-        bin_mask = ndi.imread(bin_mask_path, mode='L')
-        bin_mask = skimage.transform.resize(bin_mask, img.shape[:2],
-                                            preserve_range=True)
-        img[bin_mask == 0] = 0
-        label_pred[bin_mask == 0] = 0
+        label_pred[label_true == -1] = -1
 
         acc, acc_cls, mean_iu, fwavcc = fcn.util.label_accuracy_score(
             label_true, label_pred, len(target_names))
