@@ -120,7 +120,8 @@ class APC2016Dataset(object):
     def view_dataset(self):
         for datum in self.val:
             rgb, label = self.load_datum(datum, train=False)
-            label_viz = label2rgb(label, rgb, bg_label=0)
+            label_viz = label2rgb(label, rgb, bg_label=-1)
+            label_viz[label == 0] = 0
             plt.imshow(label_viz)
             plt.show()
 
@@ -139,9 +140,6 @@ class APC2016Dataset(object):
         return rgb
 
     def load_datum(self, datum, train):
-        max_size = 500 * 500
-        rgb = ndi.imread(datum['img_file'], mode='RGB')
-        rgb, _ = fcn.util.resize_img_with_max_size(rgb, max_size=max_size)
         # # translate
         # height, width = rgb.shape[:2]
         # translation = (int(0.1 * np.random.random() * height),
@@ -150,7 +148,10 @@ class APC2016Dataset(object):
         # rgb = skimage.transform.warp(
         #     rgb, tform, mode='constant', preserve_range=True)
         # rgb = rgb.astype(np.uint8)
+        rgb = ndi.imread(datum['img_file'], mode='RGB')
         if datum['annotate_type'] == 'MaskImageList':
+            max_size = 500 * 500
+            rgb, _ = fcn.util.resize_img_with_max_size(rgb, max_size=max_size)
             # bin_mask
             bin_mask = ndi.imread(datum['bin_mask_file'], mode='L')
             bin_mask, _ = fcn.util.resize_img_with_max_size(
@@ -160,8 +161,7 @@ class APC2016Dataset(object):
             # bin_mask = bin_mask.astype(np.uint8)
             # generate label
             label = np.zeros(rgb.shape[:2], dtype=np.int32)
-            for index, mask_file in enumerate(datum['mask_files']):
-                label_value = index + 1  # 0 is background
+            for label_value, mask_file in enumerate(datum['mask_files']):
                 if mask_file is None:
                     continue
                 mask = ndi.imread(mask_file, mode='L')
@@ -172,12 +172,12 @@ class APC2016Dataset(object):
                 # mask = mask.astype(np.uint8)
                 label[mask != 0] = label_value
             label[bin_mask == 0] = -1
+            target_names = np.array(self.target_names.tolist() + ['unlabeled'])
         elif datum['annotate_type'] == 'LabelImage':
             label = ndi.imread(datum['label_file'], mode='L')
-            label, _ = fcn.util.resize_img_with_max_size(
-                label, max_size=max_size)
             label = label.astype(np.int32)
             label[label == 255] = -1
+            target_names = np.array(self.target_names.tolist() + ['unlabeled'])
         return rgb, label
 
     def next_batch(self, batch_size, type, indices=None):
