@@ -68,9 +68,10 @@ def main():
         candidate_labels = [target_names.index(obj)
                             for obj in ['background'] + pkl_data['objects']]
 
-        label_pred = pred[candidate_labels].argmax(axis=0)
+        label_pred_tmp = pred[candidate_labels].argmax(axis=0)
+        label_pred = np.zeros_like(label_pred_tmp)
         for ind, label_val in enumerate(candidate_labels):
-            label_pred[label_pred == ind] = label_val
+            label_pred[label_pred_tmp == ind] = label_val
 
         mask_path = osp.splitext(img_path)[0] + '.pbm'
         mask = ndi.imread(mask_path, mode='L')
