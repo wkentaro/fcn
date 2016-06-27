@@ -77,14 +77,16 @@ class Forwarding(object):
         label = np.argmax(pred_datum, axis=0)
         return img, label, pred_datum
 
-    def visualize_label(self, img, label):
+    def visualize_label(self, img, label, ignore_label=-1):
         # visualize result
         unique_labels, label_counts = np.unique(label, return_counts=True)
         print('- labels:')
         label_titles = {}
         for label_value, label_count in zip(unique_labels, label_counts):
+            if label_value == ignore_label:
+                continue
             label_region = label_count / label.size
-            if label_region < 0.001:
+            if label_region < 0.01:
                 continue
             title = '{0}:{1} = {2:.1%}'.format(
                 label_value, self.target_names[label_value], label_region)
