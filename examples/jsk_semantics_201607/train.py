@@ -54,9 +54,9 @@ def main():
         model=model,
         optimizer=optimizer,
         weight_decay=0.0005,
-        test_interval=1000,
-        max_iter=20000,
-        snapshot=1000,
+        test_interval=100,
+        max_iter=5000,
+        snapshot=100,
         gpu=gpu,
     )
     trainer.train()
