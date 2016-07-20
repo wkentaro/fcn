@@ -39,6 +39,7 @@ class SegmentationClassDataset(Bunch):
         'train',
         'tv/monitor',
     ])
+    mean_bgr = np.array((104.00698793, 116.66876762, 122.67891434))
 
     def __init__(self, db_path=None):
         super(self.__class__, self).__init__()
@@ -94,10 +95,16 @@ class SegmentationClassDataset(Bunch):
             batch.append(datum)
         return batch
 
-    @staticmethod
-    def img_to_datum(img):
+    def img_to_datum(self, img):
         datum = img.astype(np.float32)
         datum = datum[:, :, ::-1]  # RGB -> BGR
-        datum -= np.array((104.00698793, 116.66876762, 122.67891434))
+        datum -= self.mean_bgr
         datum = datum.transpose((2, 0, 1))
         return datum
+
+    def datum_to_img(self, blob):
+        bgr = blob.transpose((1, 2, 0))
+        bgr += self.mean_bgr
+        rgb = bgr[:, :, ::-1]  # BGR -> RGB
+        rgb = rgb.astype(np.uint8)
+        return rgb
