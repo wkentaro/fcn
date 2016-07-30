@@ -8,16 +8,28 @@ import os.path as osp
 import fcn
 
 
-def _get_data_dir():
+def get_data_home():
+    """Return the data directory.
+
+    Order of priorities is as following:
+
+    1. FCN_DATA environmental variable.
+    2. {THIS_DIR}/../data if exists and writable
+    3. $HOME/fcn_data.
+    """
+    # 1
+    if os.environ.get('FCN_DATA') is not None:
+        return osp.expanduser(os.environ('FCN_DATA'))
+    # 2
     this_dir = osp.dirname(osp.abspath(__file__))
-    # 1. python setup.py develop
-    data_dir = osp.realpath(osp.join(this_dir, '_data'))
-    if not osp.exists(data_dir):
-        os.makedirs(data_dir)
-    return data_dir
+    if (osp.exists(osp.join(this_dir, '../data')) and
+            os.access(osp.join(this_dir, '../data'), os.W_OK)):
+        return osp.join(this_dir, '../data')
+    # 3
+    return osp.expanduser('~/fcn_data')
 
 
-data_dir = _get_data_dir()
+data_dir = get_data_home()
 
 
 def download_vgg16_chainermodel():
