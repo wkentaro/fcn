@@ -42,7 +42,18 @@ Installation
 
 .. code-block:: bash
 
+  # LINUX: install required libraries via apt
+  sudo apt-get install liblapack-dev   # for numpy
+  sudo apt-get install libhdf5-dev     # for h5py
+  sudo apt-get install libleveldb-dev  # for plyvel
+  # OS X: install required libraries via brew
+  brew install gfortran  # for numpy
+  brew install leveldb   # for plyvel
+  brew install hdf5      # for h5py
+
+  pip install -U setuptools
   pip install fcn
+
   fcn_install_trained_data.py
 
 
