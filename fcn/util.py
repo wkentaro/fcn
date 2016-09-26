@@ -286,8 +286,8 @@ def draw_label(label, img, n_class, label_titles, bg_label=0):
     from scipy.misc import fromimage
     from skimage.color import label2rgb
     from skimage.transform import resize
-    from skimage.color.colorlabel import DEFAULT_COLORS
-    label_viz = label2rgb(label, img, colors=DEFAULT_COLORS, bg_label=bg_label)
+    colors = labelcolormap(n_class)
+    label_viz = label2rgb(label, img, colors=colors[1:], bg_label=bg_label)
     # label 0 color: (0, 0, 0, 0) -> (0, 0, 0, 255)
     label_viz[label == 0] = 0
 
@@ -306,7 +306,7 @@ def draw_label(label, img, n_class, label_titles, bg_label=0):
     for label_value in np.unique(label):
         if label_value not in label_titles:
             continue
-        fc = DEFAULT_COLORS[label_value % len(DEFAULT_COLORS)]
+        fc = colors[label_value]
         p = plt.Rectangle((0, 0), 1, 1, fc=fc)
         plt_handlers.append(p)
         plt_titles.append(label_titles[label_value])
