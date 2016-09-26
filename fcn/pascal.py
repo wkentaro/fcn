@@ -95,6 +95,7 @@ class SegmentationClassDataset(Bunch):
             batch.append(datum)
         return batch
 
+    @classmethod
     def img_to_datum(self, img):
         datum = img.astype(np.float32)
         datum = datum[:, :, ::-1]  # RGB -> BGR
@@ -102,6 +103,7 @@ class SegmentationClassDataset(Bunch):
         datum = datum.transpose((2, 0, 1))
         return datum
 
+    @classmethod
     def datum_to_img(self, blob):
         bgr = blob.transpose((1, 2, 0))
         bgr += self.mean_bgr
