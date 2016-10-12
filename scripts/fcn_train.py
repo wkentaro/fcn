@@ -13,7 +13,7 @@ from fcn.models import VGG16
 from fcn import pascal
 
 
-def get_vgg16_pretrained_model(self):
+def get_vgg16_pretrained_model():
     vgg16_path = fcn.setup.download_vgg16_chainermodel()
     vgg16 = VGG16()
     print('Loading vgg16 model: {0}'.format(vgg16_path))
