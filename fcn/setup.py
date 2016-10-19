@@ -18,8 +18,8 @@ def get_data_home():
     3. $HOME/fcn_data.
     """
     # 1
-    if os.environ.get('FCN_DATA') is not None:
-        return osp.expanduser(os.environ('FCN_DATA'))
+    if 'FCN_DATA' in os.environ:
+        return osp.expanduser(os.environ['FCN_DATA'])
     # 2
     this_dir = osp.dirname(osp.abspath(__file__))
     if (osp.exists(osp.join(this_dir, '../data')) and
