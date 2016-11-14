@@ -2,12 +2,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
+import hashlib
 import os.path as osp
+import re
+import shlex
+import subprocess
 
 import chainer
-
-import fcn
 
 
 def download(url, path, quiet=False):
@@ -30,6 +31,7 @@ def download(url, path, quiet=False):
 
 
 def cached_download(url, path, md5=None, quiet=False):
+
     def check_md5(path, md5, quiet=False):
         if not quiet:
             print('Checking md5 [{}] of file [{}]'.format(md5, path))
