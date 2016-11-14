@@ -1,8 +1,3 @@
-fcn.berkeleyvision.org/voc-fcn8s/fcn8s-heavy-pascal.caffemodel
-
-vgg16.chainermodel
-fcn8s_from_caffe.chainermodel
-
 fcn8s_forward.ps
 fcn32s_forward.ps
 
