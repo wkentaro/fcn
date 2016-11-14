@@ -31,7 +31,7 @@ setup(
     name='fcn',
     version=version,
     packages=find_packages(),
-    scripts=['scripts/fcn_forward.py', 'scripts/fcn_install_trained_data.py'],
+    scripts=['scripts/fcn_forward.py'],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
     long_description=open('README.rst').read(),
