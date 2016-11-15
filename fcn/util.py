@@ -122,6 +122,8 @@ def draw_computational_graph(*args, **kwargs):
 def extract_file(path, to_directory='.'):
     if path.endswith('.zip'):
         opener, mode = zipfile.ZipFile, 'r'
+    elif path.endswith('.tar'):
+        opener, mode = tarfile.open, 'r'
     elif path.endswith('.tar.gz') or path.endswith('.tgz'):
         opener, mode = tarfile.open, 'r:gz'
     elif path.endswith('.tar.bz2') or path.endswith('.tbz'):
