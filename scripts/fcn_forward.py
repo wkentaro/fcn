@@ -3,21 +3,16 @@
 from __future__ import print_function
 from __future__ import division
 from __future__ import unicode_literals
+
 import argparse
-import os
 import os.path as osp
 
-from chainer import cuda
+import chainer
 import chainer.serializers as S
-from chainer import Variable
 import numpy as np
-from scipy.misc import imread
-from scipy.misc import imsave
+import scipy.misc
 
 import fcn
-from fcn.models import FCN16s
-from fcn.models import FCN32s
-from fcn.models import FCN8s
 
 
 class Forwarding(object):
@@ -29,17 +24,20 @@ class Forwarding(object):
         self.n_class = len(self.target_names)
 
         if chainermodel is None:
-            chainermodel = osp.join(fcn.data_dir,
-                                    'fcn8s_from_caffe.chainermodel')
+            from fcn.models import FCN8s
+            chainermodel = fcn.data.download_fcn8s_from_caffe_chainermodel()
             self.model_name = 'fcn8s'
             self.model = FCN8s(n_class=self.n_class)
         elif osp.basename(chainermodel).startswith('fcn8s'):
+            from fcn.models import FCN8s
             self.model_name = 'fcn8s'
             self.model = FCN8s(n_class=self.n_class)
         elif osp.basename(chainermodel).startswith('fcn16s'):
+            from fcn.models import FCN16s
             self.model_name = 'fcn16s'
             self.model = FCN16s(n_class=self.n_class)
         elif osp.basename(chainermodel).startswith('fcn32s'):
+            from fcn.models import FCN32s
             self.model_name = 'fcn32s'
             self.model = FCN32s(n_class=self.n_class)
         else:
@@ -54,26 +52,27 @@ class Forwarding(object):
     def forward_img_file(self, img_file):
         print('{0}:'.format(osp.realpath(img_file)))
         # setup image
-        img = imread(img_file, mode='RGB')
+        img = scipy.misc.imread(img_file, mode='RGB')
         img, resizing_scale = fcn.util.resize_img_with_max_size(img)
         print(' - resizing_scale: {0}'.format(resizing_scale))
         # setup input datum
         datum = fcn.pascal.SegmentationClassDataset.img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
         if self.gpu != -1:
-            x_data = cuda.to_gpu(x_data, device=self.gpu)
-        x = Variable(x_data, volatile=False)
+            x_data = chainer.cuda.to_gpu(x_data, device=self.gpu)
+        x = chainer.Variable(x_data, volatile=False)
         # forward
         self.model.train = False
         self.model(x)
         pred = self.model.score
         # generate computational_graph
         psfile = osp.join(
-            fcn.data_dir, '{0}_forward.ps'.format(self.model_name))
+            chainer.dataset.get_dataset_directory('fcn'),
+            '{0}_forward.ps'.format(self.model_name))
         if not osp.exists(psfile):
             fcn.util.draw_computational_graph([pred], output=psfile)
             print('- computational_graph: {0}'.format(psfile))
-        pred_datum = cuda.to_cpu(pred.data)[0]
+        pred_datum = chainer.cuda.to_cpu(pred.data)[0]
         label = np.argmax(pred_datum, axis=0)
         return img, label
 
@@ -106,7 +105,7 @@ class Forwarding(object):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', default=0, type=int,
-                        help='if -1, use cpu only')
+                        help='if -1, use cpu only (default: 0)')
     parser.add_argument('-c', '--chainermodel')
     parser.add_argument('-i', '--img-files', nargs='+', required=True)
     args = parser.parse_args()
@@ -114,10 +113,7 @@ def main():
     img_files = args.img_files
     gpu = args.gpu
     chainermodel = args.chainermodel
-
-    save_dir = osp.join(fcn.data_dir, 'forward_out')
-    if not osp.exists(save_dir):
-        os.makedirs(save_dir)
+    save_dir = chainer.dataset.get_dataset_directory('fcn/fcn_forward')
 
     forwarding = Forwarding(gpu, chainermodel)
     for img_file in img_files:
@@ -125,7 +121,7 @@ def main():
         out_img = forwarding.visualize_label(img, label)
 
         out_file = osp.join(save_dir, osp.basename(img_file))
-        imsave(out_file, out_img)
+        scipy.misc.imsave(out_file, out_img)
         print('- out_file: {0}'.format(out_file))
 
 

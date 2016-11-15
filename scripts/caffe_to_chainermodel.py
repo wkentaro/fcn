@@ -2,10 +2,11 @@
 
 from __future__ import print_function
 
-import argparse
 import os.path as osp
+import pkg_resources
 
 import caffe
+import chainer
 import chainer.serializers as S
 
 import fcn
@@ -38,25 +39,15 @@ def fcn8s_caffe_to_chainermodel(caffe_prototxt, caffemodel_path,
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--download', action='store_true')
-    args = parser.parse_args()
-
-    downloader = fcn.setup.FCN8sFromCaffeChainerModel()
-    chainermodel = downloader.path
-
-    if args.download:
-        downloader.download()
-        return
-
-    if downloader.exists():
-        print("'{0}' is already newest version.".format(chainermodel))
-        return
-
+    # get caffemodel
+    pkg_root = pkg_resources.get_distribution('fcn').location
     caffe_prototxt = osp.join(
-        fcn.data_dir, 'fcn.berkeleyvision.org/voc-fcn8s/deploy.prototxt')
-    caffemodel = fcn.setup.download_fcn8s_caffemodel()
+        pkg_root, 'external/fcn.berkeleyvision.org/voc-fcn8s/deploy.prototxt')
+    caffemodel = fcn.data.download_fcn8s_caffemodel()
 
+    # convert caffemodel to chainermodel
+    chainermodel = osp.join(chainer.dataset.get_dataset_directory('fcn'),
+                            'fcn8s_from_caffe.chainermodel')
     fcn8s_caffe_to_chainermodel(caffe_prototxt, caffemodel, chainermodel)
 
 
