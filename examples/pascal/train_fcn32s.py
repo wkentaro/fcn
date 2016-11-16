@@ -6,6 +6,16 @@ from chainer.training import extensions
 import fcn
 
 
+class TestModeEvaluator(extensions.Evaluator):
+
+    def evaluate(self):
+        model = self.get_target('main')
+        model.train = False
+        ret = super(TestModeEvaluator, self).evaluate()
+        model.train = True
+        return ret
+
+
 def main():
     gpu = 0
     resume = None  # filename
@@ -42,7 +52,7 @@ def main():
     trainer = chainer.training.Trainer(
         updater, (max_iter, 'iteration'), out='result')
 
-    trainer.extend(extensions.Evaluator(iter_val, model, device=gpu),
+    trainer.extend(TestModeEvaluator(iter_val, model, device=gpu),
                    trigger=(1000, 'iteration'))
     trainer.extend(extensions.snapshot(), trigger=(1000, 'epoch'))
     trainer.extend(extensions.LogReport())
