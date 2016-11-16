@@ -20,7 +20,8 @@ class Forwarding(object):
     def __init__(self, gpu, chainermodel=None):
         self.gpu = gpu
 
-        self.target_names = fcn.pascal.SegmentationClassDataset.target_names
+        self.dataset = fcn.datasets.PascalVOC2012SegmentationDataset('val')
+        self.target_names = self.dataset.label_names
         self.n_class = len(self.target_names)
 
         if chainermodel is None:
@@ -56,7 +57,7 @@ class Forwarding(object):
         img, resizing_scale = fcn.util.resize_img_with_max_size(img)
         print(' - resizing_scale: {0}'.format(resizing_scale))
         # setup input datum
-        datum = fcn.pascal.SegmentationClassDataset.img_to_datum(img.copy())
+        datum = self.dataset.img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
         if self.gpu != -1:
             x_data = chainer.cuda.to_gpu(x_data, device=self.gpu)

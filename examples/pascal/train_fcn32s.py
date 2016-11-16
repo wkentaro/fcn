@@ -18,7 +18,7 @@ def main():
     iter_val = chainer.iterators.SerialIterator(dataset_val, batch_size=1)
 
     # 2. model
-    vgg_path = fcn.data.download_vgg16_chainermodel
+    vgg_path = fcn.data.download_vgg16_chainermodel()
     vgg = fcn.models.VGG16()
     chainer.serializers.load_hdf5(vgg_path, vgg)
 
@@ -31,7 +31,7 @@ def main():
 
     # 3. optimizer
     optimizer = chainer.optimizers.MomentumSGD(lr=1e-10, momentum=0.99)
-    optimizer.set(model)
+    optimizer.setup(model)
 
     # 4. trainer
     max_epoch = 10000

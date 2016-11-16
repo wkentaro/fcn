@@ -45,7 +45,7 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
         # set db
         if db_path is None:
             db_path = chainer.dataset.get_dataset_directory(
-                'fcn/pascal_leveldb')
+                'fcn/pascal_leveldb/{}'.format(data_type))
         self.db = plyvel.DB(db_path, create_if_missing=True)
         # get ids for the data_type
         dataset_dir = chainer.dataset.get_dataset_directory(
