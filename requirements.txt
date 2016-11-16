@@ -7,4 +7,5 @@ plyvel>=0.9
 scikit-image>=0.12.3
 scikit-learn>= 0.14.1
 scipy>=0.13.3
+setuptools>=28.8.0
 tqdm>=4.5.0
