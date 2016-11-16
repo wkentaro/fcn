@@ -24,6 +24,7 @@ def main():
     args = parser.parse_args()
 
     gpu = args.gpu
+    out_dir = 'result'
     resume = None  # filename
     max_iter = 100000
 
@@ -55,8 +56,10 @@ def main():
     # 4. trainer
     updater = chainer.training.StandardUpdater(
         iter_train, optimizer, device=gpu)
+    if osp.exists(out_dir):
+        raise RuntimeError('Result dir already exists: {}'.format(out_dir))
     trainer = chainer.training.Trainer(
-        updater, (max_iter, 'iteration'), out='result')
+        updater, (max_iter, 'iteration'), out=out_dir)
 
     trainer.extend(TestModeEvaluator(iter_val, model, device=gpu),
                    trigger=(100, 'iteration'))
