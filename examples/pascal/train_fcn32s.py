@@ -9,13 +9,15 @@ import fcn
 def main():
     gpu = 0
     resume = None  # filename
+    max_iter = 100000
 
     # 1. dataset
     dataset_train = fcn.datasets.PascalVOC2012SegmentationDataset('train')
     dataset_val = fcn.datasets.PascalVOC2012SegmentationDataset('val')
 
     iter_train = chainer.iterators.SerialIterator(dataset_train, batch_size=1)
-    iter_val = chainer.iterators.SerialIterator(dataset_val, batch_size=1)
+    iter_val = chainer.iterators.SerialIterator(
+        dataset_val, batch_size=1, repeat=False, shuffle=False)
 
     # 2. model
     vgg_path = fcn.data.download_vgg16_chainermodel()
@@ -23,6 +25,7 @@ def main():
     chainer.serializers.load_hdf5(vgg_path, vgg)
 
     model = fcn.models.FCN32s()
+    model.train = True
     fcn.util.copy_chainermodel(vgg, model)
 
     if gpu >= 0:
@@ -34,17 +37,17 @@ def main():
     optimizer.setup(model)
 
     # 4. trainer
-    max_epoch = 10000
     updater = chainer.training.StandardUpdater(
         iter_train, optimizer, device=gpu)
     trainer = chainer.training.Trainer(
-        updater, (max_epoch, 'epoch'), out='result')
+        updater, (max_iter, 'iteration'), out='result')
 
-    trainer.extend(extensions.Evaluator(iter_val, model, device=gpu))
-    trainer.extend(extensions.snapshot(), trigger=(max_epoch, 'epoch'))
+    trainer.extend(extensions.Evaluator(iter_val, model, device=gpu),
+                   trigger=(1000, 'iteration'))
+    trainer.extend(extensions.snapshot(), trigger=(1000, 'epoch'))
     trainer.extend(extensions.LogReport())
     trainer.extend(extensions.PrintReport(
-        ['epoch', 'main/loss', 'validation/main/loss',
+        ['iteration', 'main/loss', 'validation/main/loss',
          'main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
     trainer.extend(extensions.ProgressBar())
 
