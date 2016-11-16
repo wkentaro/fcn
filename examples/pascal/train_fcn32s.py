@@ -59,7 +59,8 @@ def main():
     updater = chainer.training.StandardUpdater(
         iter_train, optimizer, device=gpu)
     if osp.exists(out_dir):
-        raise RuntimeError('Result dir already exists: {}'.format(out_dir))
+        raise RuntimeError('Result dir already exists: {}'
+                           .format(osp.abspath(out_dir)))
     trainer = chainer.training.Trainer(
         updater, (max_iter, 'iteration'), out=out_dir)
 
