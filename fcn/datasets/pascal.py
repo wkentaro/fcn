@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import cPickle as pickle
 import os.path as osp
+import tempfile
 
 import chainer
 import numpy as np
@@ -41,12 +42,9 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
     ])
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
-    def __init__(self, data_type, db_path=None):
+    def __init__(self, data_type):
         # set db
-        if db_path is None:
-            db_path = chainer.dataset.get_dataset_directory(
-                'fcn/pascal_leveldb/{}'.format(data_type))
-        self.db = plyvel.DB(db_path, create_if_missing=True)
+        self.db = plyvel.DB(tempfile.mktemp(), create_if_missing=True)
         # get ids for the data_type
         dataset_dir = chainer.dataset.get_dataset_directory(
             'pascal/VOCdevkit/VOC2012')
