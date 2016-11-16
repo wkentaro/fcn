@@ -7,6 +7,8 @@ import chainer.links as L
 from chainer import Variable
 import numpy as np
 
+import fcn
+
 
 class FCN32s(chainer.Chain):
 
@@ -117,4 +119,23 @@ class FCN32s(chainer.Chain):
         self.loss = F.softmax_cross_entropy(self.score, t, normalize=False)
         if math.isnan(self.loss.data):
             raise ValueError('loss value is nan')
+
+        # report the loss and accuracy
+        batch_size = len(x.data)
+        labels = cuda.to_cpu(t.data)
+        label_preds = cuda.to_cpu(self.score.data).argmax(axis=1)
+        results = []
+        for i in xrange(batch_size):
+            acc, acc_cls, iu, fwavacc = fcn.util.label_accuracy_score(
+                labels[i], label_preds[i], self.n_class)
+            results.append((acc, acc_cls, iu, fwavacc))
+        results = np.array(results).mean(axis=0)
+        chainer.reporter.report({
+            'loss': self.loss,
+            'accuracy': results[0],
+            'acc_cls': results[1],
+            'iu': results[2],
+            'fwavacc': results[3],
+        }, self)
+
         return self.loss
