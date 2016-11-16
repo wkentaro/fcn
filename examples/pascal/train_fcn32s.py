@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import argparse
+
 import chainer
 from chainer.training import extensions
 
@@ -17,7 +19,11 @@ class TestModeEvaluator(extensions.Evaluator):
 
 
 def main():
-    gpu = 0
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu', type=int, default=0)
+    args = parser.parse_args()
+
+    gpu = args.gpu
     resume = None  # filename
     max_iter = 100000
 
@@ -53,12 +59,15 @@ def main():
         updater, (max_iter, 'iteration'), out='result')
 
     trainer.extend(TestModeEvaluator(iter_val, model, device=gpu),
-                   trigger=(1000, 'iteration'))
-    trainer.extend(extensions.snapshot(), trigger=(1000, 'epoch'))
-    trainer.extend(extensions.LogReport())
-    trainer.extend(extensions.PrintReport(
-        ['iteration', 'main/loss', 'validation/main/loss',
-         'main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
+                   trigger=(100, 'iteration'))
+    trainer.extend(extensions.snapshot(trigger=(100, 'iteration')))
+    trainer.extend(extensions.LogReport(trigger=(1, 'iteration')))
+    trainer.extend(extensions.PrintReport([
+        'iteration',
+        'main/loss', 'validation/main/loss',
+        'main/accuracy', 'validation/main/accuracy',
+        'main/iu', 'validation/main/iu',
+    ]))
     trainer.extend(extensions.ProgressBar())
 
     if resume:
