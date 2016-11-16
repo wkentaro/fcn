@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import cPickle as pickle
 import os.path as osp
+import shutil
 import tempfile
 
 import chainer
@@ -44,7 +45,8 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
 
     def __init__(self, data_type):
         # set db
-        self.db = plyvel.DB(tempfile.mktemp(), create_if_missing=True)
+        self.db_path = tempfile.mktemp()
+        self.db = plyvel.DB(self.db_path, create_if_missing=True)
         # get ids for the data_type
         dataset_dir = chainer.dataset.get_dataset_directory(
             'pascal/VOCdevkit/VOC2012')
@@ -65,6 +67,9 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
 
     def __len__(self):
         return len(self.files)
+
+    def __del__(self):
+        shutil.rmtree(self.db_path, ignore_errors=True)
 
     def get_example(self, i):
         data_file = self.files[i]
