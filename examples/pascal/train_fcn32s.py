@@ -61,14 +61,14 @@ def main():
     trainer.extend(TestModeEvaluator(iter_val, model, device=gpu),
                    trigger=(100, 'iteration'))
     trainer.extend(extensions.snapshot(trigger=(100, 'iteration')))
-    trainer.extend(extensions.LogReport(trigger=(1, 'iteration')))
+    trainer.extend(extensions.LogReport(trigger=(10, 'iteration')))
     trainer.extend(extensions.PrintReport([
         'iteration',
         'main/loss', 'validation/main/loss',
         'main/accuracy', 'validation/main/accuracy',
         'main/iu', 'validation/main/iu',
     ]))
-    trainer.extend(extensions.ProgressBar())
+    trainer.extend(extensions.ProgressBar(update_interval=1))
 
     if resume:
         chainer.serializers.load_hdf5(resume, trainer)
