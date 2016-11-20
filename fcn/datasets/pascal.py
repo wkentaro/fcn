@@ -3,9 +3,7 @@ import os.path as osp
 import chainer
 import numpy as np
 import scipy.misc
-import skimage.color
 
-import fcn
 from fcn.datasets.segmentation_dataset import SegmentationDatasetBase
 
 
