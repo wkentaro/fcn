@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import division
+
 import argparse
+import collections
 
 import os.path as osp
 
@@ -29,6 +32,21 @@ def learning_curve(json_file):
         'main/iu',
     ]
     df_train = df[columns]
+
+    # make smooth the learning curve with iteration step
+    iteration_step = 10
+    df_train_stat = []
+    stat = collections.defaultdict(list)
+    for index, row in df_train.iterrows():
+        for col in row.keys():
+            value = row[col]
+            stat[col].append(value)
+        if int(row['iteration']) % iteration_step == 0:
+            means = [sum(stat[col]) / len(stat[col]) for col in row.keys()]
+            means[0] = row['iteration']  # iteration_step is the representative
+            df_train_stat.append(means)
+            stat = collections.defaultdict(list)
+    df_train = pd.DataFrame(df_train_stat, columns=df_train.columns)
 
     # train loss
     plt.subplot(231)
