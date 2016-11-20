@@ -29,7 +29,7 @@ def main():
 
     dataset = APC2015Dataset('val')
 
-    model = fcn.models.FCN8s(n_class=len(dataset.label_names))
+    model = fcn.models.FCN32s(n_class=len(dataset.label_names))
     chainer.serializers.load_hdf5(chainermodel, model)
 
     infer = fcn.Inferencer(dataset, model, gpu)
