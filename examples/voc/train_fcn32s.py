@@ -22,12 +22,18 @@ class TestModeEvaluator(extensions.Evaluator):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('-o', '--out-dir', default='result')
+    parser.add_argument('--resume')
     args = parser.parse_args()
 
     gpu = args.gpu
-    out_dir = 'result'
-    resume = None  # filename
+    out_dir = args.out_dir
+    resume = args.resume
     max_iter = 100000
+
+    if not resume and osp.exists(out_dir):
+        raise RuntimeError('Result dir already exists: {}'
+                           .format(osp.abspath(out_dir)))
 
     # 1. dataset
     dataset_train = fcn.datasets.PascalVOC2012SegmentationDataset('train')
@@ -58,16 +64,16 @@ def main():
     # 4. trainer
     updater = chainer.training.StandardUpdater(
         iter_train, optimizer, device=gpu)
-    if osp.exists(out_dir):
-        raise RuntimeError('Result dir already exists: {}'
-                           .format(osp.abspath(out_dir)))
     trainer = chainer.training.Trainer(
         updater, (max_iter, 'iteration'), out=out_dir)
 
     trainer.extend(TestModeEvaluator(iter_val, model, device=gpu),
-                   trigger=(100, 'iteration'))
-    trainer.extend(extensions.snapshot(trigger=(100, 'iteration')))
-    trainer.extend(extensions.LogReport(trigger=(10, 'iteration')))
+                   trigger=(1000, 'iteration'))
+    trainer.extend(extensions.snapshot(
+        filename='snapshot_iter_{.updater.iteration}.npz',
+        trigger=(1000, 'iteration')))
+    trainer.extend(extensions.LogReport(
+        trigger=(10, 'iteration'), log_name='log.json'))
     trainer.extend(extensions.PrintReport([
         'iteration',
         'main/loss', 'validation/main/loss',
@@ -77,7 +83,7 @@ def main():
     trainer.extend(extensions.ProgressBar(update_interval=1))
 
     if resume:
-        chainer.serializers.load_hdf5(resume, trainer)
+        chainer.serializers.load_npz(resume, trainer)
 
     trainer.run()
 
