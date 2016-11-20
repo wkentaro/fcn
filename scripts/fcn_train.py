@@ -4,6 +4,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import argparse
+
 import chainer.optimizers as O
 import chainer.serializers as S
 
@@ -22,7 +24,11 @@ def get_vgg16_pretrained_model():
 
 
 def main():
-    gpu = 0
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu', type=int, default=0)
+    args = parser.parse_args()
+
+    gpu = args.gpu
 
     # setup dataset
     dataset = pascal.SegmentationClassDataset()
