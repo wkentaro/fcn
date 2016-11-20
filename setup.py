@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-from distutils.command.build_py import build_py as BuildPyCommand
 import os
 import os.path as osp
 import shlex
+import shutil
 import subprocess
 import sys
-import tempfile
 
 from setuptools import find_packages
 from setuptools import setup
