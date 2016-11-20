@@ -10,7 +10,7 @@ Dataset
 Learning Curve
 --------------
 
-.. image:: _images/2016-06-11-23-47-29_log.png
+.. image:: static/2016-06-11-23-47-29_log.png
 
 
 Evaluation with Validation data
@@ -29,5 +29,5 @@ Evaluation with Validation data
 
 **Sample**
 
-.. image:: _images/rbo_val_8000/2015-05-06_18-13-09-840861_bin_J.jpg
-.. image:: _images/rbo_val_8000/2015-05-07_20-26-01-779896_bin_F.jpg
+.. image:: static/rbo_val_8000/2015-05-06_18-13-09-840861_bin_J.jpg
+.. image:: static/rbo_val_8000/2015-05-07_20-26-01-779896_bin_F.jpg
