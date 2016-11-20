@@ -34,7 +34,7 @@ def cached_download(url, path, md5=None, quiet=False):
 
     def check_md5(path, md5, quiet=False):
         if not quiet:
-            print('Checking md5 [{}] of file [{}]'.format(md5, path))
+            print('Checking md5 of file: {}'.format(path))
         is_same = hashlib.md5(open(path, 'rb').read()).hexdigest() == md5
         return is_same
 

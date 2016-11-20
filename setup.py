@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-from distutils.command.build_py import build_py as BuildPyCommand
 import os
 import os.path as osp
 import shlex
+import shutil
 import subprocess
 import sys
-import tempfile
 
 from setuptools import find_packages
 from setuptools import setup
@@ -27,11 +26,17 @@ if sys.argv[-1] == 'release':
     sys.exit(0)
 
 
+if not osp.exists('build/scripts'):
+    os.makedirs('build/scripts')
+shutil.copyfile('examples/pascal/infer.py',
+                osp.join('build/scripts/fcn_infer.py'))
+
+
 setup(
     name='fcn',
     version=version,
     packages=find_packages(),
-    scripts=['scripts/fcn_forward.py'],
+    scripts=['build/scripts/fcn_infer.py'],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
     long_description=open('README.rst').read(),

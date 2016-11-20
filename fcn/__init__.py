@@ -1,11 +1,10 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+import fcn.data  # NOQA
+import fcn.datasets  # NOQA
+import fcn.inferencer  # NOQA
+import fcn.models  # NOQA
+import fcn.trainers  # NOQA
+import fcn.training  # NOQA
+import fcn.util  # NOQA
 
-import fcn.data
-import fcn.pascal
-import fcn.trainer
-import fcn.util
 
-
-Trainer = fcn.trainer.Trainer
+Inferencer = fcn.inferencer.Inferencer
