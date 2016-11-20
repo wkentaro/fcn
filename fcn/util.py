@@ -59,6 +59,9 @@ def copy_chainermodel(src, dst):
     from chainer import link
     assert isinstance(src, link.Chain)
     assert isinstance(dst, link.Chain)
+    desc = 'Copying layers %s -> %s:' % (src.__class__.__name__,
+                                         dst.__class__.__name__)
+    links_copied = []
     for child in src.children():
         if child.name not in dst.__dict__:
             continue
@@ -77,11 +80,13 @@ def copy_chainermodel(src, dst):
                     match = False
                     break
             if not match:
-                print('Ignore %s because of parameter mismatch.' % child.name)
+                print('%s Ignore %s because of parameter mismatch.'
+                      % (desc, child.name))
                 continue
             for a, b in zip(child.namedparams(), dst_child.namedparams()):
                 b[1].data = a[1].data
-            print('Copy layer %s.' % child.name)
+            links_copied.append(child.name)
+    print('%s %s' % (desc, ', '.join(links_copied)))
 
 
 def draw_computational_graph(*args, **kwargs):
