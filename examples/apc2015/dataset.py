@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 import fcn
 
 
-class APC2015Dataset(chainer.dataset.DatasetMixin):
+class APC2015Dataset(fcn.datasets.SegmentationDatasetBase):
 
     label_names = [
         'background',
@@ -92,33 +92,6 @@ class APC2015Dataset(chainer.dataset.DatasetMixin):
                 label[mask > 127] = label_value
 
         return datum, label
-
-    def visualize_example(self, i):
-        n_class = len(self.label_names)
-        cmap = fcn.util.labelcolormap(n_class)
-        datum, label = self.get_example(i)
-        img = self.datum_to_img(datum)
-        ignore_label_mask = label == -1
-        label[ignore_label_mask] = 0
-        label_viz = skimage.color.label2rgb(
-            label, img, colors=cmap[1:], bg_label=0)
-        label_viz = (label_viz * 255).astype(np.uint8)
-        label_viz[ignore_label_mask] = (0, 0, 0)
-        return label_viz
-
-    def img_to_datum(self, rgb):
-        rgb = rgb.astype(np.float32)
-        blob = rgb[:, :, ::-1]  # RGB-> BGR
-        blob -= self.mean_bgr
-        blob = blob.transpose((2, 0, 1))
-        return blob
-
-    def datum_to_img(self, blob):
-        bgr = blob.transpose((1, 2, 0))
-        bgr += self.mean_bgr
-        rgb = bgr[:, :, ::-1]  # BGR -> RGB
-        rgb = rgb.astype(np.uint8)
-        return rgb
 
 
 if __name__ == '__main__':
