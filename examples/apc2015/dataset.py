@@ -6,7 +6,6 @@ import os.path as osp
 import chainer
 import numpy as np
 import scipy.misc
-import skimage.color
 from sklearn.model_selection import train_test_split
 
 import fcn
