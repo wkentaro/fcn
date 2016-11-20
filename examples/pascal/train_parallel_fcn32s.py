@@ -9,16 +9,6 @@ from chainer.training import extensions
 import fcn
 
 
-class TestModeEvaluator(extensions.Evaluator):
-
-    def evaluate(self):
-        model = self.get_target('main')
-        model.train = False
-        ret = super(TestModeEvaluator, self).evaluate()
-        model.train = True
-        return ret
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpus', type=int, default=[0], nargs='*')
@@ -72,8 +62,10 @@ def main():
     trainer = chainer.training.Trainer(
         updater, (max_iter, 'iteration'), out=out_dir)
 
-    trainer.extend(TestModeEvaluator(iter_val, model, device=gpus[0]),
-                   trigger=(1000, 'iteration'))
+    trainer.extend(
+        fcn.training.extensions.TestModeEvaluator(
+            iter_val, model, device=gpus[0]),
+        trigger=(1000, 'iteration'))
     trainer.extend(extensions.snapshot(
         filename='snapshot_iter_{.updater.iteration}.npz',
         trigger=(1000, 'iteration')))
