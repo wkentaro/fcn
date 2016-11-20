@@ -79,6 +79,7 @@ def main():
         'main/loss', 'validation/main/loss',
         'main/accuracy', 'validation/main/accuracy',
         'main/iu', 'validation/main/iu',
+        'elapsed_time',
     ]))
     trainer.extend(extensions.ProgressBar(update_interval=1))
 
