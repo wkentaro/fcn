@@ -1,4 +1,8 @@
-fcn.egg-info
+*.egg-info
+
 *.py[cdo]
+
 build/
 dist/
+
+logs/
