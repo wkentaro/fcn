@@ -133,7 +133,7 @@ class APC2016Dataset(chainer.dataset.DatasetMixin):
         ignore_label_mask = label == -1
         label[ignore_label_mask] = 0
         label_viz = skimage.color.label2rgb(
-            label, img, colors=cmap, bg_label=0)
+            label, img, colors=cmap[1:], bg_label=0)
         label_viz = (label_viz * 255).astype(np.uint8)
         label_viz[ignore_label_mask] = (0, 0, 0)
         return label_viz
