@@ -2,19 +2,33 @@ FCN for Amazon Picking Challenge 2015
 =====================================
 
 
+Usage
+-----
+
+.. code-block:: bash
+
+  ./download_dataset.py
+  ./train_fcn32s.py
+
+
 Dataset
 -------
+
 - https://drive.google.com/open?id=0B9P1L--7Wd2vbXFvRGJLdy11anM
 
 
+Result
+------
+
 Learning Curve
---------------
+++++++++++++++
+
 
 .. image:: static/2016-06-11-23-47-29_log.png
 
 
-Evaluation with Validation data
--------------------------------
+Evaluation
+++++++++++
 
 **Condition**
 
