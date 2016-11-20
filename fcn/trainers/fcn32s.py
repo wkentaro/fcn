@@ -62,12 +62,12 @@ def get_trainer(
         trigger=(interval_eval, 'iteration'))
     trainer.extend(extensions.snapshot(
         savefun=chainer.serializers.hdf5.save_hdf5,
-        filename='snapshot_iter_{.updater.iteration}.h5',
+        filename='trainer_iter_{.updater.iteration}.h5',
         trigger=(interval_eval, 'iteration')))
     trainer.extend(extensions.snapshot_object(
         model,
         savefun=chainer.serializers.hdf5.save_hdf5,
-        filename='snapshot_model_iter_{.updater.iteration}.h5',
+        filename='model_iter_{.updater.iteration}.h5',
         trigger=(interval_eval, 'iteration')))
     trainer.extend(extensions.LogReport(
         trigger=(interval_log, 'iteration'), log_name='log.json'))
