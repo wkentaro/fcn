@@ -29,6 +29,8 @@ def main():
         max_iter=max_iter,
         out=out,
         resume=resume,
+        interval_log=10,
+        interval_eval=100,
     )
     trainer.run()
 

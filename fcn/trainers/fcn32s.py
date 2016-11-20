@@ -3,6 +3,7 @@ import tempfile
 
 import chainer
 from chainer.training import extensions
+import h5py
 
 import fcn
 
@@ -13,6 +14,8 @@ def get_trainer(
         max_iter,
         out=None,
         resume=None,
+        interval_log=10,
+        interval_eval=1000,
         ):
 
     if out is None:
@@ -56,12 +59,18 @@ def get_trainer(
 
     trainer.extend(
         fcn.training.extensions.TestModeEvaluator(iter_val, model, device=gpu),
-        trigger=(1000, 'iteration'))
+        trigger=(interval_eval, 'iteration'))
     trainer.extend(extensions.snapshot(
-        filename='snapshot_iter_{.updater.iteration}.npz',
-        trigger=(1000, 'iteration')))
+        savefun=chainer.serializers.hdf5.save_hdf5,
+        filename='snapshot_iter_{.updater.iteration}.h5',
+        trigger=(interval_eval, 'iteration')))
+    trainer.extend(extensions.snapshot_object(
+        model,
+        savefun=chainer.serializers.hdf5.save_hdf5,
+        filename='snapshot_model_iter_{.updater.iteration}.h5',
+        trigger=(interval_eval, 'iteration')))
     trainer.extend(extensions.LogReport(
-        trigger=(10, 'iteration'), log_name='log.json'))
+        trigger=(interval_log, 'iteration'), log_name='log.json'))
     trainer.extend(extensions.PrintReport([
         'iteration',
         'main/loss', 'validation/main/loss',
@@ -72,6 +81,9 @@ def get_trainer(
     trainer.extend(extensions.ProgressBar(update_interval=1))
 
     if resume:
-        chainer.serializers.load_npz(resume, trainer)
+        if resume.endswith('npz'):
+            chainer.serializers.load_npz(resume, trainer)
+        else:
+            chainer.serializers.load_hdf5(resume, trainer)
 
     return trainer
