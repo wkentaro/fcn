@@ -287,7 +287,8 @@ def label_accuracy_score(label_true, label_pred, n_class):
 def draw_label(label, img, n_class, label_titles, bg_label=0):
     """Convert label to rgb with label titles.
 
-    @param labeltitle: label title for each labels.
+    @param label_title: label title for each labels.
+    @type label_title: dict
     """
     from PIL import Image
     from scipy.misc import fromimage
@@ -410,7 +411,7 @@ def get_tile_image(imgs, tile_shape=None, result_img=None):
         h_scale, w_scale = max_height / h, max_width / w
         scale = min([h_scale, w_scale])
         h, w = int(scale * h), int(scale * w)
-        img = resize(img, (w, h), preserve_range=True).astype(dtype)
+        img = resize(img, (h, w), preserve_range=True).astype(dtype)
         if len(img.shape) == 3:
             img = centerize(img, (max_height, max_width, 3))
         else:
