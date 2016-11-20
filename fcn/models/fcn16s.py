@@ -1,9 +1,6 @@
 import chainer
-from chainer import cuda
 import chainer.functions as F
 import chainer.links as L
-from chainer import Variable
-import numpy as np
 
 
 class FCN16s(chainer.Chain):

@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import division
-from __future__ import print_function
-
 import glob
 import os.path as osp
 
@@ -11,6 +8,7 @@ import numpy as np
 import scipy.misc
 import skimage.color
 from sklearn.model_selection import train_test_split
+
 import fcn
 
 

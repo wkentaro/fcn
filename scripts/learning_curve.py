@@ -7,10 +7,10 @@ import collections
 
 import os.path as osp
 
-import pandas as pd
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # NOQA
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
 
@@ -59,7 +59,7 @@ def learning_curve(json_file):
 
     # train accuracy
     plt.subplot(232)
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     plt.plot(df_train['iteration'], df_train['main/accuracy'],
              '-', markersize=1, color=colors[1], alpha=.5,
              label='train accuracy')
@@ -68,7 +68,7 @@ def learning_curve(json_file):
 
     # train mean iu
     plt.subplot(233)
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     plt.plot(df_train['iteration'], df_train['main/iu'],
              '-', markersize=1, color=colors[2], alpha=.5,
              label='train accuracy')
@@ -90,8 +90,8 @@ def learning_curve(json_file):
 
     # val loss
     plt.subplot(234)
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
-    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
     plt.plot(df_val['iteration'], df_val['validation/main/loss'],
              'o-', color=colors[0], alpha=.5, label='val loss')
     plt.xlabel('iteration')
@@ -99,7 +99,7 @@ def learning_curve(json_file):
 
     # val accuracy
     plt.subplot(235)
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     plt.plot(df_val['iteration'], df_val['validation/main/accuracy'],
              'o-', color=colors[1], alpha=.5, label='val accuracy')
     plt.xlabel('iteration')
@@ -107,7 +107,7 @@ def learning_curve(json_file):
 
     # val mean iu
     plt.subplot(236)
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     plt.plot(df_val['iteration'], df_val['validation/main/iu'],
              'o-', color=colors[2], alpha=.5, label='val mean IU')
     plt.xlabel('iteration')

@@ -1,10 +1,8 @@
 import math
 
 import chainer
-from chainer import cuda
 import chainer.functions as F
 import chainer.links as L
-from chainer import Variable
 import numpy as np
 
 import fcn
@@ -122,8 +120,8 @@ class FCN32s(chainer.Chain):
 
         # report the loss and accuracy
         batch_size = len(x.data)
-        labels = cuda.to_cpu(t.data)
-        label_preds = cuda.to_cpu(self.score.data).argmax(axis=1)
+        labels = chainer.cuda.to_cpu(t.data)
+        label_preds = chainer.cuda.to_cpu(self.score.data).argmax(axis=1)
         results = []
         for i in xrange(batch_size):
             acc, acc_cls, iu, fwavacc = fcn.util.label_accuracy_score(
