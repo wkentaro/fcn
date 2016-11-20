@@ -8,7 +8,7 @@ import fcn
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('-o', '--out', default='result')
+    parser.add_argument('-o', '--out', default='logs/latest')
     parser.add_argument('--resume')
     args = parser.parse_args()
 
