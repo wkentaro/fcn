@@ -3,7 +3,6 @@ import tempfile
 
 import chainer
 from chainer.training import extensions
-import h5py
 
 import fcn
 

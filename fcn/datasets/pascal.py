@@ -1,11 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import cPickle as pickle
 import os.path as osp
-import shutil
-import tempfile
 
 import chainer
 import numpy as np

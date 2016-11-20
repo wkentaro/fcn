@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import os.path as osp
-
-import chainer
-from chainer.training import extensions
 
 import fcn
 
