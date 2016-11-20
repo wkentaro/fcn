@@ -10,16 +10,15 @@ cache:
     - $HOME/.ccache
 
 before_install:
-- sudo apt-get install -y -qq liblapack-dev
-- sudo apt-get install -y -qq libhdf5-dev
-- sudo apt-get install -y -qq python-dev
-- sudo -H pip install -U pip setuptools
+  - sudo apt-get install -y -qq liblapack-dev
+  - sudo apt-get install -y -qq libhdf5-dev
+  - sudo apt-get install -y -qq python-dev
+  - sudo -H pip install -U pip setuptools
 
 install:
-- for req in $(cat requirements.txt); do
-    sudo -H pip install $req;
-  done
-- sudo python setup.py develop
+  - sudo -H pip install -r requirements.txt
+  - sudo python setup.py develop
 
 script:
-- true
+  - sudo -H pip install -r requirements-dev.txt
+  - flake8 .
