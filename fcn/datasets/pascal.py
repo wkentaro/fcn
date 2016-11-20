@@ -9,7 +9,6 @@ import tempfile
 
 import chainer
 import numpy as np
-import plyvel
 import scipy.misc
 import skimage.color
 
@@ -44,9 +43,6 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
     def __init__(self, data_type):
-        # set db
-        self.db_path = tempfile.mktemp()
-        self.db = plyvel.DB(self.db_path, create_if_missing=True)
         # get ids for the data_type
         dataset_dir = chainer.dataset.get_dataset_directory(
             'pascal/VOCdevkit/VOC2012')
@@ -68,15 +64,8 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
     def __len__(self):
         return len(self.files)
 
-    def __del__(self):
-        shutil.rmtree(self.db_path, ignore_errors=True)
-
     def get_example(self, i):
         data_file = self.files[i]
-        # load cache
-        cache = self.db.get(str(i))
-        if cache is not None:
-            return pickle.loads(cache)
         # load image
         img_file = data_file['img']
         img = scipy.misc.imread(img_file, mode='RGB')
@@ -85,9 +74,6 @@ class PascalVOC2012SegmentationDataset(chainer.dataset.DatasetMixin):
         label_rgb_file = data_file['label_rgb']
         label_rgb = scipy.misc.imread(label_rgb_file, mode='RGB')
         label = self.label_rgb_to_32sc1(label_rgb)
-        # store cache
-        cache = (datum, label)
-        self.db.put(str(i), pickle.dumps(cache))
         return datum, label
 
     def visualize_example(self, i):
