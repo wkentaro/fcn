@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import os
-import os.path as osp
 import shlex
-import shutil
 import subprocess
 import sys
 
