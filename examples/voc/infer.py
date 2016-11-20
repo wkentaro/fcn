@@ -23,10 +23,7 @@ def main():
     img_files = args.img_files
     gpu = args.gpu
     if args.chainermodel is None:
-        chainermodel = osp.join(
-            chainer.dataset.get_dataset_directory('fcn'),
-            'fcn8s_from_caffe.chainermodel',
-        )
+        chainermodel = fcn.data.download_fcn8s_from_caffe_chainermodel()
     else:
         chainermodel = args.chainermodel
     save_dir = chainer.dataset.get_dataset_directory('fcn/inference')
