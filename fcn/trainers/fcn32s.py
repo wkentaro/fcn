@@ -37,7 +37,8 @@ def get_trainer(
     vgg = fcn.models.VGG16()
     chainer.serializers.load_hdf5(vgg_path, vgg)
 
-    model = fcn.models.FCN32s()
+    n_class = len(dataset_train.label_names)
+    model = fcn.models.FCN32s(n_class=n_class)
     model.train = True
     fcn.util.copy_chainermodel(vgg, model)
 
