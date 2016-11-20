@@ -12,7 +12,6 @@ cache:
 before_install:
 - sudo apt-get install -y -qq liblapack-dev
 - sudo apt-get install -y -qq libhdf5-dev
-- sudo apt-get install -y -qq libleveldb-dev
 - sudo apt-get install -y -qq python-dev
 - sudo -H pip install -U pip setuptools
 
