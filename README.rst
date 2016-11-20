@@ -34,33 +34,26 @@ License
 | http://opensource.org/licenses/mit-license.php
 
 
-For Beginners
--------------
 
 Installation
-++++++++++++
+------------
 
 .. code-block:: bash
 
-  # LINUX: install required libraries via apt
+  # Ubuntu: install required libraries via apt
   sudo apt-get install liblapack-dev   # for numpy
   sudo apt-get install libhdf5-dev     # for h5py
-  sudo apt-get install libleveldb-dev  # for plyvel
-  # OS X: install required libraries via brew
+  # macOS: install required libraries via brew
   brew install gfortran  # for numpy
-  brew install leveldb   # for plyvel
   brew install hdf5      # for h5py
 
-  pip install -U setuptools
   pip install fcn
 
-  fcn_install_trained_data.py
 
+For Inference
++++++++++++++
 
-Forwarding
-++++++++++
-
-Forwarding is done as below, and computation graph is `here <https://github.com/wkentaro/fcn/blob/master/_images/fcn8s_forward.jpg>`_.
+Inference is done as below:
 
 .. code-block:: bash
 
@@ -68,66 +61,40 @@ Forwarding is done as below, and computation graph is `here <https://github.com/
   wget https://farm2.staticflickr.com/1522/26471792680_a485afb024_z_d.jpg -O sample.jpg
 
   # forwaring of the networks
-  fcn_forward.py --img-files sample.jpg --gpu -1  # cpu mode
-  fcn_forward.py --img-files sample.jpg  # gpu mode
+  fcn_infer.py --img-files sample.jpg --gpu -1  # cpu mode
+  fcn_infer.py --img-files sample.jpg  # gpu mode
 
-.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn8s_26471792680.jpg
+.. image:: static/fcn8s_26471792680.jpg
 
 Original Image: https://www.flickr.com/photos/faceme/26471792680/
 
 
-For Developers
---------------
-
-
-Installation
-++++++++++++
+For Developing
+++++++++++++++
 
 .. code-block:: bash
 
   git clone https://github.com/wkentaro/fcn.git
   cd fcn
 
-  python setup.py install
-  fcn_install_trained_data.py
-
-You need to download pascal VOC2012 dataset from `here <http://host.robots.ox.ac.uk/pascal/VOC/voc2012/>`_,
-and install it as below construction::
-
-  - fcn - data - pascal - VOC2012 -- JPEGImages
-                                   - SegmentationClass
-                                   - ...
-
-Fowarding
-+++++++++
-
-Forwarding with trained model in caffe is done as below:
-
-.. code-block:: bash
-
-  # This downloads caffemodel and convert it to chainermodel
-  ./scripts/caffe_to_chainermodel.py
-
-  # forwarding of the networks
-  ./scripts/fcn_forward.py --img-files data/pascal/VOC2012/JPEGImages/2007_000129.jpg
-
-.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn8s_2007_000129.jpg
-
-Original Image: http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
+  python setup.py develop
 
 
 Training
-++++++++
+--------
 
 .. code-block:: bash
 
-  ./scripts/fcn_train.py
+  cd examples/pascal
+  ./download_dataset.py
+
+  ./train_fcn32s.py
 
 Currently we support only training FCN32s.
 The learning curve looks like below:
 
-.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn32s_learning_curve.png
+.. image:: static/fcn32s_learning_curve.png
 
-Forwarding with ``fcn32s_60000.chainermodel`` ends with below result:
+Inference with FCN32s + 60000 iterations outputs below result:
 
-.. image:: https://raw.githubusercontent.com/wkentaro/fcn/master/_images/fcn32s_2007_000129.jpg
+.. image:: static/fcn32s_2007_000129.jpg

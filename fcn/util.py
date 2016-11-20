@@ -59,6 +59,9 @@ def copy_chainermodel(src, dst):
     from chainer import link
     assert isinstance(src, link.Chain)
     assert isinstance(dst, link.Chain)
+    desc = 'Copying layers %s -> %s:' % (src.__class__.__name__,
+                                         dst.__class__.__name__)
+    links_copied = []
     for child in src.children():
         if child.name not in dst.__dict__:
             continue
@@ -77,11 +80,13 @@ def copy_chainermodel(src, dst):
                     match = False
                     break
             if not match:
-                print('Ignore %s because of parameter mismatch.' % child.name)
+                print('%s Ignore %s because of parameter mismatch.'
+                      % (desc, child.name))
                 continue
             for a, b in zip(child.namedparams(), dst_child.namedparams()):
                 b[1].data = a[1].data
-            print('Copy layer %s.' % child.name)
+            links_copied.append(child.name)
+    print('%s %s' % (desc, ', '.join(links_copied)))
 
 
 def draw_computational_graph(*args, **kwargs):
@@ -122,6 +127,8 @@ def draw_computational_graph(*args, **kwargs):
 def extract_file(path, to_directory='.'):
     if path.endswith('.zip'):
         opener, mode = zipfile.ZipFile, 'r'
+    elif path.endswith('.tar'):
+        opener, mode = tarfile.open, 'r'
     elif path.endswith('.tar.gz') or path.endswith('.tgz'):
         opener, mode = tarfile.open, 'r:gz'
     elif path.endswith('.tar.bz2') or path.endswith('.tbz'):
@@ -280,7 +287,8 @@ def label_accuracy_score(label_true, label_pred, n_class):
 def draw_label(label, img, n_class, label_titles, bg_label=0):
     """Convert label to rgb with label titles.
 
-    @param labeltitle: label title for each labels.
+    @param label_title: label title for each labels.
+    @type label_title: dict
     """
     from PIL import Image
     from scipy.misc import fromimage
@@ -403,7 +411,7 @@ def get_tile_image(imgs, tile_shape=None, result_img=None):
         h_scale, w_scale = max_height / h, max_width / w
         scale = min([h_scale, w_scale])
         h, w = int(scale * h), int(scale * w)
-        img = resize(img, (w, h), preserve_range=True).astype(dtype)
+        img = resize(img, (h, w), preserve_range=True).astype(dtype)
         if len(img.shape) == 3:
             img = centerize(img, (max_height, max_width, 3))
         else:
