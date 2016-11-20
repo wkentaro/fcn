@@ -27,11 +27,17 @@ if sys.argv[-1] == 'release':
     sys.exit(0)
 
 
+if not osp.exists('build/scripts'):
+    os.makedirs('build/scripts')
+shutil.copyfile('examples/pascal/infer.py',
+                osp.join('build/scripts/fcn_infer.py'))
+
+
 setup(
     name='fcn',
     version=version,
     packages=find_packages(),
-    scripts=['scripts/fcn_forward.py'],
+    scripts=['build/scripts/fcn_infer.py'],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
     long_description=open('README.rst').read(),
