@@ -3,6 +3,8 @@ import tempfile
 
 import chainer
 from chainer.training import extensions
+import scipy.misc
+import skimage.color
 
 import fcn
 
@@ -62,6 +64,27 @@ def get_trainer(
     trainer.extend(
         fcn.training.extensions.TestModeEvaluator(iter_val, model, device=gpu),
         trigger=(interval_eval, 'iteration'))
+
+    def viz_func(trainer, target):
+        datum = chainer.cuda.to_cpu(target.x.data[0])
+        img = dataset_val.datum_to_img(datum)
+        label_true = chainer.cuda.to_cpu(target.t.data[0])
+        label_pred = chainer.cuda.to_cpu(target.score.data[0]).argmax(axis=0)
+        label_pred[label_true == -1] = 0
+        cmap = fcn.util.labelcolormap(len(dataset_val.label_names))
+        labelviz = skimage.color.label2rgb(
+            label_pred, img, colors=cmap[1:], bg_label=0)
+        labelviz[label_true == -1] = (0, 0, 0)
+        out_path = osp.join(
+            trainer.out, 'viz_{.updater.iteration}.png'.format(trainer))
+        scipy.misc.imsave(out_path, labelviz)
+
+    trainer.extend(
+        fcn.training.extensions.Visualizer(
+            iter_val, model, viz_func, device=gpu),
+        trigger=(interval_eval, 'iteration'),
+    )
+
     model_name = model.__class__.__name__
     trainer.extend(extensions.snapshot(
         savefun=chainer.serializers.hdf5.save_hdf5,
