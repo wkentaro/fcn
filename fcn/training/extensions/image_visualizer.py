@@ -1,12 +1,14 @@
 import copy
+import os.path as osp
 
 import six
 
 import chainer
 from chainer.training import extension
+import scipy.misc
 
 
-class Visualizer(extension.Extension):
+class ImageVisualizer(extension.Extension):
 
     trigger = 1, 'epoch'
     priority = extension.PRIORITY_WRITER
@@ -20,8 +22,8 @@ class Visualizer(extension.Extension):
             target = {'main': target}
         self._targets = target
 
-        self.device = device
         self.viz_func = viz_func
+        self.device = device
 
     def __call__(self, trainer=None):
         iterator = self._iterators['main']
@@ -43,4 +45,8 @@ class Visualizer(extension.Extension):
             in_var = chainer.Variable(in_arrays, volatile='on')
             target(in_var)
 
-        return self.viz_func(trainer, target)
+        result = self.viz_func(target)
+
+        out_path = osp.join(
+            trainer.out, 'viz_{.updater.iteration}.png'.format(trainer))
+        scipy.misc.imsave(out_path, result)
