@@ -15,6 +15,7 @@ def get_trainer(
         resume=None,
         interval_log=10,
         interval_eval=1000,
+        optimizer=None,
         ):
 
     if out is None:
@@ -47,7 +48,8 @@ def get_trainer(
         model.to_gpu()
 
     # 3. optimizer
-    optimizer = chainer.optimizers.MomentumSGD(lr=1e-10, momentum=0.99)
+    if optimizer is None:
+        optimizer = chainer.optimizers.MomentumSGD(lr=1e-10, momentum=0.99)
     optimizer.setup(model)
     optimizer.add_hook(chainer.optimizer.WeightDecay(rate=0.0005))
 
