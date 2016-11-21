@@ -29,7 +29,15 @@ def main():
 
     dataset = fcn.datasets.PascalVOC2012SegmentationDataset('val')
 
-    model = fcn.models.FCN8s(n_class=len(dataset.label_names))
+    if osp.basename(chainermodel).startswith('FCN32s'):
+        model_class = fcn.models.FCN32s
+    elif osp.basename(chainermodel).startswith('FCN16s'):
+        model_class = fcn.models.FCN16s
+    elif osp.basename(chainermodel).startswith('FCN8s'):
+        model_class = fcn.models.FCN8s
+    else:
+        raise ValueError
+    model = model_class(n_class=len(dataset.label_names))
     chainer.serializers.load_hdf5(chainermodel, model)
 
     infer = fcn.Inferencer(dataset, model, gpu)
