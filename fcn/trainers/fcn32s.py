@@ -20,6 +20,11 @@ def get_trainer(
         optimizer=None,
         ):
 
+    if isinstance(gpu, list):
+        gpus = gpu
+    else:
+        gpus = [gpu]
+
     if out is None:
         out = tempfile.mktemp()
 
@@ -31,7 +36,12 @@ def get_trainer(
     dataset_train = dataset_class('train')
     dataset_val = dataset_class('val')
 
-    iter_train = chainer.iterators.SerialIterator(dataset_train, batch_size=1)
+    if len(gpus) > 1:
+        iter_train = chainer.iterators.MultiprocessIterator(
+            dataset_train, batch_size=len(gpus), shared_mem=10000000)
+    else:
+        iter_train = chainer.iterators.SerialIterator(
+            dataset_train, batch_size=1)
     iter_val = chainer.iterators.SerialIterator(
         dataset_val, batch_size=1, repeat=False, shuffle=False)
 
@@ -45,8 +55,9 @@ def get_trainer(
     model.train = True
     fcn.util.copy_chainermodel(vgg, model)
 
-    if gpu >= 0:
-        chainer.cuda.get_device(gpu).use()
+    if len(gpus) > 1 or gpus[0] >= 0:
+        chainer.cuda.get_device(gpus[0]).use()
+    if len(gpus) == 1 and gpus[0] >= 0:
         model.to_gpu()
 
     # 3. optimizer
@@ -56,13 +67,21 @@ def get_trainer(
     optimizer.add_hook(chainer.optimizer.WeightDecay(rate=0.0005))
 
     # 4. trainer
-    updater = chainer.training.StandardUpdater(
-        iter_train, optimizer, device=gpu)
+    if len(gpus) > 1:
+        devices = {'main': gpus[0]}
+        for gpu in gpus[1:]:
+            devices['gpu{}'.format(gpu)] = gpu
+        updater = chainer.training.ParallelUpdater(
+            iter_train, optimizer, devices=devices)
+    else:
+        updater = chainer.training.StandardUpdater(
+            iter_train, optimizer, device=gpus[0])
     trainer = chainer.training.Trainer(
         updater, (max_iter, 'iteration'), out=out)
 
     trainer.extend(
-        fcn.training.extensions.TestModeEvaluator(iter_val, model, device=gpu),
+        fcn.training.extensions.TestModeEvaluator(
+            iter_val, model, device=gpus[0]),
         trigger=(interval_eval, 'iteration'),
         invoke_before_training=True,
     )
@@ -89,7 +108,7 @@ def get_trainer(
 
     trainer.extend(
         fcn.training.extensions.ImageVisualizer(
-            iter_val, model, viz_func=visualize_segmentation, device=gpu),
+            iter_val, model, viz_func=visualize_segmentation, device=gpus[0]),
         trigger=(interval_eval, 'iteration'),
         invoke_before_training=True,
     )
