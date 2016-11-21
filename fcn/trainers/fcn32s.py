@@ -63,7 +63,8 @@ def get_trainer(
 
     trainer.extend(
         fcn.training.extensions.TestModeEvaluator(iter_val, model, device=gpu),
-        trigger=(interval_eval, 'iteration'))
+        trigger=(interval_eval, 'iteration'),
+        invoke_before_training=True)
 
     def visualize_segmentation(target):
         datum = chainer.cuda.to_cpu(target.x.data[0])
