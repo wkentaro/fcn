@@ -12,7 +12,7 @@ import fcn
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpus', type=int, default=[0], nargs='*')
-    parser.add_argument('-o', '--out-dir', default='result')
+    parser.add_argument('-o', '--out-dir', default='logs/latest')
     parser.add_argument('--resume')
     args = parser.parse_args()
 
@@ -30,8 +30,8 @@ def main():
     dataset_val = fcn.datasets.PascalVOC2012SegmentationDataset('val')
 
     iter_train = chainer.iterators.MultiprocessIterator(
-        dataset_train, batch_size=len(gpus))
-    iter_val = chainer.iterators.MultiprocessIterator(
+        dataset_train, batch_size=len(gpus), shared_mem=10000000)
+    iter_val = chainer.iterators.SerialIterator(
         dataset_val, batch_size=len(gpus), repeat=False, shuffle=False)
 
     # 2. model
