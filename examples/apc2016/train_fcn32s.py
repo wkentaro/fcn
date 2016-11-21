@@ -2,6 +2,8 @@
 
 import argparse
 
+import chainer
+
 import fcn
 
 import dataset
@@ -27,6 +29,7 @@ def main():
         resume=resume,
         interval_log=10,
         interval_eval=100,
+        optimizer=chainer.optimizers.Adam(alpha=1e-5),
     )
     trainer.run()
 
