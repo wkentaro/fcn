@@ -29,11 +29,11 @@ def main():
 
     dataset = fcn.datasets.PascalVOC2012SegmentationDataset('val')
 
-    if osp.basename(chainermodel).startswith('FCN32s'):
+    if osp.basename(chainermodel).lower().startswith('fcn32s'):
         model_class = fcn.models.FCN32s
-    elif osp.basename(chainermodel).startswith('FCN16s'):
+    elif osp.basename(chainermodel).lower().startswith('fcn16s'):
         model_class = fcn.models.FCN16s
-    elif osp.basename(chainermodel).startswith('FCN8s'):
+    elif osp.basename(chainermodel).lower().startswith('fcn8s'):
         model_class = fcn.models.FCN8s
     else:
         raise ValueError
