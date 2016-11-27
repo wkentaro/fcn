@@ -17,7 +17,7 @@ Training
 
 The learning curve looks like below:
 
-.. image:: static/learning_curve.gif
+.. image:: static/learning_scale0.8.gif
 
 
 Convert caffemodel to chainermodel
