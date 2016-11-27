@@ -329,7 +329,7 @@ def draw_label(label, img, n_class, label_titles, bg_label=0):
     return result_img
 
 
-def centerize(src, dst_shape):
+def centerize(src, dst_shape, margin_color=None):
     """Centerize image for specified image size
 
     @param src: image to centerize
@@ -338,6 +338,8 @@ def centerize(src, dst_shape):
     if src.shape[:2] == dst_shape[:2]:
         return src
     centerized = np.zeros(dst_shape, dtype=src.dtype)
+    if margin_color:
+        centerized[:, :] = margin_color
     pad_vertical, pad_horizontal = 0, 0
     h, w = src.shape[:2]
     dst_h, dst_w = dst_shape[:2]
@@ -358,7 +360,7 @@ def _tile_images(imgs, tile_shape, concatenated_image):
     @param concatenated_image: returned image.
         if it is None, new image will be created.
     """
-    x_num, y_num = tile_shape
+    y_num, x_num = tile_shape
     one_width = imgs[0].shape[1]
     one_height = imgs[0].shape[0]
     if concatenated_image is None:
@@ -379,7 +381,7 @@ def _tile_images(imgs, tile_shape, concatenated_image):
     return concatenated_image
 
 
-def get_tile_image(imgs, tile_shape=None, result_img=None):
+def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     """Concatenate images whose sizes are different.
 
     @param imgs: image list which should be concatenated
@@ -413,8 +415,8 @@ def get_tile_image(imgs, tile_shape=None, result_img=None):
         h, w = int(scale * h), int(scale * w)
         img = resize(img, (h, w), preserve_range=True).astype(dtype)
         if len(img.shape) == 3:
-            img = centerize(img, (max_height, max_width, 3))
+            img = centerize(img, (max_height, max_width, 3), margin_color)
         else:
-            img = centerize(img, (max_height, max_width))
+            img = centerize(img, (max_height, max_width), margin_color)
         imgs[i] = img
     return _tile_images(imgs, tile_shape, result_img)

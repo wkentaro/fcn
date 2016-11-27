@@ -15,6 +15,11 @@ Training
   ./train_fcn32s.py
 
 
+The learning curve looks like below:
+
+.. image:: static/learning_scale0.8.gif
+
+
 Convert caffemodel to chainermodel
 ++++++++++++++++++++++++++++++++++
 

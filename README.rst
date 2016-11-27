@@ -16,7 +16,6 @@ This is Chainer_ implementation of fcn.berkeleyvision.org_.
 Features
 --------
 
-- Provide FCN8s model for Chainer. [v1.0.0_]
 - Copy caffemodel to chainermodel. [v1.0.0_]
 - Forwarding with Chainer for pascal dataset. [v1.0.0_]
 - Training with Chainer for pascal dataset. [v2.0.0_]
@@ -50,8 +49,8 @@ Installation
   pip install fcn
 
 
-For Inference
-+++++++++++++
+Inference
+---------
 
 Inference is done as below:
 
@@ -69,17 +68,6 @@ Inference is done as below:
 Original Image: https://www.flickr.com/photos/faceme/26471792680/
 
 
-For Developing
-++++++++++++++
-
-.. code-block:: bash
-
-  git clone https://github.com/wkentaro/fcn.git
-  cd fcn
-
-  python setup.py develop
-
-
 Training
 --------
 
@@ -93,8 +81,4 @@ Training
 Currently we support only training FCN32s.
 The learning curve looks like below:
 
-.. image:: static/fcn32s_learning_curve.png
-
-Inference with FCN32s + 60000 iterations outputs below result:
-
-.. image:: static/fcn32s_2007_000129.jpg
+.. image:: examples/pascal/static/learning_scale0.8.gif
