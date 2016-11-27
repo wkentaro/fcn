@@ -117,7 +117,8 @@ def learning_curve(json_file, output_interval):
         # val accuracy
         plt.subplot(235)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
-        plt.plot(df_val_step['iteration'], df_val_step['validation/main/accuracy'],
+        plt.plot(df_val_step['iteration'],
+                 df_val_step['validation/main/accuracy'],
                  'o-', color=colors[1], alpha=.5, label='val accuracy')
         plt.xlim((0, row_max['iteration']))
         plt.ylim((0, row_max['validation/main/accuracy']))
