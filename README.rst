@@ -81,4 +81,4 @@ Training
 Currently we support only training FCN32s.
 The learning curve looks like below:
 
-.. image:: examples/pascal/static/learning_curve.gif
+.. image:: examples/pascal/static/learning_scale0.8.gif
