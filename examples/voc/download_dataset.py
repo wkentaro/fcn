@@ -4,8 +4,7 @@ import os.path as osp
 
 import chainer
 
-import fcn.data
-import fcn.utils
+import fcn
 
 
 def main():
@@ -15,8 +14,9 @@ def main():
     fcn.data.cached_download(
         url,
         path=path,
+        md5='6cd6e144f989b92b3379bac3b3de84fd',
     )
-    fcn.util.extract_file(path, to_directory=dataset_dir)
+    fcn.utils.extract_file(path, to_directory=dataset_dir)
 
 
 if __name__ == '__main__':
