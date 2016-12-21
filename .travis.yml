@@ -20,5 +20,5 @@ install:
   - sudo python setup.py develop
 
 script:
-  - sudo -H pip install -r requirements-dev.txt
+  - sudo -H pip install flake8 hacking
   - flake8 .
