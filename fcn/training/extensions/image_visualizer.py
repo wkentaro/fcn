@@ -13,7 +13,8 @@ class ImageVisualizer(extension.Extension):
     trigger = 1, 'epoch'
     priority = extension.PRIORITY_WRITER
 
-    def __init__(self, iterator, target, viz_func, device=None):
+    def __init__(self, iterator, target, viz_func,
+                 out='viz_{.updater.iteration}.png', device=None):
         if isinstance(iterator, chainer.dataset.iterator.Iterator):
             iterator = {'main': iterator}
         self._iterators = iterator
@@ -23,6 +24,7 @@ class ImageVisualizer(extension.Extension):
         self._targets = target
 
         self.viz_func = viz_func
+        self.out = out
         self.device = device
 
     def __call__(self, trainer=None):
@@ -48,5 +50,5 @@ class ImageVisualizer(extension.Extension):
         result = self.viz_func(target)
 
         out_path = osp.join(
-            trainer.out, 'viz_{.updater.iteration}.png'.format(trainer))
+            trainer.out, self.out.format(trainer))
         scipy.misc.imsave(out_path, result)
