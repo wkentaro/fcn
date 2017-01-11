@@ -5,7 +5,7 @@ import os.path as osp
 import chainer
 
 import fcn.data
-import fcn.util
+import fcn.utils
 
 
 def main():
