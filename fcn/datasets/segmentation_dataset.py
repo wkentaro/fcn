@@ -36,14 +36,16 @@ class SegmentationDatasetBase(chainer.dataset.DatasetMixin):
         return label
 
     def img_to_datum(self, img):
+        img = img.copy()
         datum = img.astype(np.float32)
         datum = datum[:, :, ::-1]  # RGB -> BGR
         datum -= self.mean_bgr
         datum = datum.transpose((2, 0, 1))
         return datum
 
-    def datum_to_img(self, blob):
-        bgr = blob.transpose((1, 2, 0))
+    def datum_to_img(self, datum):
+        datum = datum.copy()
+        bgr = datum.transpose((1, 2, 0))
         bgr += self.mean_bgr
         rgb = bgr[:, :, ::-1]  # BGR -> RGB
         rgb = rgb.astype(np.uint8)
