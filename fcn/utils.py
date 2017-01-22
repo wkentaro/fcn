@@ -15,9 +15,6 @@ import tarfile
 import tempfile
 import zipfile
 
-import matplotlib
-if os.environ.get('DISPLAY', '') == '':  # NOQA
-    matplotlib.use('Agg')  # NOQA
 import matplotlib.pyplot as plt
 import numpy as np
 
