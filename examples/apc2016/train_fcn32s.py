@@ -16,9 +16,13 @@ def main():
     parser.add_argument('--gpus', type=int, nargs='+', default=[0])
     parser.add_argument('-o', '--out')
     parser.add_argument('--resume')
+    parser.add_argument('--dataset', default='v2', choices=['v1', 'v2'])
     args = parser.parse_args()
 
-    dataset_class = datasets.APC2016DatasetV1
+    if args.dataset == 'v1':
+        dataset_class = datasets.APC2016DatasetV1
+    else:
+        dataset_class = datasets.APC2016DatasetV2
     out = args.out
     resume = args.resume
     if out is None:
