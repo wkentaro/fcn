@@ -18,6 +18,7 @@ def get_trainer(
         interval_log=10,
         interval_eval=1000,
         optimizer=None,
+        batch_size=1,
         ):
 
     if isinstance(gpu, list):
@@ -36,12 +37,9 @@ def get_trainer(
     dataset_train = dataset_class('train')
     dataset_val = dataset_class('val')
 
-    if len(gpus) > 1:
-        iter_train = chainer.iterators.MultiprocessIterator(
-            dataset_train, batch_size=len(gpus), shared_mem=10000000)
-    else:
-        iter_train = chainer.iterators.SerialIterator(
-            dataset_train, batch_size=1)
+    iter_train = chainer.iterators.MultiprocessIterator(
+        dataset_train, batch_size=batch_size * len(gpus),
+        shared_mem=10000000)
     iter_val = chainer.iterators.SerialIterator(
         dataset_val, batch_size=1, repeat=False, shuffle=False)
 
@@ -83,7 +81,7 @@ def get_trainer(
         fcn.training.extensions.TestModeEvaluator(
             iter_val, model, device=gpus[0]),
         trigger=(interval_eval, 'iteration'),
-        invoke_before_training=True,
+        invoke_before_training=False,
     )
 
     def visualize_segmentation(target):
