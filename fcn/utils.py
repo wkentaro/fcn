@@ -245,6 +245,25 @@ def visualize_labelcolormap(cmap):
     return ret.reshape((n_colors * 10, 10, 3))
 
 
+def get_label_colortable(n_labels, shape):
+    import cv2
+    rows, cols = shape
+    if rows * cols < n_labels:
+        raise ValueError
+    cmap = labelcolormap(n_labels)
+    table = np.zeros((rows * cols, 50, 50, 3), dtype=np.uint8)
+    for lbl_id, color in enumerate(cmap):
+        color_uint8 = (color * 255).astype(np.uint8)
+        table[lbl_id, :, :] = color_uint8
+        text = '{:<2}'.format(lbl_id)
+        cv2.putText(table[lbl_id], text, (5, 35),
+                    cv2.cv.CV_FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 3)
+    table = table.reshape(rows, cols, 50, 50, 3)
+    table = table.transpose(0, 2, 1, 3, 4)
+    table = table.reshape(rows * 50, cols * 50, 3)
+    return table
+
+
 # -----------------------------------------------------------------------------
 # Evaluation
 # -----------------------------------------------------------------------------
