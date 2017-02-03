@@ -23,6 +23,7 @@ def main():
         max_iter=max_iter,
         out=out,
         resume=resume,
+        batch_size=10,
     )
     trainer.run()
 
