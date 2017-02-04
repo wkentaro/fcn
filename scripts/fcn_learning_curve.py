@@ -56,7 +56,12 @@ def learning_curve(json_file, output_interval):
     df_val = df[columns]
     df_val = df_val.dropna()
 
-    for iter_stop in xrange(0, int(df_train['iteration'].max()),
+    iter_start = 0
+    if output_interval < 0:
+        iter_start = int(row_max['iteration'])
+        output_interval = 1
+
+    for iter_stop in xrange(iter_start, int(row_max['iteration']) + 1,
                             output_interval):
         #########
         # TRAIN #
@@ -145,7 +150,7 @@ def learning_curve(json_file, output_interval):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('json_file')
-    parser.add_argument('--output-interval', type=int, default=1000)
+    parser.add_argument('--output-interval', type=int, default=-1)
     args = parser.parse_args()
 
     json_file = args.json_file
