@@ -38,7 +38,7 @@ def main():
         gpu=gpus,
         out=out,
         resume=resume,
-        max_iter=100000,  # num_feed = iteration * batch_size * num_gpu
+        max_iter=150000,  # num_feed = iteration * batch_size * num_gpu
         interval_log=10,
         interval_eval=1000,
         optimizer=chainer.optimizers.Adam(alpha=1e-5),
