@@ -25,14 +25,15 @@ def main():
     )
     fcn.utils.extract_file(path, to_directory=dataset_dir)
 
-    path = osp.join(dataset_dir, 'APC2016mit_training.zip')
-    fcn.data.cached_download(
-        url='https://drive.google.com/uc?id=0B4mCa-2YGnp7ZEMwcW5rcVBpeG8',
-        path=path,
-    )
+    # XXX: this is optional
+    # path = osp.join(dataset_dir, 'APC2016mit_training.zip')
+    # fcn.data.cached_download(
+    #     url='https://drive.google.com/uc?id=0B4mCa-2YGnp7ZEMwcW5rcVBpeG8',
+    #     path=path,
+    # )
     path = osp.join(dataset_dir, 'APC2016mit_benchmark.zip')
     fcn.data.cached_download(
-        url='https://drive.google.com/uc?id=0B9P1L--7Wd2vOHhlbENra2REZDA',
+        url='https://drive.google.com/uc?id=0B9P1L--7Wd2vZHlSQjJSV0x4eXc',
         path=path,
         md5='15a6ff714fafb3950c0b0ff0161d6ef6',
     )
