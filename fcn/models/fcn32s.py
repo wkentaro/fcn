@@ -131,7 +131,7 @@ class FCN32s(chainer.Chain):
         chainer.reporter.report({
             'loss': self.loss,
             'accuracy': results[0],
-            'acc_cls': results[1],
+            'accuracy_cls': results[1],
             'iu': results[2],
             'fwavacc': results[3],
         }, self)
