@@ -12,7 +12,7 @@ import pandas
 import skimage.color
 import skimage.io
 
-from dataset import APC2016Dataset
+from datasets import APC2016DatasetV1
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
     gpu = args.gpu
     chainermodel = args.chainermodel
 
-    dataset = APC2016Dataset('val')
+    dataset = APC2016DatasetV1('val')
     n_class = len(dataset.label_names)
 
     model = fcn.models.FCN32s(n_class=n_class)
@@ -55,8 +55,8 @@ def main():
         score = cuda.to_cpu(model.score.data[0])
         lbl_pred = score.argmax(axis=0)
 
-        acc, acc_cls, iu, fwavacc = fcn.utils.label_accuracy_score(
-            lbl_true, lbl_pred, n_class)
+        acc, acc_cls, iu, fwavacc = \
+            fcn.utils.label_accuracy_score(lbl_true, lbl_pred, n_class)
         records.append((acc, acc_cls, iu, fwavacc))
 
         img = dataset.datum_to_img(datum)
@@ -77,7 +77,7 @@ def main():
         skimage.io.imsave(osp.join(sub_dir, 'lbl_true.jpg'), viz_true)
         print('saved to: %s' % sub_dir)
 
-    columns = ['acc', 'acc_cls', 'iu', 'fwavacc']
+    columns = ['accuracy', 'accuracy_cls', 'iu', 'fwavacc']
     df = pandas.DataFrame(data=records, columns=columns)
     df.to_csv(osp.join(out_dir, 'log.csv'))
 
