@@ -10,7 +10,6 @@ from chainer import cuda
 import fcn
 
 import datasets
-from train_fcn16s import train
 
 
 def main():
@@ -48,7 +47,7 @@ def main():
     vgg = fcn.models.VGG16()
     chainer.serializers.load_hdf5(vgg_path, vgg)
 
-    model = fcn.models.FCN16s(n_class=n_class)
+    model = fcn.models.FCN32s(n_class=n_class)
     model.train = True
     fcn.utils.copy_chainermodel(vgg, model)
 
@@ -63,15 +62,17 @@ def main():
 
     # training loop
 
-    train(
+    trainer = fcn.Trainer(
+        device=gpu,
         model=model,
         optimizer=optimizer,
         iter_train=iter_train,
         iter_val=iter_val,
-        gpu=gpu,
+        out=out,
+    )
+    trainer.train(
         max_iter=150000,
         interval_eval=5000,
-        out=out,
     )
 
 
