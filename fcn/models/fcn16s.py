@@ -129,6 +129,10 @@ class FCN16s(chainer.Chain):
         self.score = score  # XXX: for backward compatibility
         # self.score = cuda.to_cpu(h.data)
 
+        if t is None:
+            assert not self.train
+            return
+
         loss = F.softmax_cross_entropy(self.score, t, normalize=False)
         self.loss = float(cuda.to_cpu(loss.data))
         if np.isnan(self.loss):
