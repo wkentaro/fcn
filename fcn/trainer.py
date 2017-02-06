@@ -42,7 +42,8 @@ class Trainer(object):
         desc = 'Evaluating at iteration %d' % self.iteration
         for batch in tqdm.tqdm(iter_val, desc=desc,
                                total=len(dataset), ncols=80):
-            in_vars = utils.batch_to_invars(batch, device=self.device)
+            in_vars = utils.batch_to_vars(
+                batch, device=self.device, volatile=True)
             self.model(*in_vars)
             logs.append(self.model.log)
             if iter_val.current_position % interval == 0 and \
@@ -89,8 +90,8 @@ class Trainer(object):
             # train #
             #########
 
-            in_vars = utils.batch_to_invars(batch, device=self.device)
-
+            in_vars = utils.batch_to_vars(
+                batch, device=self.device, volatile=False)
             self.model.zerograds()
             loss = self.model(*in_vars)
 

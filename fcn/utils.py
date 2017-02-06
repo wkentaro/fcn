@@ -125,13 +125,13 @@ def append_log_to_json(log, log_file):
         json.dump(logs, f, indent=4, sort_keys=True)
 
 
-def batch_to_invars(batch, device=-1):
+def batch_to_vars(batch, device=-1, volatile='off'):
     import chainer
     from chainer import cuda
     in_arrays = [np.asarray(x) for x in zip(*batch)]
     if device >= 0:
         in_arrays = [cuda.to_gpu(x, device=device) for x in in_arrays]
-    in_vars = [chainer.Variable(x) for x in in_arrays]
+    in_vars = [chainer.Variable(x, volatile) for x in in_arrays]
     return in_vars
 
 
