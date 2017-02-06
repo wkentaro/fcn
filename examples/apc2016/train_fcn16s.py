@@ -86,6 +86,46 @@ def evaluate(iteration, model, iter_val, device, out, n_viz=9):
     return log
 
 
+def train(model, optimizer, iter_train, iter_val, gpu,
+          max_iter, interval_eval, out):
+    for iteration, batch in enumerate(iter_train):
+
+        # evaluate
+
+        log_val = {}
+        if iteration % interval_eval == 0:
+            log_val = evaluate(iteration, model, copy.copy(iter_val),
+                               device=gpu, out=out)
+            out_model_dir = osp.join(out, 'models')
+            if not osp.exists(out_model_dir):
+                os.makedirs(out_model_dir)
+            out_model = osp.join(out_model_dir, '%s_iter%d.h5' %
+                                 (model.__class__.__name__, iteration))
+            chainer.serializers.save_hdf5(out_model, model)
+
+        # train
+
+        in_arrays = [np.asarray(x) for x in zip(*batch)]
+        if gpu >= 0:
+            in_arrays = [cuda.to_gpu(x, device=gpu) for x in in_arrays]
+        in_vars = [chainer.Variable(x) for x in in_arrays]
+
+        model.zerograds()
+        loss = model(*in_vars)
+
+        if loss is not None:
+            loss.backward()
+            optimizer.update()
+            log = model.log
+            log['epoch'] = iter_train.epoch
+            log['iteration'] = iteration
+            log.update(log_val)
+            write_log(model.log, out)
+
+        if iteration >= max_iter:
+            break
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--fcn32s', required=True)
@@ -137,45 +177,16 @@ def main():
 
     # training loop
 
-    max_iter = 100000
-    interval_eval = 1000
-
-    for iteration, batch in enumerate(iter_train):
-
-        # evaluate
-
-        log_val = {}
-        if iteration % interval_eval == 0:
-            log_val = evaluate(iteration, model, copy.copy(iter_val),
-                               device=gpu, out=out)
-            out_model_dir = osp.join(out, 'models')
-            if not osp.exists(out_model_dir):
-                os.makedirs(out_model_dir)
-            out_model = osp.join(out_model_dir, '%s_iter%d.h5' %
-                                 (model.__class__.__name__, iteration))
-            chainer.serializers.save_hdf5(out_model, model)
-
-        # train
-
-        in_arrays = [np.asarray(x) for x in zip(*batch)]
-        if gpu >= 0:
-            in_arrays = [cuda.to_gpu(x, device=gpu) for x in in_arrays]
-        in_vars = [chainer.Variable(x) for x in in_arrays]
-
-        model.zerograds()
-        loss = model(*in_vars)
-
-        if loss is not None:
-            loss.backward()
-            optimizer.update()
-            log = model.log
-            log['epoch'] = iter_train.epoch
-            log['iteration'] = iteration
-            log.update(log_val)
-            write_log(model.log, out)
-
-        if iteration >= max_iter:
-            break
+    train(
+        model=model,
+        optimizer=optimizer,
+        iter_train=iter_train,
+        iter_val=iter_val,
+        gpu=gpu,
+        max_iter=150000,
+        interval_eval=5000,
+        out=out,
+    )
 
 
 if __name__ == '__main__':
