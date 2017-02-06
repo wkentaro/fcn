@@ -1,6 +1,10 @@
 import chainer
+from chainer import cuda
 import chainer.functions as F
 import chainer.links as L
+import numpy as np
+
+from fcn import utils
 
 
 class FCN16s(chainer.Chain):
@@ -42,8 +46,7 @@ class FCN16s(chainer.Chain):
         self.train = False
 
     def __call__(self, x, t=None):
-        self.x = x
-        self.t = t
+        self.data = cuda.to_cpu(x.data)
 
         # conv1
         h = F.relu(self.conv1_1(x))
@@ -122,8 +125,30 @@ class FCN16s(chainer.Chain):
 
         # score
         h = upscore16[:, :, 27:27+x.data.shape[2], 27:27+x.data.shape[3]]
-        self.score = h  # 1/1
+        score = h  # 1/1
+        self.score = score  # XXX: for backward compatibility
+        # self.score = cuda.to_cpu(h.data)
 
-        # testing with t or training
-        self.loss = F.softmax_cross_entropy(self.score, t, normalize=False)
-        return self.loss
+        loss = F.softmax_cross_entropy(self.score, t, normalize=False)
+        self.loss = float(cuda.to_cpu(loss.data))
+        if np.isnan(self.loss):
+            raise ValueError('loss value is nan')
+
+        self.lbl_true = chainer.cuda.to_cpu(t.data)
+        self.lbl_pred = cuda.to_cpu(score.data).argmax(axis=1)
+
+        logs = []
+        for i in xrange(x.shape[0]):
+            acc, acc_cls, iu, fwavacc = utils.label_accuracy_score(
+                self.lbl_true[i], self.lbl_pred[i], self.n_class)
+            logs.append((acc, acc_cls, iu, fwavacc))
+        log = np.array(logs).mean(axis=0)
+        self.log = {
+            'loss': self.loss,
+            'accuracy': log[0],
+            'accuracy_cls': log[1],
+            'iu': log[2],
+            'fwavacc': log[3],
+        }
+
+        return loss
