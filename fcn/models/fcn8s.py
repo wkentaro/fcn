@@ -174,5 +174,6 @@ class FCN8s(chainer.Chain):
             'iu': log[2],
             'fwavacc': log[3],
         }
+        chainer.report(self.log, self)
 
         return loss
