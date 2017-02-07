@@ -39,9 +39,9 @@ class Trainer(object):
         vizs = []
         dataset = iter_val.dataset
         interval = len(dataset) // n_viz
-        desc = 'Evaluating at iteration %d' % self.iteration
-        for batch in tqdm.tqdm(iter_val, desc=desc,
-                               total=len(dataset), ncols=80):
+        desc = 'eval [iter=%d]' % self.iteration
+        for batch in tqdm.tqdm(iter_val, desc=desc, total=len(dataset),
+                               ncols=80, leave=False):
             in_vars = utils.batch_to_vars(
                 batch, device=self.device, volatile=True)
             self.model(*in_vars)
@@ -67,7 +67,9 @@ class Trainer(object):
         return log
 
     def train(self, max_iter, interval_eval):
-        for iteration, batch in enumerate(self.iter_train):
+        for iteration, batch in tqdm.tqdm(enumerate(self.iter_train),
+                                          desc='train', total=max_iter,
+                                          ncols=80):
             self.epoch = self.iter_train.epoch
             self.iteration = iteration
 
