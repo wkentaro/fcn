@@ -1,11 +1,10 @@
-import math
-
 import chainer
+from chainer import cuda
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
 
-import fcn
+from fcn import utils
 
 
 class FCN32s(chainer.Chain):
@@ -44,8 +43,7 @@ class FCN32s(chainer.Chain):
         self.train = False
 
     def __call__(self, x, t=None):
-        self.x = x
-        self.t = t
+        self.data = cuda.to_cpu(x.data)
 
         # conv1
         h = F.relu(self.conv1_1(x))
@@ -107,33 +105,36 @@ class FCN32s(chainer.Chain):
 
         # score
         h = upscore[:, :, 19:19+x.data.shape[2], 19:19+x.data.shape[3]]
-        self.score = h  # 1/1
+        score = h
+        self.score = score  # XXX: for backward compatibility
+        # self.score = cuda.to_cpu(h.data)
 
         if t is None:
             assert not self.train
             return
 
         # testing with t or training
-        self.loss = F.softmax_cross_entropy(self.score, t, normalize=False)
-        if math.isnan(self.loss.data):
+        loss = F.softmax_cross_entropy(self.score, t, normalize=False)
+        self.loss = float(cuda.to_cpu(loss.data))
+        if np.isnan(self.loss):
             raise ValueError('loss value is nan')
 
-        # report the loss and accuracy
-        batch_size = len(x.data)
-        labels = chainer.cuda.to_cpu(t.data)
-        label_preds = chainer.cuda.to_cpu(self.score.data).argmax(axis=1)
-        results = []
-        for i in xrange(batch_size):
-            acc, acc_cls, iu, fwavacc = fcn.util.label_accuracy_score(
-                labels[i], label_preds[i], self.n_class)
-            results.append((acc, acc_cls, iu, fwavacc))
-        results = np.array(results).mean(axis=0)
-        chainer.reporter.report({
-            'loss': self.loss,
-            'accuracy': results[0],
-            'accuracy_cls': results[1],
-            'iu': results[2],
-            'fwavacc': results[3],
-        }, self)
+        self.lbl_true = chainer.cuda.to_cpu(t.data)
+        self.lbl_pred = cuda.to_cpu(score.data).argmax(axis=1)
 
-        return self.loss
+        logs = []
+        for i in xrange(x.shape[0]):
+            acc, acc_cls, iu, fwavacc = utils.label_accuracy_score(
+                self.lbl_true[i], self.lbl_pred[i], self.n_class)
+            logs.append((acc, acc_cls, iu, fwavacc))
+        log = np.array(logs).mean(axis=0)
+        self.log = {
+            'loss': self.loss,
+            'accuracy': log[0],
+            'accuracy_cls': log[1],
+            'iu': log[2],
+            'fwavacc': log[3],
+        }
+        chainer.report(self.log, self)
+
+        return loss

@@ -14,12 +14,13 @@ import datasets
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--fcn16s', required=True)
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--out', required=True)
-    parser.add_argument('--resume')
     parser.add_argument('--dataset', default='v2', choices=['v1', 'v2'])
     args = parser.parse_args()
 
+    fcn16s_path = args.fcn16s
     gpu = args.gpu
     out = args.out
     if args.dataset == 'v1':
@@ -43,13 +44,12 @@ def main():
 
     n_class = len(dataset_train.label_names)
 
-    vgg_path = fcn.data.download_vgg16_chainermodel()
-    vgg = fcn.models.VGG16()
-    chainer.serializers.load_hdf5(vgg_path, vgg)
+    fcn16s = fcn.models.FCN16s(n_class=n_class)
+    chainer.serializers.load_hdf5(fcn16s_path, fcn16s)
 
-    model = fcn.models.FCN32s(n_class=n_class)
+    model = fcn.models.FCN8s(n_class=n_class)
     model.train = True
-    fcn.utils.copy_chainermodel(vgg, model)
+    fcn.utils.copy_chainermodel(fcn16s, model)
 
     if gpu >= 0:
         cuda.get_device(gpu).use()

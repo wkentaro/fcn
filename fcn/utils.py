@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import cStringIO as StringIO
 import hashlib
+import json
 import math
 import os
 import os.path as osp
@@ -114,9 +115,30 @@ def draw_computational_graph(*args, **kwargs):
     subprocess.call(cmd, shell=True)
 
 
+def append_log_to_json(log, log_file):
+    if osp.exists(log_file):
+        logs = json.load(open(log_file))
+    else:
+        logs = []
+    logs.append(log)
+    with open(log_file, 'w') as f:
+        json.dump(logs, f, indent=4, sort_keys=True)
+
+
+def batch_to_vars(batch, device=-1, volatile='off'):
+    import chainer
+    from chainer import cuda
+    in_arrays = [np.asarray(x) for x in zip(*batch)]
+    if device >= 0:
+        in_arrays = [cuda.to_gpu(x, device=device) for x in in_arrays]
+    in_vars = [chainer.Variable(x, volatile) for x in in_arrays]
+    return in_vars
+
+
 # -----------------------------------------------------------------------------
 # Data Util
 # -----------------------------------------------------------------------------
+
 
 def extract_file(path, to_directory='.'):
     if path.endswith('.zip'):
@@ -433,3 +455,27 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
             img = centerize(img, (max_height, max_width), margin_color)
         imgs[i] = img
     return _tile_images(imgs, tile_shape, result_img)
+
+
+def visualize_segmentation(lbl_pred, lbl_true, img, n_class):
+    import skimage.color
+    import skimage.util
+    lbl_pred[lbl_true == -1] = 0
+    lbl_true[lbl_true == -1] = 0
+
+    cmap = labelcolormap(n_class)
+
+    viz_true0 = skimage.color.label2rgb(lbl_true, colors=cmap[1:], bg_label=0)
+    viz_true0 = skimage.util.img_as_ubyte(viz_true0)
+    viz_true1 = skimage.color.label2rgb(
+        lbl_true, img, colors=cmap[1:], bg_label=0)
+    viz_true1 = skimage.util.img_as_ubyte(viz_true1)
+
+    viz_pred0 = skimage.color.label2rgb(lbl_pred, colors=cmap[1:], bg_label=0)
+    viz_pred0 = skimage.util.img_as_ubyte(viz_pred0)
+    viz_pred1 = skimage.color.label2rgb(
+        lbl_pred, img, colors=cmap[1:], bg_label=0)
+    viz_pred1 = skimage.util.img_as_ubyte(viz_pred1)
+
+    return get_tile_image([viz_true0, viz_true1, viz_pred0, viz_pred1],
+                          tile_shape=(2, 2))
