@@ -36,7 +36,7 @@ class Inferencer(object):
         print(' - resizing_scale: {0}'.format(resizing_scale))
         datum = self.dataset.img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
-        if self.gpu >= -1:
+        if self.gpu >= 0:
             x_data = chainer.cuda.to_gpu(x_data, device=self.gpu)
         x = chainer.Variable(x_data, volatile=False)
         label = self.infer(x)
