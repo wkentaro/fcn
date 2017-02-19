@@ -21,7 +21,7 @@ def main():
     fcn.data.cached_download(
         url='https://drive.google.com/uc?id=0B9P1L--7Wd2vaExFU1AxWHlMdTg',
         path=path,
-        md5='791af8d7d296ed23c3a6690f894cd7f8',
+        md5='8f1641f52fff90154533f84b9eb111a5',
     )
     fcn.utils.extract_file(path, to_directory=dataset_dir)
 
