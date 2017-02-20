@@ -50,6 +50,11 @@ def main():
     model = fcn.models.FCN32s(n_class=n_class)
     model.train = True
     fcn.utils.copy_chainermodel(vgg, model)
+    for link_name in ['fc6', 'fc7']:
+        W1, b1 = getattr(vgg, link_name).params()
+        W2, b2 = getattr(vgg, link_name).params()
+        W2.data = W1.data.reshape(W2.shape)
+        b2.data = b1.data
 
     if gpu >= 0:
         cuda.get_device(gpu).use()
