@@ -3,6 +3,7 @@
 import argparse
 
 import fcn
+import fcn.trainers
 
 import dataset
 

@@ -4,8 +4,7 @@ import os.path as osp
 
 import chainer
 
-import fcn.data
-import fcn.util
+import fcn
 
 
 def main():
@@ -17,7 +16,7 @@ def main():
         path=path,
         md5='697dde1c5beab563e5ff9a5bb7cd7fc0',
     )
-    fcn.util.extract_file(path, to_directory=dataset_dir)
+    fcn.utils.extract_file(path, to_directory=dataset_dir)
 
 
 if __name__ == '__main__':
