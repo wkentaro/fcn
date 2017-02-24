@@ -31,7 +31,7 @@ def main():
         viz_file = osp.join(log_dir, 'viz_{}.png'.format(iter_stop))
         img_viz = scipy.misc.imread(viz_file, mode='RGB')
         # save tiled image
-        img_tiled = fcn.util.get_tile_image(
+        img_tiled = fcn.utils.get_tile_image(
             [img_log, img_viz], tile_shape=(2, 1),
             margin_color=(255, 255, 255))
         out_file = osp.join(tmpdir, '{}.png'.format(iter_stop))

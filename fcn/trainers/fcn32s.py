@@ -11,7 +11,10 @@ import numpy as np
 import skimage.color
 import yaml
 
-import fcn
+from fcn import data
+from fcn import models
+from fcn import training
+from fcn import utils
 
 
 def get_trainer(
@@ -76,14 +79,14 @@ def get_trainer(
         dataset_val, batch_size=batch_size, repeat=False, shuffle=False)
 
     # 2. model
-    vgg_path = fcn.data.download_vgg16_chainermodel()
-    vgg = fcn.models.VGG16()
+    vgg_path = data.download_vgg16_chainermodel()
+    vgg = models.VGG16()
     chainer.serializers.load_hdf5(vgg_path, vgg)
 
     n_class = len(dataset_train.label_names)
-    model = fcn.models.FCN32s(n_class=n_class)
+    model = models.FCN32s(n_class=n_class)
     model.train = True
-    fcn.util.copy_chainermodel(vgg, model)
+    utils.copy_chainermodel(vgg, model)
 
     if len(gpus) > 1 or gpus[0] >= 0:
         chainer.cuda.get_device(gpus[0]).use()
@@ -108,7 +111,7 @@ def get_trainer(
         updater, (max_iter, 'iteration'), out=out)
 
     trainer.extend(
-        fcn.training.extensions.TestModeEvaluator(
+        training.extensions.TestModeEvaluator(
             iter_val, model, device=gpus[0]),
         trigger=(interval_eval, 'iteration'),
         invoke_before_training=False,
@@ -121,7 +124,7 @@ def get_trainer(
         label_pred = chainer.cuda.to_cpu(target.score.data[0]).argmax(axis=0)
         label_pred[label_true == -1] = 0
 
-        cmap = fcn.util.labelcolormap(len(dataset_val.label_names))
+        cmap = utils.labelcolormap(len(dataset_val.label_names))
         label_viz0 = skimage.color.label2rgb(
             label_pred, colors=cmap[1:], bg_label=0)
         label_viz0[label_true == -1] = (0, 0, 0)
@@ -132,10 +135,10 @@ def get_trainer(
         label_viz1[label_true == -1] = (0, 0, 0)
         label_viz1 = (label_viz1 * 255).astype(np.uint8)
 
-        return fcn.util.get_tile_image([img, label_viz0, label_viz1])
+        return utils.get_tile_image([img, label_viz0, label_viz1])
 
     trainer.extend(
-        fcn.training.extensions.ImageVisualizer(
+        training.extensions.ImageVisualizer(
             iter_val, model, viz_func=visualize_segmentation, device=gpus[0]),
         trigger=(interval_eval, 'iteration'),
         invoke_before_training=True,

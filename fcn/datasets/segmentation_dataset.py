@@ -4,7 +4,7 @@ import chainer
 import numpy as np
 import skimage.color
 
-import fcn
+from fcn import utils
 
 
 class SegmentationDatasetBase(chainer.dataset.DatasetMixin):
@@ -15,7 +15,7 @@ class SegmentationDatasetBase(chainer.dataset.DatasetMixin):
     def visualize_example(self, i):
         datum, label = self.get_example(i)
         img = self.datum_to_img(datum)
-        cmap = fcn.util.labelcolormap(len(self.label_names))
+        cmap = utils.labelcolormap(len(self.label_names))
         ignore_mask = [label == -1]
         label[ignore_mask] = 0
         labelviz = skimage.color.label2rgb(
@@ -28,7 +28,7 @@ class SegmentationDatasetBase(chainer.dataset.DatasetMixin):
         assert label_rgb.dtype == np.uint8
         label = np.zeros(label_rgb.shape[:2], dtype=np.int32)
         label.fill(-1)
-        cmap = fcn.util.labelcolormap(len(self.label_names))
+        cmap = utils.labelcolormap(len(self.label_names))
         cmap = (cmap * 255).astype(np.uint8)
         for l, rgb in enumerate(cmap):
             mask = np.all(label_rgb == rgb, axis=-1)

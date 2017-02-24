@@ -6,7 +6,7 @@ import chainer
 import numpy as np
 import scipy.misc
 
-import fcn
+from fcn import utils
 
 
 class Inferencer(object):
@@ -32,7 +32,7 @@ class Inferencer(object):
         print('{0}:'.format(osp.realpath(img_file)))
         # setup input
         img = scipy.misc.imread(img_file, mode='RGB')
-        img, resizing_scale = fcn.util.resize_img_with_max_size(img)
+        img, resizing_scale = utils.resize_img_with_max_size(img)
         print(' - resizing_scale: {0}'.format(resizing_scale))
         datum = self.dataset.img_to_datum(img.copy())
         x_data = np.array([datum], dtype=np.float32)
@@ -55,8 +55,8 @@ class Inferencer(object):
                 label_value, self.label_names[label_value], label_region)
             label_titles[label_value] = title
             print('  - {0}'.format(title))
-        labelviz = fcn.util.draw_label(
+        labelviz = utils.draw_label(
             label, img, n_class=len(self.label_names),
             label_titles=label_titles)
         # save result
-        return fcn.util.get_tile_image([img, labelviz])
+        return utils.get_tile_image([img, labelviz])
