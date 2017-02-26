@@ -45,7 +45,7 @@ def main():
     fcn.utils.copy_chainermodel(vgg, model)
     for link_name in ['fc6', 'fc7']:
         W1, b1 = getattr(vgg, link_name).params()
-        W2, b2 = getattr(vgg, link_name).params()
+        W2, b2 = getattr(model, link_name).params()
         W2.data = W1.data.reshape(W2.shape)
         b2.data = b1.data
 
