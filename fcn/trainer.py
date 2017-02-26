@@ -11,6 +11,7 @@ import tqdm
 import fcn
 from fcn import utils
 
+import copy
 
 class Trainer(object):
 
@@ -31,6 +32,12 @@ class Trainer(object):
         self.out = out
         self.epoch = 0
         self.iteration = 0
+        if len(device) > 1:
+            models = [model]
+            for i in xrange(1, len(device)):
+                models.append(copy.deepcopy(model).to_gpu(i))
+            self.model = models
+
 
     def evaluate(self, n_viz=9):
         iter_val = copy.copy(self.iter_val)
@@ -92,20 +99,43 @@ class Trainer(object):
             # train #
             #########
 
-            in_vars = utils.batch_to_vars(
-                batch, device=self.device, volatile=False)
-            self.model.zerograds()
-            loss = self.model(*in_vars)
+            in_vars = []
+            for i in xrange(len(self.device)):
+                in_vars.append(utils.batch_to_vars(
+                    batch[i], device=self.device, volatile=False))
 
-            if loss is not None:
-                loss.backward()
-                self.optimizer.update()
-                log = self.model.log
-                log['epoch'] = self.iter_train.epoch
-                log['iteration'] = iteration
-                log.update(log_val)
-                utils.append_log_to_json(self.model.log,
-                                         osp.join(self.out, 'log.json'))
+            for i in xrange(len(self.device)):
+                self.model[i].zerograds()
+
+            loss = []
+            for i in xrange(len(self.device)):
+                loss.append(self.model[i](*in_vars))
+
+            for i in xrange(len(self.device)):
+                if loss[i] is not None:
+                    loss[i].backward()
+
+            # add grad
+            for i in xrange(1, len(self.device)):
+                if loss[i] is not None:
+                    self.model[0].addgrads(self.model[i])
+
+            
+            self.optimizer.update()
+
+            # copy params
+            for i in xrange(1, len(self.device)):
+                self.model[i].copyparams(self.model[0])
+
+            log = self.model[0].log
+            log['epoch'] = self.iter_train.epoch
+            log['iteration'] = iteration
+            log.update(log_val)
+            utils.append_log_to_json(self.model[0].log,
+                                     osp.join(self.out, 'log.json'))
 
             if iteration >= max_iter:
                 break
+
+
+                
