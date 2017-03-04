@@ -7,12 +7,18 @@ import os.path as osp
 import chainer
 from chainer import cuda
 import fcn
+import matplotlib
 import numpy as np
 import pandas
 import skimage.color
 import skimage.io
 
 from datasets import APC2016DatasetV1
+
+
+def softmax(input):
+    e = np.exp(input)
+    return e / np.sum(e, axis=0)
 
 
 def main():
@@ -75,6 +81,13 @@ def main():
         skimage.io.imsave(osp.join(sub_dir, 'image.jpg'), img)
         skimage.io.imsave(osp.join(sub_dir, 'lbl_pred.jpg'), viz_pred)
         skimage.io.imsave(osp.join(sub_dir, 'lbl_true.jpg'), viz_true)
+
+        prob = softmax(score)
+        for c in xrange(prob.shape[0]):
+            cls_prob = prob[c]
+            viz_prob = matplotlib.cm.jet(cls_prob)
+            skimage.io.imsave(osp.join(sub_dir, 'prob_cls_%02d.jpg' % c),
+                              viz_prob)
         print('saved to: %s' % sub_dir)
 
     columns = ['accuracy', 'accuracy_cls', 'iu', 'fwavacc']
