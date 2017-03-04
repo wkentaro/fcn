@@ -86,6 +86,7 @@ def main():
         for c in xrange(prob.shape[0]):
             cls_prob = prob[c]
             viz_prob = matplotlib.cm.jet(cls_prob)
+            viz_prob = fcn.utils.apply_mask(viz_prob, bin_mask, crop=True)
             skimage.io.imsave(osp.join(sub_dir, 'prob_cls_%02d.jpg' % c),
                               viz_prob)
         print('saved to: %s' % sub_dir)
