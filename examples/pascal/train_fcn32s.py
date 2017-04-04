@@ -13,11 +13,13 @@ from fcn.datasets import PascalVOC2012SegmentationDataset
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--gpu', type=str)
     parser.add_argument('--out', required=True)
     args = parser.parse_args()
 
-    gpu = args.gpu
+    gpu = args.gpu.split(',')
+    for i in xrange(len(gpu)):
+        gpu[i] = int(gpu[i])
     out = args.out
 
     if not osp.exists(out):
@@ -49,8 +51,8 @@ def main():
         W2.data = W1.data.reshape(W2.shape)
         b2.data = b1.data
 
-    if gpu >= 0:
-        cuda.get_device(gpu).use()
+    if gpu[0] >= 0:
+        cuda.get_device(gpu[0]).use()
         model.to_gpu()
 
     # 3. optimizer

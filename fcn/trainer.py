@@ -11,6 +11,7 @@ import tqdm
 import fcn
 from fcn import utils
 
+import copy
 
 class Trainer(object):
 
@@ -31,10 +32,16 @@ class Trainer(object):
         self.out = out
         self.epoch = 0
         self.iteration = 0
+        if len(device) > 1:
+            models = [model]
+            for i in xrange(1, len(device)):
+                models.append(copy.deepcopy(model).to_gpu(i))
+            self.model = models
+
 
     def evaluate(self, n_viz=9):
         iter_val = copy.copy(self.iter_val)
-        self.model.train = False
+        self.model[0].train = False
         logs = []
         vizs = []
         dataset = iter_val.dataset
@@ -44,14 +51,14 @@ class Trainer(object):
                                ncols=80, leave=False):
             in_vars = utils.batch_to_vars(
                 batch, device=self.device, volatile=True)
-            self.model(*in_vars)
-            logs.append(self.model.log)
+            self.model[0](*in_vars)
+            logs.append(self.model[0].log)
             if iter_val.current_position % interval == 0 and \
                     len(vizs) < n_viz:
-                img = dataset.datum_to_img(self.model.data[0])
+                img = dataset.datum_to_img(self.model[0].data[0])
                 viz = utils.visualize_segmentation(
-                    self.model.lbl_pred[0], self.model.lbl_true[0], img,
-                    n_class=self.model.n_class)
+                    self.model[0].lbl_pred[0], self.model[0].lbl_true[0], img,
+                    n_class=self.model[0].n_class)
                 vizs.append(viz)
         # save visualization
         out_viz = osp.join(self.out, 'viz_eval', 'iter%d.jpg' % self.iteration)
@@ -63,7 +70,7 @@ class Trainer(object):
         log = pd.DataFrame(logs).mean(axis=0).to_dict()
         log = {'validation/%s' % k: v for k, v in log.items()}
         # finalize
-        self.model.train = True
+        self.model[0].train = True
         return log
 
     def train(self, max_iter, interval_eval):
@@ -78,34 +85,56 @@ class Trainer(object):
             ############
 
             log_val = {}
-            if iteration % interval_eval == 0:
+            if iteration % interval_eval == 0 and iteration != 0:
                 log_val = self.evaluate()
                 out_model_dir = osp.join(self.out, 'models')
                 if not osp.exists(out_model_dir):
                     os.makedirs(out_model_dir)
                 out_model = osp.join(
                     out_model_dir, '%s_iter%d.h5' %
-                    (self.model.__class__.__name__, self.iteration))
-                chainer.serializers.save_hdf5(out_model, self.model)
+                    (self.model[0].__class__.__name__, self.iteration))
+                chainer.serializers.save_hdf5(out_model, self.model[0])
 
             #########
             # train #
             #########
 
-            in_vars = utils.batch_to_vars(
-                batch, device=self.device, volatile=False)
-            self.model.zerograds()
-            loss = self.model(*in_vars)
+            in_vars = []
+            for i in xrange(len(self.device)):
+                in_vars.append(utils.batch_to_vars(
+                    batch[i], device=self.device, volatile=False))
 
-            if loss is not None:
-                loss.backward()
-                self.optimizer.update()
-                log = self.model.log
-                log['epoch'] = self.iter_train.epoch
-                log['iteration'] = iteration
-                log.update(log_val)
-                utils.append_log_to_json(self.model.log,
-                                         osp.join(self.out, 'log.json'))
+            for i in xrange(len(self.device)):
+                self.model[i].zerograds()
+
+            loss = []
+            for i in xrange(len(self.device)):
+                loss.append(self.model[i](*in_vars))
+
+            for i in xrange(len(self.device)):
+                if loss[i] is not None:
+                    loss[i].backward()
+
+            # add grad
+            for i in xrange(1, len(self.device)):
+                if loss[i] is not None:
+                    self.model[0].addgrads(self.model[i])
+
+            
+            self.optimizer.update()
+
+            # copy params
+            for i in xrange(1, len(self.device)):
+                self.model[i].copyparams(self.model[0])
+
+            log = self.model[0].log
+            log['epoch'] = self.iter_train.epoch
+            log['iteration'] = iteration
+            log.update(log_val)
+            utils.append_log_to_json(self.model[0].log,
+                                     osp.join(self.out, 'log.json'))
 
             if iteration >= max_iter:
                 break
+
+
