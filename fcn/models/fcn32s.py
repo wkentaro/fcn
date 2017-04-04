@@ -46,52 +46,52 @@ class FCN32s(chainer.Chain):
         self.data = cuda.to_cpu(x.data)
 
         # conv1
-        h = F.relu(self.conv1_1(x))
+        h = F.relu(self.conv1_1(x), use_cudnn=False)
         conv1_1 = h
-        h = F.relu(self.conv1_2(conv1_1))
+        h = F.relu(self.conv1_2(conv1_1), use_cudnn=False)
         conv1_2 = h
         h = F.max_pooling_2d(conv1_2, 2, stride=2, pad=0)
         pool1 = h  # 1/2
 
         # conv2
-        h = F.relu(self.conv2_1(pool1))
+        h = F.relu(self.conv2_1(pool1), use_cudnn=False)
         conv2_1 = h
-        h = F.relu(self.conv2_2(conv2_1))
+        h = F.relu(self.conv2_2(conv2_1), use_cudnn=False)
         conv2_2 = h
         h = F.max_pooling_2d(conv2_2, 2, stride=2, pad=0)
         pool2 = h  # 1/4
 
         # conv3
-        h = F.relu(self.conv3_1(pool2))
+        h = F.relu(self.conv3_1(pool2), use_cudnn=False)
         conv3_1 = h
-        h = F.relu(self.conv3_2(conv3_1))
+        h = F.relu(self.conv3_2(conv3_1), use_cudnn=False)
         conv3_2 = h
-        h = F.relu(self.conv3_3(conv3_2))
+        h = F.relu(self.conv3_3(conv3_2), use_cudnn=False)
         conv3_3 = h
         h = F.max_pooling_2d(conv3_3, 2, stride=2, pad=0)
         pool3 = h  # 1/8
 
         # conv4
-        h = F.relu(self.conv4_1(pool3))
-        h = F.relu(self.conv4_2(h))
-        h = F.relu(self.conv4_3(h))
+        h = F.relu(self.conv4_1(pool3), use_cudnn=False)
+        h = F.relu(self.conv4_2(h), use_cudnn=False)
+        h = F.relu(self.conv4_3(h), use_cudnn=False)
         h = F.max_pooling_2d(h, 2, stride=2, pad=0)
         pool4 = h  # 1/16
 
         # conv5
-        h = F.relu(self.conv5_1(pool4))
-        h = F.relu(self.conv5_2(h))
-        h = F.relu(self.conv5_3(h))
+        h = F.relu(self.conv5_1(pool4), use_cudnn=False)
+        h = F.relu(self.conv5_2(h), use_cudnn=False)
+        h = F.relu(self.conv5_3(h), use_cudnn=False)
         h = F.max_pooling_2d(h, 2, stride=2, pad=0)
         pool5 = h  # 1/32
 
         # fc6
-        h = F.relu(self.fc6(pool5))
+        h = F.relu(self.fc6(pool5), use_cudnn=False)
         h = F.dropout(h, ratio=.5, train=self.train)
         fc6 = h  # 1/32
 
         # fc7
-        h = F.relu(self.fc7(fc6))
+        h = F.relu(self.fc7(fc6), use_cudnn=False)
         h = F.dropout(h, ratio=.5, train=self.train)
         fc7 = h  # 1/32
 
