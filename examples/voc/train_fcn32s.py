@@ -66,7 +66,8 @@ def main(gpu, config_file):
     chainer.serializers.load_hdf5(vgg_path, vgg)
 
     model = fcn.models.FCN32s(n_class=n_class)
-    model.init_from_vgg16(vgg, copy_fc8=True, init_upscore=False)
+    model.init_from_vgg16(vgg, copy_fc8=config.get('copy_fc8', True),
+                          init_upscore=False)
     model.train = True
 
     if gpu >= 0:

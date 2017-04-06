@@ -66,8 +66,7 @@ class Trainer(object):
                 batch, device=self.device, volatile=True)
             self.model(*in_vars)
             logs.append(self.model.log)
-            if iter_valid.current_position % interval == 0 and \
-                    len(vizs) < n_viz:
+            if len(vizs) < n_viz:
                 img = dataset.datum_to_img(self.model.data[0])
                 viz = utils.visualize_segmentation(
                     self.model.lbl_pred[0], self.model.lbl_true[0], img,
