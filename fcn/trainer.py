@@ -23,6 +23,7 @@ class Trainer(object):
             iter_train,
             iter_valid,
             out,
+            max_iter,
             ):
         self.device = device
         self.model = model
@@ -32,6 +33,7 @@ class Trainer(object):
         self.out = out
         self.epoch = 0
         self.iteration = 0
+        self.max_iter = max_iter
         self.log_headers = [
             'epoch',
             'iteration',
@@ -84,9 +86,9 @@ class Trainer(object):
         self.model.train = True
         return log
 
-    def train(self, max_iter):
+    def train(self):
         for iteration, batch in tqdm.tqdm(enumerate(self.iter_train),
-                                          desc='train', total=max_iter,
+                                          desc='train', total=self.max_iter,
                                           ncols=80):
             self.epoch = self.iter_train.epoch
             self.iteration = iteration
@@ -134,5 +136,5 @@ class Trainer(object):
                     f.write(','.join(str(log[h]) for h in self.log_headers) +
                             '\n')
 
-            if iteration >= max_iter:
+            if iteration >= self.max_iter:
                 break
