@@ -1,9 +1,11 @@
 chainer>=1.18.0,!=1.20.0
+click
 gdown
 h5py
 matplotlib
 numpy
 pandas
+pytz
 PyYaml
 scikit-image>=0.12.3
 scikit-learn
