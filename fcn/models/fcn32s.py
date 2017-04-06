@@ -11,7 +11,7 @@ class FCN32s(chainer.Chain):
 
     """Full Convolutional Network 32s"""
 
-    def __init__(self, n_class=21):
+    def __init__(self, n_class=21, nodeconv=False):
         self.n_class = n_class
         super(self.__class__, self).__init__(
             conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100),
@@ -37,9 +37,13 @@ class FCN32s(chainer.Chain):
 
             score_fr=L.Convolution2D(4096, self.n_class, 1, stride=1, pad=0),
 
-            upscore=L.Deconvolution2D(self.n_class, self.n_class, 64,
-                                      stride=32, pad=0),
         )
+        if nodeconv:
+            self.add_link('upscore',
+                          L.Deconvolution2D(self.n_class, self.n_class, 64,
+                                            stride=32, pad=0))
+        else:
+            self.upscore = None
         self.train = False
 
     def __call__(self, x, t=None):
@@ -100,7 +104,15 @@ class FCN32s(chainer.Chain):
         score_fr = h  # 1/32
 
         # upscore
-        h = self.upscore(score_fr)
+        if self.upscore:
+            h = self.upscore(score_fr)
+        else:
+            in_h, in_w = score_fr.shape[2:4]
+            out_h = chainer.utils.conv.get_deconv_outsize(
+                in_h, k=32, s=32, p=0)
+            out_w = chainer.utils.conv.get_deconv_outsize(
+                in_w, k=32, s=32, p=0)
+            h = F.resize_images(score_fr, (out_h, out_w))
         upscore = h  # 1
 
         # score
