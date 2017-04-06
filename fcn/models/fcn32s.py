@@ -130,11 +130,44 @@ class FCN32s(chainer.Chain):
         log = np.array(logs).mean(axis=0)
         self.log = {
             'loss': self.loss,
-            'accuracy': log[0],
-            'accuracy_cls': log[1],
-            'iu': log[2],
+            'acc': log[0],
+            'acc_cls': log[1],
+            'mean_iu': log[2],
             'fwavacc': log[3],
         }
         chainer.report(self.log, self)
 
         return loss
+
+    def init_from_vgg16(self, vgg16, copy_fc8=True, init_upscore=True):
+        for l in self.children():
+            if l.name.startswith('conv'):
+                l1 = getattr(vgg16, l.name)
+                l2 = getattr(self, l.name)
+                assert l1.W.shape == l2.W.shape
+                assert l1.b.shape == l2.b.shape
+                l2.W.data = l1.W.data
+                l2.b.data = l1.b.data
+            elif l.name in ['fc6', 'fc7']:
+                l1 = getattr(vgg16, l.name)
+                l2 = getattr(self, l.name)
+                assert l1.W.size == l2.W.size
+                assert l1.b.size == l2.b.size
+                l2.W.data = l1.W.data.reshape(l2.W.shape)
+                l2.b.data = l1.b.data.reshape(l2.b.shape)
+            elif l.name == 'score_fr' and copy_fc8:
+                l1 = getattr(vgg16, 'fc8')
+                l2 = getattr(self, 'score_fr')
+                W = l1.W.data[:self.n_class, :]
+                b = l1.b.data[:self.n_class]
+                assert W.size == l2.W.size
+                assert b.size == l2.b.size
+                l2.W.data = W.reshape(l2.W.shape)
+                l2.b.data = b.reshape(l2.b.shape)
+            elif l.name == 'upscore' and init_upscore:
+                l2 = getattr(self, 'upscore')
+                c1, c2, h, w = l2.W.data.shape
+                assert c1 == c2 == self.n_class
+                assert h == w
+                W = utils.get_upsample_filter(h)
+                l2.W.data = np.tile(W.reshape((1, 1, h, w)), (c1, c2, 1, 1))

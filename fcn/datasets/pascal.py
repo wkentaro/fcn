@@ -37,7 +37,7 @@ class PascalVOC2012SegmentationDataset(SegmentationDatasetBase):
     def __init__(self, data_type):
         # get ids for the data_type
         dataset_dir = chainer.dataset.get_dataset_directory(
-            'pascal/VOCdevkit/VOC2012')
+            'VOC/VOCdevkit/VOC2012')
         imgsets_file = osp.join(
             dataset_dir,
             'ImageSets/Segmentation/{}.txt'.format(data_type))

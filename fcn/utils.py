@@ -479,3 +479,17 @@ def visualize_segmentation(lbl_pred, lbl_true, img, n_class):
 
     return get_tile_image([viz_true0, viz_true1, viz_pred0, viz_pred1],
                           tile_shape=(2, 2))
+
+
+# https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/surgery.py
+def get_upsample_filter(size):
+    """Make a 2D bilinear kernel suitable for upsampling"""
+    factor = (size + 1) // 2
+    if size % 2 == 1:
+        center = factor - 1
+    else:
+        center = factor - 0.5
+    og = np.ogrid[:size, :size]
+    filter = (1 - abs(og[0] - center) / factor) * \
+             (1 - abs(og[1] - center) / factor)
+    return filter.astype(np.float32)
