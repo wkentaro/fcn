@@ -39,11 +39,11 @@ class FCN32s(chainer.Chain):
 
         )
         if nodeconv:
+            self.upscore = None
+        else:
             self.add_link('upscore',
                           L.Deconvolution2D(self.n_class, self.n_class, 64,
                                             stride=32, pad=0))
-        else:
-            self.upscore = None
         self.train = False
 
     def __call__(self, x, t=None):
