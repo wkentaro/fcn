@@ -58,7 +58,6 @@ class Trainer(object):
         logs = []
         vizs = []
         dataset = iter_valid.dataset
-        interval = len(dataset) // n_viz
         desc = 'eval [epoch=%d]' % self.epoch
         for batch in tqdm.tqdm(iter_valid, desc=desc, total=len(dataset),
                                ncols=80, leave=False):
