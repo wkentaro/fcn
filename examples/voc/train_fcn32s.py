@@ -88,8 +88,9 @@ def main(gpu, config_file):
         iter_train=iter_train,
         iter_valid=iter_valid,
         out=config['out'],
+        max_iter=config['max_iteration'],
     )
-    trainer.train(max_iter=config['max_iteration'])
+    trainer.train()
 
 
 if __name__ == '__main__':
