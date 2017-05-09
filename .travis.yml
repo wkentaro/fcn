@@ -15,6 +15,7 @@ before_install:
   - sudo apt-get install -y -qq libhdf5-dev
   - sudo apt-get install -y -qq python-dev
   - sudo apt-get install -y -qq python-opencv
+  - sudo apt-get install -y -qq python-tk  # for matplotlib
   - sudo -H pip install -U -q pip setuptools
 
 install:
