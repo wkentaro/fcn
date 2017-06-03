@@ -1,2 +1,3 @@
-from fcn.datasets.pascal import PascalVOC2012SegmentationDataset  # NOQA
-from fcn.datasets.segmentation_dataset import SegmentationDatasetBase  # NOQA
+from .voc import VOC2011ClassSeg  # NOQA
+from .voc import VOC2012ClassSeg  # NOQA
+from .voc import SBDClassSeg  # NOQA
