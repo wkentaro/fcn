@@ -38,14 +38,14 @@ class FCN8s(chainer.Chain):
             score_fr=L.Convolution2D(4096, self.n_class, 1, stride=1, pad=0),
 
             upscore2=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                       stride=2, pad=0, use_cudnn=False),
+                                       stride=2, pad=0),
             upscore8=L.Deconvolution2D(self.n_class, self.n_class, 16,
-                                       stride=8, pad=0, use_cudnn=False),
+                                       stride=8, pad=0),
 
             score_pool3=L.Convolution2D(256, self.n_class, 1, stride=1, pad=0),
             score_pool4=L.Convolution2D(512, self.n_class, 1, stride=1, pad=0),
             upscore_pool4=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                            stride=2, pad=0, use_cudnn=False),
+                                            stride=2, pad=0),
         )
         self.train = False
 
