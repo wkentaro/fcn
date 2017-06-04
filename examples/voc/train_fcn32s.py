@@ -19,7 +19,7 @@ from fcn import datasets
 here = osp.dirname(osp.abspath(__file__))
 
 
-@click.command()
+@click.command(context_settings={'help_option_names': ['-h', '--help']})
 @click.option('-g', '--gpu', type=int, required=True)
 def main(gpu):
     # 0. config
