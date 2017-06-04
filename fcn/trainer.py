@@ -55,15 +55,16 @@ class Trainer(object):
 
     def validate(self, n_viz=9):
         iter_valid = copy.copy(self.iter_valid)
-        chainer.using_config('train', False)
         losses, lbl_trues, lbl_preds = [], [], []
         vizs = []
         dataset = iter_valid.dataset
-        desc = 'valid [epoch=%d]' % self.epoch
+        desc = 'valid [iteration=%08d]' % self.iteration
         for batch in tqdm.tqdm(iter_valid, desc=desc, total=len(dataset),
                                ncols=80, leave=False):
-            in_vars = utils.batch_to_vars(batch, device=self.device)
-            loss = self.model(*in_vars)
+            with chainer.no_backprop_mode(), \
+                 chainer.using_config('train', False):
+                in_vars = utils.batch_to_vars(batch, device=self.device)
+                loss = self.model(*in_vars)
             losses.append(float(loss.data))
             score = self.model.score
             img, lbl_true = zip(*batch)
@@ -78,7 +79,8 @@ class Trainer(object):
                         lp, lt, im, n_class=self.model.n_class)
                     vizs.append(viz)
         # save visualization
-        out_viz = osp.join(self.out, 'viz_eval', 'epoch%d.jpg' % self.epoch)
+        out_viz = osp.join(self.out, 'visualizations_valid',
+                           'iter%08d.jpg' % self.iteration)
         if not osp.exists(osp.dirname(out_viz)):
             os.makedirs(osp.dirname(out_viz))
         viz = fcn.utils.get_tile_image(vizs)
@@ -111,8 +113,7 @@ class Trainer(object):
 
             if self.iteration % 4000 == 0:
                 log = collections.defaultdict(str)
-                with chainer.no_backprop_mode():
-                    log_valid = self.validate()
+                log_valid = self.validate()
                 log.update(log_valid)
                 log['epoch'] = self.iter_train.epoch
                 log['iteration'] = iteration
@@ -123,9 +124,9 @@ class Trainer(object):
                 if not osp.exists(out_model_dir):
                     os.makedirs(out_model_dir)
                 out_model = osp.join(
-                    out_model_dir, '%s_epoch%d.h5' %
-                    (self.model.__class__.__name__, self.epoch))
-                chainer.serializers.save_hdf5(out_model, self.model)
+                    out_model_dir, '%s_iter%08d.npz' %
+                    (self.model.__class__.__name__, self.iteration))
+                chainer.serializers.save_npz(out_model, self.model)
 
             #########
             # train #
