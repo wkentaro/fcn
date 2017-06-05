@@ -4,13 +4,13 @@ import chainer.links as L
 import numpy as np
 
 
-class FCN8s(chainer.Chain):
+class FCN8sAtOnce(chainer.Chain):
 
-    """Full Convolutional Network 8s"""
+    """Full Convolutional Network 8s traineable at once."""
 
     def __init__(self, n_class=21):
         self.n_class = n_class
-        super(FCN8s, self).__init__(
+        super(FCN8sAtOnce, self).__init__(
             conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100),
             conv1_2=L.Convolution2D(64, 64, 3, stride=1, pad=1),
 
@@ -111,11 +111,13 @@ class FCN8s(chainer.Chain):
         score_fr = h  # 1/32
 
         # score_pool3
-        h = self.score_pool3(pool3)
+        scale_pool3 = 0.0001 * pool3  # XXX: scale to train at once
+        h = self.score_pool3(scale_pool3)
         score_pool3 = h  # 1/8
 
         # score_pool4
-        h = self.score_pool4(pool4)
+        scale_pool4 = 0.01 * pool4  # XXX: scale to train at once
+        h = self.score_pool4(scale_pool4)
         score_pool4 = h  # 1/16
 
         # upscore2
@@ -162,16 +164,19 @@ class FCN8s(chainer.Chain):
             raise ValueError('Loss is nan.')
         return loss
 
-    def init_from_fcn16s(self, fcn16s):
-        for l2 in self.children():
-            if l2.name.startswith('up'):
-                continue
-            try:
-                l1 = getattr(fcn16s, l2.name)
-            except Exception:
-                continue
-            assert l1.W.shape == l2.W.shape
-            l2.W.data = l1.W.data
-            if l2.b is not None:
+    def init_from_vgg16(self, vgg16):
+        for l in self.children():
+            if l.name.startswith('conv'):
+                l1 = getattr(vgg16, l.name)
+                l2 = getattr(self, l.name)
+                assert l1.W.shape == l2.W.shape
                 assert l1.b.shape == l2.b.shape
+                l2.W.data = l1.W.data
                 l2.b.data = l1.b.data
+            elif l.name in ['fc6', 'fc7']:
+                l1 = getattr(vgg16, l.name)
+                l2 = getattr(self, l.name)
+                assert l1.W.size == l2.W.size
+                assert l1.b.size == l2.b.size
+                l2.W.data = l1.W.data.reshape(l2.W.shape)
+                l2.b.data = l1.b.data.reshape(l2.b.shape)
