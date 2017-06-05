@@ -113,7 +113,7 @@ class VOC2012ClassSeg(VOCClassSegBase):
 
     def __init__(self, split='train', transform=True):
         super(VOC2012ClassSeg, self).__init__(
-            root, year=2012, split=split, transform=transform)
+            year=2012, split=split, transform=transform)
 
 
 class SBDClassSeg(VOCClassSegBase):
