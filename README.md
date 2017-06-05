@@ -7,20 +7,6 @@ fcn - Fully Convolutional Networks
 This is [Chainer](https://github.com/pfnet/chainer.git) implementation of
 [fcn.berkeley.vision.org](https://github.com/shelhamer/fcn.berkeleyvision.org.git).
 
-Features
---------
-
-- Copy caffemodel to chainermodel.  [[v1.0.0](https://github.com/wkentaro/fcn/releases/tag/v1.0.0)]
-- Forwarding with Chainer for voc dataset.  [[v1.0.0](https://github.com/wkentaro/fcn/releases/tag/v1.0.0)]
-- Training with Chainer for voc dataset.  [[v2.0.0](https://github.com/wkentaro/fcn/releases/tag/v2.0.0)]
-- Training for APC2015 dataset.  [[v3.0.0](https://github.com/wkentaro/fcn/releases/tag/v3.0.0)]
-
-License
--------
-
-Copyright (C) 2016 Kentaro Wada\
-Released under the MIT license\
-<http://opensource.org/licenses/mit-license.php>
 
 Installation
 ------------
@@ -33,6 +19,7 @@ brew install gfortran  # for numpy
 
 pip install fcn
 ```
+
 
 Inference
 ---------
@@ -51,6 +38,7 @@ fcn_infer.py --img-files sample.jpg  # gpu mode
 ![image](static/fcn8s_26471792680.jpg)
 
 Original Image: <https://www.flickr.com/photos/faceme/26471792680/>
+
 
 Training
 --------
@@ -71,3 +59,11 @@ using `convert_caffe_to_chainermodel.py`.
 | Ours | **90.74** | **75.84** | **63.76** | **83.73** |
 
 <img src="examples/voc/static/fcn32s_iters.gif" width="48%" /> <img src="examples/voc/static/fcn32s_iter00084000.jpg" width="48%" />
+
+
+License
+-------
+
+Copyright (C) 2016 Kentaro Wada\
+Released under the MIT license\
+<http://opensource.org/licenses/mit-license.php>
