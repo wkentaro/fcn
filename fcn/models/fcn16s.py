@@ -35,18 +35,23 @@ class FCN16s(chainer.Chain):
             fc6=L.Convolution2D(512, 4096, 7, stride=1, pad=0),
             fc7=L.Convolution2D(4096, 4096, 1, stride=1, pad=0),
 
-            score_fr=L.Convolution2D(4096, self.n_class, 1, stride=1, pad=0),
-            score_pool4=L.Convolution2D(512, self.n_class, 1, stride=1, pad=0),
+            score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0),
+            score_pool4=L.Convolution2D(512, n_class, 1, stride=1, pad=0),
 
-            upscore2=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                       stride=2, nobias=False),
-            upscore16=L.Deconvolution2D(self.n_class, self.n_class, 32,
-                                        stride=16, nobias=False),
+            upscore2=L.Deconvolution2D(n_class, n_class, 4, stride=2,
+                                       nobias=False),
+            upscore16=L.Deconvolution2D(n_class, n_class, 32, stride=16,
+                                        nobias=False),
         )
+        # initialize weights for deconv layer
+        filt = utils.get_upsampling_filter(4)
+        self.upscore2.W.data[...] = 0
+        self.upscore2.W.data[range(n_class), range(n_class), :, :] = filt
+        filt = utils.get_upsampling_filter(32)
+        self.upscore16.W.data[...] = 0
+        self.upscore16.W.data[range(n_class), range(n_class), :, :] = filt
 
     def __call__(self, x, t=None):
-        self.data = cuda.to_cpu(x.data)
-
         # conv1
         h = F.relu(self.conv1_1(x))
         conv1_1 = h
@@ -125,34 +130,34 @@ class FCN16s(chainer.Chain):
         # score
         h = upscore16[:, :, 27:27+x.data.shape[2], 27:27+x.data.shape[3]]
         score = h  # 1/1
-        self.score = score  # XXX: for backward compatibility
-        # self.score = cuda.to_cpu(h.data)
+        self.score = score
 
         if t is None:
             assert not chainer.configuration.config.train
             return
 
         loss = F.softmax_cross_entropy(self.score, t, normalize=False)
-        self.loss = float(cuda.to_cpu(loss.data))
-        if np.isnan(self.loss):
-            raise ValueError('loss value is nan')
-
-        self.lbl_true = chainer.cuda.to_cpu(t.data)
-        self.lbl_pred = cuda.to_cpu(score.data).argmax(axis=1)
-
-        logs = []
-        for i in xrange(x.shape[0]):
-            acc, acc_cls, iu, fwavacc = utils.label_accuracy_score(
-                self.lbl_true[i], self.lbl_pred[i], self.n_class)
-            logs.append((acc, acc_cls, iu, fwavacc))
-        log = np.array(logs).mean(axis=0)
-        self.log = {
-            'loss': self.loss,
-            'accuracy': log[0],
-            'accuracy_cls': log[1],
-            'iu': log[2],
-            'fwavacc': log[3],
-        }
-        chainer.report(self.log, self)
-
+        if np.isnan(float(loss.data)):
+            raise ValueError('Loss value is nan.')
         return loss
+
+    def init_from_fcn32s(self, fcn32s):
+        for l in self.children():
+            if l.name.startswith('conv') or l.name.startswith('fc'):
+                l1 = getattr(fcn32s, l.name)
+                l2 = getattr(self, l.name)
+                assert l1.W.shape == l2.W.shape
+                assert l1.b.shape == l2.b.shape
+                l2.W.data = l1.W.data
+                l2.b.data = l1.b.data
+            elif l.name.startswith('score_fr'):
+                l1 = getattr(fcn32s, l.name)
+                l2 = getattr(self, l.name)
+                assert l1.W.shape == l2.W.shape
+                assert l1.b.shape == l2.b.shape
+                l2.W.data = l1.W.data
+                l2.b.data = l1.b.data
+            elif l.name in ['score_pool4', 'upscore2', 'upscore16']:
+                pass
+            else:
+                raise ValueError
