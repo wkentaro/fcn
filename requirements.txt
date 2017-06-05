@@ -1,7 +1,6 @@
 chainer>=2.0.0
 click
 gdown
-h5py
 matplotlib
 numpy
 pandas
