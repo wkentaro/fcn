@@ -32,7 +32,8 @@ def test_label_accuracy_score():
                                         preserve_range=True)
     lbl_pred = lbl_pred.astype(lbl_gt.dtype)
 
-    viz = utils.visualize_segmentation(lbl_pred, lbl_gt, img, n_class=21)
+    viz = utils.visualize_segmentation(
+        lbl_pred, img, n_class=21, lbl_true=lbl_gt)
 
     img_h, img_w = img.shape[:2]
 
