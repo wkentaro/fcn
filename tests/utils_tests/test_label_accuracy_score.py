@@ -33,7 +33,7 @@ def test_label_accuracy_score():
     lbl_pred = lbl_pred.astype(lbl_gt.dtype)
 
     acc, acc_cls, mean_iu, fwavacc = utils.label_accuracy_score(
-        lbl_gt, lbl_gt, n_class=21)
+        [lbl_gt], [lbl_gt], n_class=21)
     assert_equal(acc, 1)
     assert_equal(acc_cls, 1)
     assert_equal(mean_iu, 1)

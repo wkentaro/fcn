@@ -33,7 +33,7 @@ setup(
     ],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
