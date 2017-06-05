@@ -448,7 +448,6 @@ def _visualize_segmentation_legend(label, n_class, label_titles,
     """
     from PIL import Image
     from scipy.misc import fromimage
-    from skimage.color import label2rgb
     from skimage.transform import resize
     colors = labelcolormap(n_class)
     label_viz = _visualize_segmentation(
@@ -502,7 +501,7 @@ def visualize_segmentation(lbl_pred, img, n_class,
 
     if lbl_true is not None:
         if label_titles:
-            viz_true = _visualize_segmentation_with_legend(
+            viz_true = _visualize_segmentation_legend(
                 lbl_true, n_class, label_titles, img)
         else:
             viz_true = _visualize_segmentation(lbl_true, n_class, img)
