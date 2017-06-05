@@ -3,6 +3,8 @@ import chainer.functions as F
 import chainer.links as L
 import numpy as np
 
+from fcn import utils
+
 
 class FCN8sAtOnce(chainer.Chain):
 
