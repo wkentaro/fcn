@@ -321,51 +321,6 @@ def label_accuracy_score(label_trues, label_preds, n_class):
 # -----------------------------------------------------------------------------
 # Visualization
 # -----------------------------------------------------------------------------
-def draw_label(label, img, n_class, label_titles, bg_label=0):
-    """Convert label to rgb with label titles.
-
-    @param label_title: label title for each labels.
-    @type label_title: dict
-    """
-    from PIL import Image
-    from scipy.misc import fromimage
-    from skimage.color import label2rgb
-    from skimage.transform import resize
-    colors = labelcolormap(n_class)
-    label_viz = label2rgb(label, img, colors=colors[1:], bg_label=bg_label)
-    # label 0 color: (0, 0, 0, 0) -> (0, 0, 0, 255)
-    label_viz[label == 0] = 0
-
-    # plot label titles on image using matplotlib
-    plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
-                        wspace=0, hspace=0)
-    plt.margins(0, 0)
-    plt.gca().xaxis.set_major_locator(plt.NullLocator())
-    plt.gca().yaxis.set_major_locator(plt.NullLocator())
-    plt.axis('off')
-    # plot image
-    plt.imshow(label_viz)
-    # plot legend
-    plt_handlers = []
-    plt_titles = []
-    for label_value in np.unique(label):
-        if label_value not in label_titles:
-            continue
-        fc = colors[label_value]
-        p = plt.Rectangle((0, 0), 1, 1, fc=fc)
-        plt_handlers.append(p)
-        plt_titles.append(label_titles[label_value])
-    plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
-    # convert plotted figure to np.ndarray
-    f = StringIO.StringIO()
-    plt.savefig(f, bbox_inches='tight', pad_inches=0)
-    result_img_pil = Image.open(f)
-    result_img = fromimage(result_img_pil, mode='RGB')
-    result_img = resize(result_img, img.shape, preserve_range=True)
-    result_img = result_img.astype(img.dtype)
-    return result_img
-
-
 def centerize(src, dst_shape, margin_color=None):
     """Centerize image for specified image size
 
@@ -459,7 +414,7 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     return _tile_images(imgs, tile_shape, result_img)
 
 
-def _visualize_segmentation(lbl, img, n_class):
+def _visualize_segmentation(lbl, n_class, img=None, bg_label=0):
     from distutils.version import StrictVersion
     import skimage
     from skimage.color import label2rgb
@@ -469,19 +424,68 @@ def _visualize_segmentation(lbl, img, n_class):
         colors = cmap[1:]
     else:
         labels = np.unique(lbl)
-        labels = labels[labels != 0]
+        labels = labels[labels != bg_label]
         colors = cmap[labels]
 
     vizs = []
-    viz0 = label2rgb(lbl, colors=colors, bg_label=0)
+    viz0 = label2rgb(lbl, colors=colors, bg_label=bg_label)
     vizs.append(img_as_ubyte(viz0))
-    viz1 = label2rgb(lbl, img, colors=colors, bg_label=0)
-    vizs.append(img_as_ubyte(viz1))
+    tile_shape = (1, 1)
+    if img is not None:
+        viz1 = label2rgb(lbl, img, colors=colors, bg_label=bg_label)
+        vizs.append(img_as_ubyte(viz1))
+        tile_shape = (1, 2)
 
-    return get_tile_image(vizs, tile_shape=(1, 2))
+    return get_tile_image(vizs, tile_shape=tile_shape)
 
 
-def visualize_segmentation(lbl_pred, img, n_class, lbl_true=None):
+def _visualize_segmentation_legend(label, n_class, label_titles,
+                                   img=None, bg_label=0):
+    """Convert label to rgb with label titles.
+
+    @param label_title: label title for each labels.
+    @type label_title: dict
+    """
+    from PIL import Image
+    from scipy.misc import fromimage
+    from skimage.color import label2rgb
+    from skimage.transform import resize
+    colors = labelcolormap(n_class)
+    label_viz = _visualize_segmentation(
+        label, n_class, img=img, bg_label=bg_label)
+
+    # plot label titles on image using matplotlib
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
+                        wspace=0, hspace=0)
+    plt.margins(0, 0)
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    plt.axis('off')
+    # plot image
+    plt.imshow(label_viz)
+    # plot legend
+    plt_handlers = []
+    plt_titles = []
+    for label_value in np.unique(label):
+        if label_value not in label_titles:
+            continue
+        fc = colors[label_value]
+        p = plt.Rectangle((0, 0), 1, 1, fc=fc)
+        plt_handlers.append(p)
+        plt_titles.append(label_titles[label_value])
+    plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
+    # convert plotted figure to np.ndarray
+    f = StringIO.StringIO()
+    plt.savefig(f, bbox_inches='tight', pad_inches=0)
+    result_img_pil = Image.open(f)
+    result_img = fromimage(result_img_pil, mode='RGB')
+    result_img = resize(result_img, label_viz.shape, preserve_range=True)
+    result_img = result_img.astype(label_viz.dtype)
+    return result_img
+
+
+def visualize_segmentation(lbl_pred, img, n_class,
+                           label_titles=None, lbl_true=None):
     if lbl_true is not None:
         mask = lbl_true == -1
         lbl_pred[mask] = 0
@@ -489,11 +493,19 @@ def visualize_segmentation(lbl_pred, img, n_class, lbl_true=None):
 
     vizs = []
 
-    viz_pred = _visualize_segmentation(lbl_pred, img, n_class)
+    if label_titles:
+        viz_pred = _visualize_segmentation_legend(
+            lbl_pred, n_class, label_titles, img)
+    else:
+        viz_pred = _visualize_segmentation(lbl_pred, n_class, img)
     vizs.append(viz_pred)
 
     if lbl_true is not None:
-        viz_true = _visualize_segmentation(lbl_true, img, n_class)
+        if label_titles:
+            viz_true = _visualize_segmentation_with_legend(
+                lbl_true, n_class, label_titles, img)
+        else:
+            viz_true = _visualize_segmentation(lbl_true, n_class, img)
         vizs.append(viz_true)
 
     return get_tile_image(vizs)

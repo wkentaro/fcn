@@ -60,7 +60,10 @@ def infer(n_class):
                 lbl_pred = chainer.cuda.to_cpu(lbl_pred.data)
 
         # visualize
-        viz = fcn.utils.visualize_segmentation(lbl_pred, img, n_class)
+        label_titles = dict(
+            enumerate(fcn.datasets.VOC2012ClassSeg.class_names))
+        viz = fcn.utils.visualize_segmentation(
+            lbl_pred, img, n_class, label_titles)
         out_file = osp.join(args.out_dir, osp.basename(file))
         skimage.io.imsave(out_file, viz)
         print('==> wrote to: %s' % out_file)
