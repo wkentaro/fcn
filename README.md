@@ -59,11 +59,3 @@ using `convert_caffe_to_chainermodel.py`.
 | Ours | **90.74** | **75.84** | **63.76** | **83.73** |
 
 <img src="examples/voc/static/fcn32s_iters.gif" width="48%" /> <img src="examples/voc/static/fcn32s_iter00084000.jpg" width="48%" />
-
-
-License
--------
-
-Copyright (C) 2016-2017 Kentaro Wada\
-Released under the MIT license\
-<http://opensource.org/licenses/mit-license.php>
