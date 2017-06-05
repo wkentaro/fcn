@@ -5,7 +5,7 @@ fcn - Fully Convolutional Networks
 [![](https://api.travis-ci.org/wkentaro/fcn.svg?branch=master)](https://travis-ci.org/wkentaro/fcn)
 
 This is [Chainer](https://github.com/pfnet/chainer.git) implementation of
-[fcnbberkeleyvisionoorg](https://github.com/shelhamer/fcn.berkeleyvision.org.git).
+[fcn.berkeley.vision.org](https://github.com/shelhamer/fcn.berkeleyvision.org.git).
 
 Features
 --------
