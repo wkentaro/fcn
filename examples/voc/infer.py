@@ -1,54 +1,70 @@
 #!/usr/bin/env python
 
-from __future__ import division
-
 import argparse
+import os
 import os.path as osp
+import re
 
 import chainer
-import scipy.misc
+import numpy as np
+import skimage.io
 
 import fcn
 
 
-def main():
+def infer(n_class):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', default=0, type=int,
-                        help='if -1, use cpu only (default: 0)')
-    parser.add_argument('-c', '--chainermodel')
+    parser.add_argument('-g', '--gpu', default=0, type=int)
+    parser.add_argument('-m', '--model-file')
     parser.add_argument('-i', '--img-files', nargs='+', required=True)
+    parser.add_argument('-o', '--out-dir', required=True)
     args = parser.parse_args()
 
-    img_files = args.img_files
-    gpu = args.gpu
-    if args.chainermodel is None:
-        chainermodel = fcn.data.download_fcn8s_chainermodel()
-    else:
-        chainermodel = args.chainermodel
-    save_dir = chainer.dataset.get_dataset_directory('fcn/inference')
+    # model
 
-    dataset = fcn.datasets.PascalVOC2012SegmentationDataset('val')
+    if args.model_file is None:
+        args.model_file = fcn.data.download_fcn8s_chainermodel()
 
-    if osp.basename(chainermodel).lower().startswith('fcn32s'):
-        model_class = fcn.models.FCN32s
-    elif osp.basename(chainermodel).lower().startswith('fcn16s'):
-        model_class = fcn.models.FCN16s
-    elif osp.basename(chainermodel).lower().startswith('fcn8s'):
-        model_class = fcn.models.FCN8s
-    else:
-        raise ValueError
-    model = model_class(n_class=len(dataset.label_names))
-    chainer.serializers.load_npz(chainermodel, model)
+    match = re.match('^fcn(32|16|8)s.*$', osp.basename(args.model_file))
+    if match is None:
+        print('Unsupported model filename: %s' % args.model_file)
+        quit(1)
+    model_name = 'FCN%ss' % match.groups()[0]
 
-    infer = fcn.Inferencer(dataset, model, gpu)
-    for img_file in img_files:
-        img, label = infer.infer_image_file(img_file)
-        out_img = infer.visualize_label(img, label)
+    model_class = getattr(fcn.models, model_name)
+    model = model_class(n_class=n_class)
+    chainer.serializers.load_npz(args.model_file, model)
 
-        out_file = osp.join(save_dir, osp.basename(img_file))
-        scipy.misc.imsave(out_file, out_img)
-        print('- out_file: {0}'.format(out_file))
+    chainer.cuda.get_device(args.gpu).use()
+    model.to_gpu()
+
+    # inference
+
+    if not osp.exists(args.out_dir):
+        os.makedirs(args.out_dir)
+
+    for file in args.img_files:
+        # input
+        img = skimage.io.imread(file)
+        lbl_dummy = np.zeros(img.shape[:2], dtype=np.int32)
+        input, _ = fcn.datasets.VOC2012ClassSeg.transform(img, lbl_dummy)
+        input = input[np.newaxis, :, :, :]
+        input = chainer.cuda.to_gpu(input)
+
+        # forward
+        with chainer.no_backprop_mode():
+            input = chainer.Variable(input)
+            with chainer.using_config('train', False):
+                model(input)
+                lbl_pred = chainer.functions.argmax(model.score, axis=1)[0]
+                lbl_pred = chainer.cuda.to_cpu(lbl_pred.data)
+
+        # visualize
+        viz = fcn.utils.visualize_segmentation(lbl_pred, img, n_class)
+        out_file = osp.join(args.out_dir, osp.basename(file))
+        skimage.io.imsave(out_file, viz)
+        print('==> wrote to: %s' % out_file)
 
 
 if __name__ == '__main__':
-    main()
+    infer(n_class=21)

@@ -73,16 +73,18 @@ class VOCClassSegBase(chainer.dataset.DatasetMixin):
         else:
             return img, lbl
 
-    def transform(self, img, lbl):
+    @classmethod
+    def transform(cls, img, lbl):
         img = img[:, :, ::-1]  # RGB -> BGR
         img = img.astype(np.float32)
-        img -= self.mean_bgr
+        img -= cls.mean_bgr
         img = img.transpose(2, 0, 1)
         return img, lbl
 
-    def untransform(self, img, lbl):
+    @classmethod
+    def untransform(cls, img, lbl):
         img = img.transpose(1, 2, 0)
-        img += self.mean_bgr
+        img += cls.mean_bgr
         img = img.astype(np.uint8)
         img = img[:, :, ::-1]
         return img, lbl

@@ -459,40 +459,44 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     return _tile_images(imgs, tile_shape, result_img)
 
 
-def visualize_segmentation(lbl_pred, lbl_true, img, n_class):
+def _visualize_segmentation(lbl, img, n_class):
     from distutils.version import StrictVersion
     import skimage
     from skimage.color import label2rgb
     from skimage.util import img_as_ubyte
-    lbl_pred[lbl_true == -1] = 0
-    lbl_true[lbl_true == -1] = 0
-
     cmap = labelcolormap(n_class)
-
     if StrictVersion(skimage.__version__) <= StrictVersion('0.12.3'):
-        colors0 = colors1 = cmap[1:]
+        colors = cmap[1:]
     else:
-        labels = np.unique(lbl_true)
+        labels = np.unique(lbl)
         labels = labels[labels != 0]
-        colors0 = cmap[labels]
-        labels = np.unique(lbl_pred)
-        labels = labels[labels != 0]
-        colors1 = cmap[labels]
+        colors = cmap[labels]
+
+    vizs = []
+    viz0 = label2rgb(lbl, colors=colors, bg_label=0)
+    vizs.append(img_as_ubyte(viz0))
+    viz1 = label2rgb(lbl, img, colors=colors, bg_label=0)
+    vizs.append(img_as_ubyte(viz1))
+
+    return get_tile_image(vizs, tile_shape=(1, 2))
+
+
+def visualize_segmentation(lbl_pred, img, n_class, lbl_true=None):
+    if lbl_true is not None:
+        mask = lbl_true == -1
+        lbl_pred[mask] = 0
+        lbl_true[mask] = 0
 
     vizs = []
 
-    viz_true0 = label2rgb(lbl_true, colors=colors0, bg_label=0)
-    vizs.append(img_as_ubyte(viz_true0))
-    viz_true1 = label2rgb(lbl_true, img, colors=colors0, bg_label=0)
-    vizs.append(img_as_ubyte(viz_true1))
+    viz_pred = _visualize_segmentation(lbl_pred, img, n_class)
+    vizs.append(viz_pred)
 
-    viz_pred0 = label2rgb(lbl_pred, colors=colors1, bg_label=0)
-    vizs.append(img_as_ubyte(viz_pred0))
-    viz_pred1 = label2rgb(lbl_pred, img, colors=colors1, bg_label=0)
-    vizs.append(img_as_ubyte(viz_pred1))
+    if lbl_true is not None:
+        viz_true = _visualize_segmentation(lbl_true, img, n_class)
+        vizs.append(viz_true)
 
-    viz = get_tile_image(vizs, tile_shape=(2, 2))
-    return viz
+    return get_tile_image(vizs)
 
 
 # https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/surgery.py

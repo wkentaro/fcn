@@ -1,10 +1,7 @@
 import chainer
-from chainer import cuda
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
-
-from fcn import utils
 
 
 class FCN8s(chainer.Chain):
@@ -38,20 +35,17 @@ class FCN8s(chainer.Chain):
             score_fr=L.Convolution2D(4096, self.n_class, 1, stride=1, pad=0),
 
             upscore2=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                       stride=2, pad=0),
+                                       stride=2, pad=0, nobias=True),
             upscore8=L.Deconvolution2D(self.n_class, self.n_class, 16,
-                                       stride=8, pad=0),
+                                       stride=8, pad=0, nobias=True),
 
             score_pool3=L.Convolution2D(256, self.n_class, 1, stride=1, pad=0),
             score_pool4=L.Convolution2D(512, self.n_class, 1, stride=1, pad=0),
             upscore_pool4=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                            stride=2, pad=0),
+                                            stride=2, pad=0, nobias=True),
         )
-        self.train = False
 
     def __call__(self, x, t=None):
-        self.data = cuda.to_cpu(x.data)
-
         # conv1
         h = F.relu(self.conv1_1(x))
         conv1_1 = h
@@ -94,12 +88,12 @@ class FCN8s(chainer.Chain):
 
         # fc6
         h = F.relu(self.fc6(pool5))
-        h = F.dropout(h, ratio=.5, train=self.train)
+        h = F.dropout(h, ratio=.5)
         fc6 = h  # 1/32
 
         # fc7
         h = F.relu(self.fc7(fc6))
-        h = F.dropout(h, ratio=.5, train=self.train)
+        h = F.dropout(h, ratio=.5)
         fc7 = h  # 1/32
 
         # score_fr
@@ -148,32 +142,12 @@ class FCN8s(chainer.Chain):
         # score
         h = upscore8[:, :, 31:31+x.data.shape[2], 31:31+x.data.shape[3]]
         score = h  # 1/1
-        self.score = score  # XXX: for backward compatibility
-        # self.score = cuda.to_cpu(h.data)
+        self.score = score
 
         if t is None:
-            assert not self.train
             return
 
         loss = F.softmax_cross_entropy(score, t, normalize=False)
-        self.loss = float(cuda.to_cpu(loss.data))
-
-        self.lbl_true = chainer.cuda.to_cpu(t.data)
-        self.lbl_pred = cuda.to_cpu(score.data).argmax(axis=1)
-
-        logs = []
-        for i in xrange(x.shape[0]):
-            acc, acc_cls, iu, fwavacc = utils.label_accuracy_score(
-                self.lbl_true[i], self.lbl_pred[i], self.n_class)
-            logs.append((acc, acc_cls, iu, fwavacc))
-        log = np.array(logs).mean(axis=0)
-        self.log = {
-            'loss': self.loss,
-            'accuracy': log[0],
-            'accuracy_cls': log[1],
-            'iu': log[2],
-            'fwavacc': log[3],
-        }
-        chainer.report(self.log, self)
-
+        if np.isnan(float(loss.data)):
+            raise ValueError('Loss is nan.')
         return loss
