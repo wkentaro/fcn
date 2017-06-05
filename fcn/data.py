@@ -38,3 +38,23 @@ def download_fcn8s_chainermodel(check_md5=True):
         path=path,
         md5=md5,
     )
+
+
+def download_fcn16s_chainermodel(check_md5=True):
+    path = osp.expanduser('~/data/models/chainer/fcn16s_from_caffe.npz')
+    md5 = '7c9b50a1a8c6c20d3855d4823bbea61e' if check_md5 else ''
+    return cached_download(
+        url='https://drive.google.com/open?id=0B9P1L--7Wd2vcnBiXzZTcG9FU3c',
+        path=path,
+        md5=md5,
+    )
+
+
+def download_fcn32s_chainermodel(check_md5=True):
+    path = osp.expanduser('~/data/models/chainer/fcn32s_from_caffe.npz')
+    md5 = 'b7f0a2e66229ccdb099c0a60b432e8cf' if check_md5 else ''
+    return cached_download(
+        url='https://drive.google.com/open?id=0B9P1L--7Wd2vTElpa1p3WFNDczQ',
+        path=path,
+        md5=md5,
+    )
