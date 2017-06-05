@@ -125,13 +125,13 @@ def append_log_to_json(log, log_file):
         json.dump(logs, f, indent=4, sort_keys=True)
 
 
-def batch_to_vars(batch, device=-1, volatile='off'):
+def batch_to_vars(batch, device=-1):
     import chainer
     from chainer import cuda
     in_arrays = [np.asarray(x) for x in zip(*batch)]
     if device >= 0:
         in_arrays = [cuda.to_gpu(x, device=device) for x in in_arrays]
-    in_vars = [chainer.Variable(x, volatile) for x in in_arrays]
+    in_vars = [chainer.Variable(x) for x in in_arrays]
     return in_vars
 
 
@@ -297,7 +297,7 @@ def _fast_hist(label_true, label_pred, n_class):
     return hist
 
 
-def label_accuracy_score(label_true, label_pred, n_class):
+def label_accuracy_score(label_trues, label_preds, n_class):
     """Returns accuracy score evaluation result.
 
       - overall accuracy
@@ -305,7 +305,9 @@ def label_accuracy_score(label_true, label_pred, n_class):
       - mean IU
       - fwavacc
     """
-    hist = _fast_hist(label_true.flatten(), label_pred.flatten(), n_class)
+    hist = np.zeros((n_class, n_class))
+    for lt, lp in zip(label_trues, label_preds):
+        hist += _fast_hist(lt.flatten(), lp.flatten(), n_class)
     acc = np.diag(hist).sum() / hist.sum()
     acc_cls = np.diag(hist) / hist.sum(axis=1)
     acc_cls = np.nanmean(acc_cls)
@@ -482,7 +484,7 @@ def visualize_segmentation(lbl_pred, lbl_true, img, n_class):
 
 
 # https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/surgery.py
-def get_upsample_filter(size):
+def get_upsampling_filter(size):
     """Make a 2D bilinear kernel suitable for upsampling"""
     factor = (size + 1) // 2
     if size % 2 == 1:
@@ -492,4 +494,4 @@ def get_upsample_filter(size):
     og = np.ogrid[:size, :size]
     filter = (1 - abs(og[0] - center) / factor) * \
              (1 - abs(og[1] - center) / factor)
-    return filter.astype(np.float32)
+    return filter

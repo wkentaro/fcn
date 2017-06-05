@@ -39,11 +39,10 @@ class FCN16s(chainer.Chain):
             score_pool4=L.Convolution2D(512, self.n_class, 1, stride=1, pad=0),
 
             upscore2=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                       stride=2),
+                                       stride=2, nobias=False),
             upscore16=L.Deconvolution2D(self.n_class, self.n_class, 32,
-                                        stride=16),
+                                        stride=16, nobias=False),
         )
-        self.train = False
 
     def __call__(self, x, t=None):
         self.data = cuda.to_cpu(x.data)
@@ -90,12 +89,12 @@ class FCN16s(chainer.Chain):
 
         # fc6
         h = F.relu(self.fc6(pool5))
-        h = F.dropout(h, ratio=.5, train=self.train)
+        h = F.dropout(h, ratio=.5)
         fc6 = h  # 1/32
 
         # fc7
         h = F.relu(self.fc7(fc6))
-        h = F.dropout(h, ratio=.5, train=self.train)
+        h = F.dropout(h, ratio=.5)
         fc7 = h  # 1/32
 
         # score_fr
@@ -130,7 +129,7 @@ class FCN16s(chainer.Chain):
         # self.score = cuda.to_cpu(h.data)
 
         if t is None:
-            assert not self.train
+            assert not chainer.configuration.config.train
             return
 
         loss = F.softmax_cross_entropy(self.score, t, normalize=False)

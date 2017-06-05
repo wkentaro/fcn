@@ -1,4 +1,0 @@
-name: fcn32s_voc2012
-lr: 1.0e-5
-max_iteration: 100000
-copy_fc8: false

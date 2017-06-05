@@ -2,22 +2,28 @@
 
 from __future__ import print_function
 
+import os
 import os.path as osp
-import pkg_resources
+import sys
 
 import caffe
-import chainer
 import chainer.serializers as S
+from termcolor import cprint
 
-import fcn
-from fcn.models import FCN8s
+from fcn import models
 
 
-def fcn8s_caffe_to_chainermodel(caffe_prototxt, caffemodel_path,
-                                chainermodel_path):
+here = osp.dirname(osp.abspath(__file__))
+
+
+sys.path.insert(0, osp.join(here, '../../fcn/external/fcn.berkeleyvision.org'))
+
+
+def caffe_to_chainermodel(model, caffe_prototxt, caffemodel_path,
+                          chainermodel_path):
+    os.chdir(osp.dirname(caffe_prototxt))
     net = caffe.Net(caffe_prototxt, caffemodel_path, caffe.TEST)
 
-    model = FCN8s()
     for name, param in net.params.iteritems():
         layer = getattr(model, name)
 
@@ -25,30 +31,41 @@ def fcn8s_caffe_to_chainermodel(caffe_prototxt, caffemodel_path,
         if len(param) == 1:
             has_bias = False
 
-        print('{0}:'.format(name))
+        cprint('{0}:'.format(name), color='blue')
         # weight
-        print('  - W:', param[0].data.shape, layer.W.data.shape)
+        cprint('  - W: %s %s' % (param[0].data.shape, layer.W.data.shape),
+               color='blue')
         assert param[0].data.shape == layer.W.data.shape
         layer.W.data = param[0].data
         # bias
         if has_bias:
-            print('  - b:', param[1].data.shape, layer.b.data.shape)
+            cprint('  - b: %s %s' % (param[1].data.shape, layer.b.data.shape),
+                   color='blue')
             assert param[1].data.shape == layer.b.data.shape
             layer.b.data = param[1].data
-    S.save_hdf5(chainermodel_path, model)
+    S.save_npz(chainermodel_path, model)
 
 
 def main():
-    # get caffemodel
-    pkg_root = pkg_resources.get_distribution('fcn').location
-    caffe_prototxt = osp.join(
-        pkg_root, 'external/fcn.berkeleyvision.org/voc-fcn8s/deploy.prototxt')
-    caffemodel = fcn.data.download_fcn8s_caffemodel()
+    for model_name in ['FCN8s', 'FCN16s', 'FCN32s']:
+        cprint('[caffe_to_chainermodel.py] converting model: %s' % model_name,
+               color='blue')
+        # get model
+        model = getattr(models, model_name)()
+        model_name = model_name.lower()
 
-    # convert caffemodel to chainermodel
-    chainermodel = osp.join(chainer.dataset.get_dataset_directory('fcn'),
-                            'fcn8s_from_caffe.chainermodel')
-    fcn8s_caffe_to_chainermodel(caffe_prototxt, caffemodel, chainermodel)
+        # get caffemodel
+        caffe_prototxt = osp.join(
+            here, '../..',
+            'fcn/external/fcn.berkeleyvision.org/voc-%s/deploy.prototxt' %
+            model_name)
+        caffemodel = osp.expanduser(
+            '~/data/models/caffe/%s-heavy-pascal.caffemodel' % model_name)
+
+        # convert caffemodel to chainermodel
+        chainermodel = osp.expanduser(
+            '~/data/models/chainer/%s_from_caffe.npz' % model_name)
+        caffe_to_chainermodel(model, caffe_prototxt, caffemodel, chainermodel)
 
 
 if __name__ == '__main__':
