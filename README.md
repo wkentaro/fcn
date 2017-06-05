@@ -64,6 +64,6 @@ using `convert_caffe_to_chainermodel.py`.
 License
 -------
 
-Copyright (C) 2016 Kentaro Wada\
+Copyright (C) 2016-2017 Kentaro Wada\
 Released under the MIT license\
 <http://opensource.org/licenses/mit-license.php>
