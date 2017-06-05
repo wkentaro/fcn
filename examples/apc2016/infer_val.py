@@ -37,7 +37,7 @@ def main():
     n_class = len(dataset.label_names)
 
     model = fcn.models.FCN32s(n_class=n_class)
-    chainer.serializers.load_hdf5(chainermodel, model)
+    chainer.serializers.load_npz(chainermodel, model)
     if gpu >= 0:
         cuda.get_device(gpu).use()
         model.to_gpu()

@@ -45,7 +45,7 @@ def main():
 
     vgg_path = fcn.data.download_vgg16_chainermodel()
     vgg = fcn.models.VGG16()
-    chainer.serializers.load_hdf5(vgg_path, vgg)
+    chainer.serializers.load_npz(vgg_path, vgg)
 
     model = fcn.models.FCN32s(n_class=n_class)
     model.train = True

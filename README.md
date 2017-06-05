@@ -28,10 +28,8 @@ Installation
 ```bash
 # Ubuntu: install required libraries via apt
 sudo apt-get install liblapack-dev   # for numpy
-sudo apt-get install libhdf5-dev     # for h5py
 # macOS: install required libraries via brew
 brew install gfortran  # for numpy
-brew install hdf5      # for h5py
 
 pip install fcn
 ```

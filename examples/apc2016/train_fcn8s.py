@@ -45,7 +45,7 @@ def main():
     n_class = len(dataset_train.label_names)
 
     fcn16s = fcn.models.FCN16s(n_class=n_class)
-    chainer.serializers.load_hdf5(fcn16s_path, fcn16s)
+    chainer.serializers.load_npz(fcn16s_path, fcn16s)
 
     model = fcn.models.FCN8s(n_class=n_class)
     model.train = True

@@ -491,7 +491,7 @@ def visualize_segmentation(lbl_pred, lbl_true, img, n_class):
     viz_pred1 = label2rgb(lbl_pred, img, colors=colors1, bg_label=0)
     vizs.append(img_as_ubyte(viz_pred1))
 
-    viz = get_tile_image(vizs , tile_shape=(2, 2))
+    viz = get_tile_image(vizs, tile_shape=(2, 2))
     return viz
 
 

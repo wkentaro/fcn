@@ -22,7 +22,7 @@ def main():
     img_files = args.img_files
     gpu = args.gpu
     if args.chainermodel is None:
-        chainermodel = fcn.data.download_fcn8s_from_caffe_chainermodel()
+        chainermodel = fcn.data.download_fcn8s_chainermodel()
     else:
         chainermodel = args.chainermodel
     save_dir = chainer.dataset.get_dataset_directory('fcn/inference')
@@ -38,7 +38,7 @@ def main():
     else:
         raise ValueError
     model = model_class(n_class=len(dataset.label_names))
-    chainer.serializers.load_hdf5(chainermodel, model)
+    chainer.serializers.load_npz(chainermodel, model)
 
     infer = fcn.Inferencer(dataset, model, gpu)
     for img_file in img_files:

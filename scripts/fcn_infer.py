@@ -1,1 +1,1 @@
-../examples/pascal/infer.py
+../examples/voc/infer.py
