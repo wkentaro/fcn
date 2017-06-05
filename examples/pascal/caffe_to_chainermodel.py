@@ -5,14 +5,11 @@ from __future__ import print_function
 import os
 import os.path as osp
 import sys
-import pkg_resources
 
 import caffe
-import chainer
 import chainer.serializers as S
 from termcolor import cprint
 
-import fcn
 from fcn import models
 
 

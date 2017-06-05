@@ -129,7 +129,7 @@ class FCN16s(chainer.Chain):
         # self.score = cuda.to_cpu(h.data)
 
         if t is None:
-            assert chainer.configuration.config.train == False
+            assert not chainer.configuration.config.train
             return
 
         loss = F.softmax_cross_entropy(self.score, t, normalize=False)

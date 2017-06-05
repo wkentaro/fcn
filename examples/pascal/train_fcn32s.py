@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 
 import datetime
-import os
 import os.path as osp
 import subprocess
-import sys
 
 import chainer
 from chainer import cuda
 import click
-import pytz
-import yaml
 
 import fcn
 from fcn import datasets
