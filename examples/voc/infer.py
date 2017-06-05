@@ -30,7 +30,6 @@ def infer(n_class):
         print('Unsupported model filename: %s' % args.model_file)
         quit(1)
     model_name = 'FCN%ss' % match.groups()[0]
-
     model_class = getattr(fcn.models, model_name)
     model = model_class(n_class=n_class)
     chainer.serializers.load_npz(args.model_file, model)

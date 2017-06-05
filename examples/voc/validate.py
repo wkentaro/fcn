@@ -2,6 +2,7 @@
 
 import argparse
 import os.path as osp
+import re
 
 import chainer
 from chainer import cuda
@@ -12,36 +13,38 @@ import tqdm
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', default=0, type=int,
+    parser.add_argument('model_file')
+    parser.add_argument('-g', '--gpu', default=0, type=int,
                         help='if -1, use cpu only (default: 0)')
-    parser.add_argument('-c', '--chainermodel', required=True)
     args = parser.parse_args()
 
     dataset = fcn.datasets.VOC2011ClassSeg('seg11valid')
     n_class = len(dataset.class_names)
 
-    model = fcn.models.FCN32s(n_class=n_class)
-    if osp.splitext(args.chainermodel)[-1] == '.h5':
-        chainer.serializers.load_hdf5(args.chainermodel, model)
-    else:
-        chainer.serializers.load_npz(args.chainermodel, model)
-    if args.gpu >= 0:
-        cuda.get_device(args.gpu).use()
-        model.to_gpu()
+    match = re.match('^fcn(32|16|8)s.*$', osp.basename(args.model_file))
+    if match is None:
+        print('Unsupported model filename: %s' % args.model_file)
+        quit(1)
+    model_name = 'FCN%ss' % match.groups()[0]
+    model_class = getattr(fcn.models, model_name)
+    model = model_class(n_class=n_class)
+    chainer.serializers.load_npz(args.model_file, model)
+
+    cuda.get_device(args.gpu).use()
+    model.to_gpu()
 
     lbl_preds, lbl_trues = [], []
     for i in tqdm.trange(len(dataset)):
         datum, lbl_true = dataset.get_example(i)
         x_data = np.expand_dims(datum, axis=0)
-        if args.gpu >= 0:
-            x_data = cuda.to_gpu(x_data)
+        x_data = cuda.to_gpu(x_data)
 
-        with chainer.no_backprop_mode(), chainer.using_config('train', False):
+        with chainer.no_backprop_mode():
             x = chainer.Variable(x_data)
-            model(x)
-
-        score = cuda.to_cpu(model.score.data[0])
-        lbl_pred = score.argmax(axis=0)
+            with chainer.using_config('train', False):
+                model(x)
+                lbl_pred = chainer.functions.argmax(model.score, axis=1)[0]
+                lbl_pred = chainer.cuda.to_cpu(lbl_pred.data)
 
         lbl_preds.append(lbl_pred)
         lbl_trues.append(lbl_true)
