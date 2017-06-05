@@ -4,7 +4,6 @@ import os.path as osp
 
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
-from nose.tools import assert_true
 import numpy as np
 import PIL.Image
 import skimage.io
