@@ -9,7 +9,7 @@ import fcn
 
 def main():
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar'  # NOQA
-    dataset_dir = chainer.dataset.get_dataset_directory('pascal')
+    dataset_dir = osp.expanduser('~/data/datasets/VOC')
     path = osp.join(dataset_dir, 'VOCtrainval_11-May-2012.tar')
     fcn.data.cached_download(
         url,

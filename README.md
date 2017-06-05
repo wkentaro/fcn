@@ -11,8 +11,8 @@ Features
 --------
 
 - Copy caffemodel to chainermodel.  [[v1.0.0](https://github.com/wkentaro/fcn/releases/tag/v1.0.0)]
-- Forwarding with Chainer for pascal dataset.  [[v1.0.0](https://github.com/wkentaro/fcn/releases/tag/v1.0.0)]
-- Training with Chainer for pascal dataset.  [[v2.0.0](https://github.com/wkentaro/fcn/releases/tag/v2.0.0)]
+- Forwarding with Chainer for voc dataset.  [[v1.0.0](https://github.com/wkentaro/fcn/releases/tag/v1.0.0)]
+- Training with Chainer for voc dataset.  [[v2.0.0](https://github.com/wkentaro/fcn/releases/tag/v2.0.0)]
 - Training for APC2015 dataset.  [[v3.0.0](https://github.com/wkentaro/fcn/releases/tag/v3.0.0)]
 
 License
@@ -58,7 +58,7 @@ Training
 --------
 
 ```bash
-cd examples/pascal
+cd examples/voc
 ./download_dataset.py
 
 ./train_fcn32s.py --gpu 0
@@ -72,4 +72,4 @@ using `convert_caffe_to_chainermodel.py`.
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) | 90.48 | 76.48 | 63.62 | 83.45 |
 | Ours | **90.74** | **75.84** | **63.76** | **83.73** |
 
-<img src="examples/pascal/static/fcn32s_iters.gif" width="48%" /> <img src="examples/pascal/static/fcn32s_iter00084000.jpg" width="48%" />
+<img src="examples/voc/static/fcn32s_iters.gif" width="48%" /> <img src="examples/voc/static/fcn32s_iter00084000.jpg" width="48%" />
