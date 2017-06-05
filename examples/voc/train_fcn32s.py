@@ -51,7 +51,6 @@ def main(gpu):
 
     model = fcn.models.FCN32s(n_class=n_class)
     model.init_from_vgg16(vgg)
-    model.upscore.disable_update()
 
     if gpu >= 0:
         cuda.get_device(gpu).use()
@@ -66,6 +65,7 @@ def main(gpu):
         if p.name == 'b':
             p.update_rule = chainer.optimizers.momentum_sgd.MomentumSGDRule(
                 lr=optimizer.lr * 2, momentum=0)
+    model.upscore.disable_update()
 
     # training loop
 

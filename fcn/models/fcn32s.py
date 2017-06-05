@@ -55,10 +55,12 @@ class FCN32s(chainer.Chain):
             score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0,
                                      initialW=initialW, initial_bias=initialb),
 
-            upscore=L.Deconvolution2D(n_class, n_class, 64, stride=32, pad=0),
+            upscore=L.Deconvolution2D(n_class, n_class, 64, stride=32, pad=0,
+                                      nobias=True),
         )
         # initialize weights for deconv layer
         filt = utils.get_upsampling_filter(64)
+        self.upscore.W.data[...] = 0
         self.upscore.W.data[range(n_class), range(n_class), :, :] = filt
 
     def __call__(self, x, t=None):
