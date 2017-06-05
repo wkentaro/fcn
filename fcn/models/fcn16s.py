@@ -39,9 +39,9 @@ class FCN16s(chainer.Chain):
             score_pool4=L.Convolution2D(512, n_class, 1, stride=1, pad=0),
 
             upscore2=L.Deconvolution2D(n_class, n_class, 4, stride=2,
-                                       nobias=False),
+                                       nobias=True),
             upscore16=L.Deconvolution2D(n_class, n_class, 32, stride=16,
-                                        nobias=False),
+                                        nobias=True),
         )
         # initialize weights for deconv layer
         filt = utils.get_upsampling_filter(4)

@@ -492,13 +492,6 @@ def visualize_segmentation(lbl_pred, img, n_class,
 
     vizs = []
 
-    if label_titles:
-        viz_pred = _visualize_segmentation_legend(
-            lbl_pred, n_class, label_titles, img)
-    else:
-        viz_pred = _visualize_segmentation(lbl_pred, n_class, img)
-    vizs.append(viz_pred)
-
     if lbl_true is not None:
         if label_titles:
             viz_true = _visualize_segmentation_legend(
@@ -506,6 +499,13 @@ def visualize_segmentation(lbl_pred, img, n_class,
         else:
             viz_true = _visualize_segmentation(lbl_true, n_class, img)
         vizs.append(viz_true)
+
+    if label_titles:
+        viz_pred = _visualize_segmentation_legend(
+            lbl_pred, n_class, label_titles, img)
+    else:
+        viz_pred = _visualize_segmentation(lbl_pred, n_class, img)
+    vizs.append(viz_pred)
 
     return get_tile_image(vizs)
 
