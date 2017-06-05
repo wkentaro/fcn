@@ -34,17 +34,17 @@ class FCN8s(chainer.Chain):
             fc6=L.Convolution2D(512, 4096, 7, stride=1, pad=0),
             fc7=L.Convolution2D(4096, 4096, 1, stride=1, pad=0),
 
-            score_fr=L.Convolution2D(4096, self.n_class, 1, stride=1, pad=0),
+            score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0),
 
-            upscore2=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                       stride=2, pad=0, nobias=True),
-            upscore8=L.Deconvolution2D(self.n_class, self.n_class, 16,
-                                       stride=8, pad=0, nobias=True),
+            upscore2=L.Deconvolution2D(n_class, n_class, 4, stride=2,
+                                       pad=0, nobias=True),
+            upscore8=L.Deconvolution2D(n_class, n_class, 16, stride=8,
+                                       pad=0, nobias=True),
 
-            score_pool3=L.Convolution2D(256, self.n_class, 1, stride=1, pad=0),
-            score_pool4=L.Convolution2D(512, self.n_class, 1, stride=1, pad=0),
-            upscore_pool4=L.Deconvolution2D(self.n_class, self.n_class, 4,
-                                            stride=2, pad=0, nobias=True),
+            score_pool3=L.Convolution2D(256, n_class, 1, stride=1, pad=0),
+            score_pool4=L.Convolution2D(512, n_class, 1, stride=1, pad=0),
+            upscore_pool4=L.Deconvolution2D(n_class, n_class, 4, stride=2,
+                                            pad=0, nobias=True),
         )
         # initialize weights for deconv layer
         filt = utils.get_upsampling_filter(4)
@@ -54,8 +54,8 @@ class FCN8s(chainer.Chain):
         self.upscore8.W.data[...] = 0
         self.upscore8.W.data[range(n_class), range(n_class), :, :] = filt
         filt = utils.get_upsampling_filter(4)
-        self.score_pool4.W.data[...] = 0
-        self.score_pool4.W.data[range(n_class), range(n_class), :, :] = filt
+        self.upscore_pool4.W.data[...] = 0
+        self.upscore_pool4.W.data[range(n_class), range(n_class), :, :] = filt
 
     def __call__(self, x, t=None):
         # conv1
