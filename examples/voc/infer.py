@@ -34,8 +34,9 @@ def infer(n_class):
     model = model_class(n_class=n_class)
     chainer.serializers.load_npz(args.model_file, model)
 
-    chainer.cuda.get_device(args.gpu).use()
-    model.to_gpu()
+    if args.gpu >= 0:
+        chainer.cuda.get_device(args.gpu).use()
+        model.to_gpu()
 
     # inference
 
@@ -48,7 +49,8 @@ def infer(n_class):
         lbl_dummy = np.zeros(img.shape[:2], dtype=np.int32)
         input, _ = fcn.datasets.VOC2012ClassSeg.transform(img, lbl_dummy)
         input = input[np.newaxis, :, :, :]
-        input = chainer.cuda.to_gpu(input)
+        if args.gpu >= 0:
+            input = chainer.cuda.to_gpu(input)
 
         # forward
         with chainer.no_backprop_mode():

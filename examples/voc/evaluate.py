@@ -30,14 +30,16 @@ def main():
     model = model_class(n_class=n_class)
     chainer.serializers.load_npz(args.model_file, model)
 
-    cuda.get_device(args.gpu).use()
-    model.to_gpu()
+    if args.gpu >= 0:
+        cuda.get_device(args.gpu).use()
+        model.to_gpu()
 
     lbl_preds, lbl_trues = [], []
     for i in tqdm.trange(len(dataset)):
         datum, lbl_true = dataset.get_example(i)
         x_data = np.expand_dims(datum, axis=0)
-        x_data = cuda.to_gpu(x_data)
+        if args.gpu >= 0:
+            x_data = cuda.to_gpu(x_data)
 
         with chainer.no_backprop_mode():
             x = chainer.Variable(x_data)
