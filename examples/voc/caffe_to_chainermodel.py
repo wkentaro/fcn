@@ -6,11 +6,15 @@ import os
 import os.path as osp
 import sys
 
-import caffe
+try:
+    import caffe
+except ImportError:
+    print('Cannot import caffe. Please install it.')
+    quit(1)
 import chainer.serializers as S
 from termcolor import cprint
 
-from fcn import models
+import fcn
 
 
 here = osp.dirname(osp.abspath(__file__))
@@ -51,7 +55,7 @@ def main():
         cprint('[caffe_to_chainermodel.py] converting model: %s' % model_name,
                color='blue')
         # get model
-        model = getattr(models, model_name)()
+        model = getattr(fcn.models, model_name)()
         model_name = model_name.lower()
 
         # get caffemodel
@@ -61,6 +65,10 @@ def main():
             model_name)
         caffemodel = osp.expanduser(
             '~/data/models/caffe/%s-heavy-pascal.caffemodel' % model_name)
+        if not osp.exists(caffemodel):
+            url = open(osp.join(osp.dirname(caffe_prototxt),
+                                'caffemodel-url')).strip()
+            fcn.data.cached_download(url, caffemodel)
 
         # convert caffemodel to chainermodel
         chainermodel = osp.expanduser(
