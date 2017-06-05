@@ -1,4 +1,4 @@
-chainer>=1.18.0,!=1.20.0
+chainer>=2.0.0
 click
 gdown
 h5py
