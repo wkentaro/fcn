@@ -35,7 +35,7 @@ fcn_infer.py --img-files sample.jpg --gpu -1  # cpu mode
 fcn_infer.py --img-files sample.jpg  # gpu mode
 ```
 
-![image](static/fcn8s_26471792680.jpg)
+<img src="static/fcn8s_26471792680.jpg" width="80%" >
 
 Original Image: <https://www.flickr.com/photos/faceme/26471792680/>
 
@@ -48,14 +48,30 @@ cd examples/voc
 ./download_dataset.py
 
 ./train_fcn32s.py --gpu 0
+# ./train_fcn16s.py --gpu 0
+# ./train_fcn8s.py --gpu 0
+# ./train_fcn8s_atonce.py --gpu 0
 ```
 
 The accuracy of original implementation is computed with (`validate.py`) after converting the caffe model to chainer one
 using `convert_caffe_to_chainermodel.py`.
 
+**FCN32s**
+
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|
-| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) | 90.48 | 76.48 | 63.62 | 83.45 |
-| Ours | **90.74** | **75.84** | **63.76** | **83.73** |
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) | 90.4810 | 76.4824 | 63.6261 | 83.4580 |
 
-<img src="examples/voc/static/fcn32s_iters.gif" width="48%" /> <img src="examples/voc/static/fcn32s_iter00084000.jpg" width="48%" />
+<img src="examples/voc/static/fcn32s_iters.gif" width="30%" /> <img src="examples/voc/static/fcn32s_iter00084000.jpg" width="30%" />
+
+**FCN16s**
+
+| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
+|:--------------:|:--------:|:--------------:|:-------:|:-------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn16s) | 90.9971 | 78.0710 | 65.0050 | 84.2614 |
+
+**FCN8s**
+
+| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
+|:--------------:|:--------:|:--------------:|:-------:|:-------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s) | 91.2212 | 77.6146 | 65.5126 | 84.5445 |
