@@ -21,12 +21,15 @@ def main():
     dataset = fcn.datasets.VOC2011ClassSeg('seg11valid')
     n_class = len(dataset.class_names)
 
-    match = re.match('^fcn(32|16|8)s.*$',
-                     osp.basename(args.model_file).lower())
-    if match is None:
-        print('Unsupported model filename: %s' % args.model_file)
-        quit(1)
-    model_name = 'FCN%ss' % match.groups()[0]
+    basename = osp.basename(args.model_file).lower()
+    if basename.startswith('fcn8s-atonce'):
+        model_name = 'FCN8sAtOnce'
+    else:
+        match = re.match('^fcn(32|16|8)s.*$', basename)
+        if match is None:
+            print('Unsupported model filename: %s' % args.model_file)
+            quit(1)
+        model_name = 'FCN%ss' % match.groups()[0]
     model_class = getattr(fcn.models, model_name)
     model = model_class(n_class=n_class)
     chainer.serializers.load_npz(args.model_file, model)
