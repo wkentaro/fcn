@@ -21,7 +21,8 @@ def main():
     dataset = fcn.datasets.VOC2011ClassSeg('seg11valid')
     n_class = len(dataset.class_names)
 
-    match = re.match('^fcn(32|16|8)s.*$', osp.basename(args.model_file))
+    match = re.match('^fcn(32|16|8)s.*$',
+                     osp.basename(args.model_file).lower())
     if match is None:
         print('Unsupported model filename: %s' % args.model_file)
         quit(1)
