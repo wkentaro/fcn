@@ -22,7 +22,8 @@ def main():
     n_class = len(dataset.class_names)
 
     basename = osp.basename(args.model_file).lower()
-    if basename.startswith('fcn8s-atonce'):
+    if basename.startswith('fcn8s-atonce') or \
+            basename.startswith('fcn8satonce'):
         model_name = 'FCN8sAtOnce'
     else:
         match = re.match('^fcn(32|16|8)s.*$', basename)
