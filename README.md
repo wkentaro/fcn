@@ -53,7 +53,7 @@ cd examples/voc
 # ./train_fcn8s_atonce.py --gpu 0
 ```
 
-The accuracy of original implementation is computed with (`validate.py`) after converting the caffe model to chainer one
+The accuracy of original implementation is computed with (`evaluate.py`) after converting the caffe model to chainer one
 using `convert_caffe_to_chainermodel.py`.
 
 **FCN32s**
