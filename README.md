@@ -61,7 +61,7 @@ using `convert_caffe_to_chainermodel.py`.
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) | 90.4810 | 76.4824 | 63.6261 | 83.4580 |
-| Ours | 90.5668 | 76.8740 | 63.8180 | 83.5067 |
+| Ours (using `vgg16_from_caffe.npz`) | 90.5668 | 76.8740 | 63.8180 | 83.5067 |
 
 <img src="examples/voc/static/fcn32s_iters.gif" width="30%" /> <img src="examples/voc/static/fcn32s_iter00092000.jpg" width="30%" />
 
@@ -84,4 +84,4 @@ using `convert_caffe_to_chainermodel.py`.
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s) | 91.1288 | 78.4979 | 65.3998 | 84.4326 |
-| Ours | 91.0883 | 77.3528 | 65.3433 | 84.4276 |
+| Ours (using `vgg16_from_caffe.npz`) | 91.0883 | 77.3528 | 65.3433 | 84.4276 |
