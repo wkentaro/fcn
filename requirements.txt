@@ -4,7 +4,6 @@ gdown
 matplotlib
 numpy
 pandas
-pytz
 PyYaml
 scikit-image
 scikit-learn
