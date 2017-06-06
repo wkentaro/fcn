@@ -33,7 +33,7 @@ def main(gpu, fcn32s_file):
     out = osp.join(here, 'logs', out)
     if not osp.exists(out):
         os.makedirs(out)
-    with open(osp.joi(out, 'config.yaml'), 'w') as f:
+    with open(osp.join(out, 'config.yaml'), 'w') as f:
         f.write('fcn32s_file: %s\n' % fcn32s_file)
 
     # 1. dataset
