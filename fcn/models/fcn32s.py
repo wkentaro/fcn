@@ -13,7 +13,7 @@ class FCN32s(chainer.Chain):
 
     def __init__(self, n_class=21):
         self.n_class = n_class
-        initialW = initializers.HeNormal()
+        initialW = initializers.Zero()
         initialb = initializers.Zero()
         super(FCN32s, self).__init__(
             conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100,
