@@ -1,6 +1,6 @@
 import chainer
-from chainer import cuda
 import chainer.functions as F
+from chainer import initializers
 import chainer.links as L
 import numpy as np
 
@@ -13,30 +13,50 @@ class FCN16s(chainer.Chain):
 
     def __init__(self, n_class=21):
         self.n_class = n_class
+        initialW = initializers.Zero()
+        initialb = initializers.Zero()
         super(self.__class__, self).__init__(
-            conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100),
-            conv1_2=L.Convolution2D(64, 64, 3, stride=1, pad=1),
+            conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100,
+                                    initialW=initialW, initial_bias=initialb),
+            conv1_2=L.Convolution2D(64, 64, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
 
-            conv2_1=L.Convolution2D(64, 128, 3, stride=1, pad=1),
-            conv2_2=L.Convolution2D(128, 128, 3, stride=1, pad=1),
+            conv2_1=L.Convolution2D(64, 128, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv2_2=L.Convolution2D(128, 128, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
 
-            conv3_1=L.Convolution2D(128, 256, 3, stride=1, pad=1),
-            conv3_2=L.Convolution2D(256, 256, 3, stride=1, pad=1),
-            conv3_3=L.Convolution2D(256, 256, 3, stride=1, pad=1),
+            conv3_1=L.Convolution2D(128, 256, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv3_2=L.Convolution2D(256, 256, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv3_3=L.Convolution2D(256, 256, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
 
-            conv4_1=L.Convolution2D(256, 512, 3, stride=1, pad=1),
-            conv4_2=L.Convolution2D(512, 512, 3, stride=1, pad=1),
-            conv4_3=L.Convolution2D(512, 512, 3, stride=1, pad=1),
+            conv4_1=L.Convolution2D(256, 512, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv4_2=L.Convolution2D(512, 512, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv4_3=L.Convolution2D(512, 512, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
 
-            conv5_1=L.Convolution2D(512, 512, 3, stride=1, pad=1),
-            conv5_2=L.Convolution2D(512, 512, 3, stride=1, pad=1),
-            conv5_3=L.Convolution2D(512, 512, 3, stride=1, pad=1),
+            conv5_1=L.Convolution2D(512, 512, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv5_2=L.Convolution2D(512, 512, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
+            conv5_3=L.Convolution2D(512, 512, 3, stride=1, pad=1,
+                                    initialW=initialW, initial_bias=initialb),
 
-            fc6=L.Convolution2D(512, 4096, 7, stride=1, pad=0),
-            fc7=L.Convolution2D(4096, 4096, 1, stride=1, pad=0),
+            fc6=L.Convolution2D(512, 4096, 7, stride=1, pad=0,
+                                initialW=initialW, initial_bias=initialb),
+            fc7=L.Convolution2D(4096, 4096, 1, stride=1, pad=0,
+                                initialW=initialW, initial_bias=initialb),
 
-            score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0),
-            score_pool4=L.Convolution2D(512, n_class, 1, stride=1, pad=0),
+            score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0,
+                                     initialW=initialW, initial_bias=initialb),
+            score_pool4=L.Convolution2D(512, n_class, 1, stride=1, pad=0,
+                                        initialW=initialW,
+                                        initial_bias=initialb),
 
             upscore2=L.Deconvolution2D(n_class, n_class, 4, stride=2,
                                        nobias=True),
@@ -142,22 +162,13 @@ class FCN16s(chainer.Chain):
         return loss
 
     def init_from_fcn32s(self, fcn32s):
-        for l in self.children():
-            if l.name.startswith('conv') or l.name.startswith('fc'):
-                l1 = getattr(fcn32s, l.name)
-                l2 = getattr(self, l.name)
-                assert l1.W.shape == l2.W.shape
+        for l1 in fcn32s.children():
+            try:
+                l2 = getattr(self, l1.name)
+            except Exception:
+                continue
+            assert l1.W.shape == l2.W.shape
+            l2.W.data = l1.W.data
+            if l1.b is not None:
                 assert l1.b.shape == l2.b.shape
-                l2.W.data = l1.W.data
                 l2.b.data = l1.b.data
-            elif l.name.startswith('score_fr'):
-                l1 = getattr(fcn32s, l.name)
-                l2 = getattr(self, l.name)
-                assert l1.W.shape == l2.W.shape
-                assert l1.b.shape == l2.b.shape
-                l2.W.data = l1.W.data
-                l2.b.data = l1.b.data
-            elif l.name in ['score_pool4', 'upscore2', 'upscore16']:
-                pass
-            else:
-                raise ValueError
