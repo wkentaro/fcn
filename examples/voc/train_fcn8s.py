@@ -17,8 +17,7 @@ here = osp.dirname(osp.abspath(__file__))
 
 @click.command(context_settings={'help_option_names': ['-h', '--help']})
 @click.option('-g', '--gpu', type=int, required=True)
-@click.option('--fcn16s-file', required=True)
-def main(gpu, fcn16s_file):
+def main(gpu):
     # 0. config
 
     cmd = 'git log -n1 --format="%h"'
@@ -46,6 +45,7 @@ def main(gpu, fcn16s_file):
     n_class = len(dataset_train.class_names)
 
     fcn16s = fcn.models.FCN16s()
+    fcn16s_file = fcn.data.download_fcn16s_chainermodel(check_md5=False)
     chainer.serializers.load_npz(fcn16s_file, fcn16s)
 
     model = fcn.models.FCN8s(n_class=n_class)
