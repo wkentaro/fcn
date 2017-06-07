@@ -71,6 +71,8 @@ You can download vgg16 model from here: [`vgg16_from_caffe.npz`](https://drive.g
 | Ours (using `fcn32s_from_caffe.npz`) | 90.9671 | 78.0617 | 65.0911 | 84.2604 | [`fcn16s_voc_using_fcn32s_from_caffe_iter00032000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vNTFyZDlXel9ZZms) |
 | Ours (using `fcn32s_voc_iter00092000.npz`) | **91.1009** | 77.2522 | **65.3628** | **84.3675** | [`fcn16s_voc_iter00100000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vZ1ZUYTJhRkZ1WTg) |
 
+<img src="examples/voc/static/fcn16s_iters.gif" width="30%" /> <img src="examples/voc/static/fcn16s_iter00100000.jpg" width="30%" />
+
 **FCN8s**
 
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
