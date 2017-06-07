@@ -414,11 +414,12 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     return _tile_images(imgs, tile_shape, result_img)
 
 
-def _visualize_segmentation(lbl, n_class, img=None, bg_label=0):
+def _visualize_segmentation(lbl, n_class=None, img=None, bg_label=0):
     from distutils.version import StrictVersion
     import skimage
     from skimage.color import label2rgb
     from skimage.util import img_as_ubyte
+    n_class = len(np.unique(lbl)) if n_class is None else n_class
     cmap = labelcolormap(n_class)
     if StrictVersion(skimage.__version__) <= StrictVersion('0.12.3'):
         colors = cmap[1:]
@@ -439,7 +440,7 @@ def _visualize_segmentation(lbl, n_class, img=None, bg_label=0):
     return get_tile_image(vizs, tile_shape=tile_shape)
 
 
-def _visualize_segmentation_legend(label, n_class, label_titles,
+def _visualize_segmentation_legend(label, label_titles, n_class=None,
                                    img=None, bg_label=0):
     """Convert label to rgb with label titles.
 
@@ -449,6 +450,7 @@ def _visualize_segmentation_legend(label, n_class, label_titles,
     from PIL import Image
     from scipy.misc import fromimage
     from skimage.transform import resize
+    n_class = len(label_titles) if n_class is None else n_class
     colors = labelcolormap(n_class)
     label_viz = _visualize_segmentation(
         label, n_class, img=img, bg_label=bg_label)
@@ -483,31 +485,59 @@ def _visualize_segmentation_legend(label, n_class, label_titles,
     return result_img
 
 
-def visualize_segmentation(lbl_pred, img, n_class,
-                           label_titles=None, lbl_true=None):
+def visualize_segmentation(**kwargs):
+    """Visualize segmentation.
+
+    Parameters
+    ----------
+    img: ndarray
+        Input image to predict label.
+    lbl_true: ndarray
+        Ground truth of the label.
+    lbl_pred: ndarray
+        Label predicted.
+    n_class: int
+        Number of classes.
+    label_names: dict
+        Names of each label value. Key is label_value and value is its name.
+
+    Returns
+    -------
+    img_array: ndarray
+        Visualized image.
+    """
+    img = kwargs.get('img')
+    lbl_true = kwargs.get('lbl_true')
+    lbl_pred = kwargs.get('lbl_pred')
+    n_class = kwargs.get('n_class')
+    label_names = kwargs.get('label_names')
+
     if lbl_true is not None:
         mask = lbl_true == -1
-        lbl_pred[mask] = 0
         lbl_true[mask] = 0
+        if lbl_pred is not None:
+            lbl_pred[mask] = 0
 
     vizs = []
 
     if lbl_true is not None:
-        if label_titles:
+        if label_names:
             viz_true = _visualize_segmentation_legend(
-                lbl_true, n_class, label_titles, img)
+                lbl_true, label_names, n_class, img)
         else:
             viz_true = _visualize_segmentation(lbl_true, n_class, img)
         vizs.append(viz_true)
 
-    if label_titles:
-        viz_pred = _visualize_segmentation_legend(
-            lbl_pred, n_class, label_titles, img)
-    else:
-        viz_pred = _visualize_segmentation(lbl_pred, n_class, img)
-    vizs.append(viz_pred)
+    if lbl_pred is not None:
+        if label_names:
+            viz_pred = _visualize_segmentation_legend(
+                lbl_pred, label_names, n_class, img)
+        else:
+            viz_pred = _visualize_segmentation(lbl_pred, n_class, img)
+        vizs.append(viz_pred)
 
-    return get_tile_image(vizs)
+    img_array = get_tile_image(vizs)
+    return img_array
 
 
 # https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/surgery.py

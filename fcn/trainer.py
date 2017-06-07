@@ -76,7 +76,8 @@ class Trainer(object):
                 if len(vizs) < n_viz:
                     im, lt = dataset.untransform(im, lt)
                     viz = utils.visualize_segmentation(
-                        lp, im, self.model.n_class, lbl_true=lt)
+                        lbl_pred=lp, lbl_true=lt,
+                        img=im, n_class=self.model.n_class)
                     vizs.append(viz)
         # save visualization
         out_viz = osp.join(self.out, 'visualizations_valid',
