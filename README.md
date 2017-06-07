@@ -75,7 +75,7 @@ using `convert_caffe_to_chainermodel.py`.
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s) | 91.2212 | **77.6146** | **65.5126** | 84.5445 | [`fcn8s_from_caffe.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vb0cxV0VhcG1Lb28) |
-| Ours (using `fcn16s_from_caffe.npz`) | **91.2513** | 77.1490 | 65.4789 | **84.5460** | [`fcn8s_voc_using_fcn16s_from_caffe_iter00010000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vdVpRN253el9fdzA) |
+| Ours (using `fcn16s_from_caffe.npz`) | **91.2513** | 77.1490 | 65.4789 | **84.5460** | [`fcn8s_voc_using_fcn16s_from_caffe_iter00016000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vdVpRN253el9fdzA) |
 
 **FCN8sAtOnce**
 
