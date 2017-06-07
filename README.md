@@ -86,4 +86,4 @@ You can download vgg16 model from here: [`vgg16_from_caffe.npz`](https://drive.g
 
 <img src="examples/voc/static/fcn32s_iter00092000.jpg" width="30%" /> <img src="examples/voc/static/fcn16s_iter00100000.jpg" width="30%" /> <img src="examples/voc/static/fcn8s_iter00072000.jpg" width="30%" />
 
-Left to right, FCN32s, FCN16s, FCN8s fully trained using this repo. See above tables to see the accuracy.
+Left to right, **FCN32s**, **FCN16s** and **FCN8s**, which are fully trained using this repo. See above tables to see the accuracy.
