@@ -12,10 +12,7 @@ Installation
 ------------
 
 ```bash
-# Ubuntu: install required libraries via apt
-sudo apt-get install liblapack-dev   # for numpy
-# macOS: install required libraries via brew
-brew install gfortran  # for numpy
+pip install --upgrade setuptools
 
 pip install fcn
 ```
