@@ -67,19 +67,19 @@ using `convert_caffe_to_chainermodel.py`.
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn16s) | 90.9971 | **78.0710** | 65.0050 | 84.2614 | [`fcn16s_from_caffe.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vcnBiXzZTcG9FU3c) |
-| Ours (using `fcn32s_from_caffe.npz`) | 90.9671 | 78.0617 | 65.0911 | 84.2604 | |
-| Ours (using `fcn32s_iter00092000.npz`) | **91.1009** | 77.2522 | **65.3628** | **84.3675** | |
+| Ours (using `fcn32s_from_caffe.npz`) | 90.9671 | 78.0617 | 65.0911 | 84.2604 | [`fcn16s_voc_using_fcn32s_from_caffe_iter00032000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vNTFyZDlXel9ZZms) |
+| Ours (using `fcn32s_voc_iter00092000.npz`) | **91.1009** | 77.2522 | **65.3628** | **84.3675** | [`fcn16s_voc_iter00100000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vZ1ZUYTJhRkZ1WTg) |
 
 **FCN8s**
 
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s) | 91.2212 | **77.6146** | **65.5126** | 84.5445 | [`fcn8s_from_caffe.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vb0cxV0VhcG1Lb28) |
-| Ours (using `fcn16s_from_caffe.npz`) | **91.2513** | 77.1490 | 65.4789 | **84.5460** | |
+| Ours (using `fcn16s_from_caffe.npz`) | **91.2513** | 77.1490 | 65.4789 | **84.5460** | [`fcn8s_voc_using_fcn16s_from_caffe_iter00010000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vdVpRN253el9fdzA) |
 
 **FCN8sAtOnce**
 
-| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
-|:--------------:|:--------:|:--------------:|:-------:|:-------:|
-| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | **91.1288** | **78.4979** | **65.3998** | **84.4326** | |
+| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
+|:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | **91.1288** | **78.4979** | **65.3998** | **84.4326** | [`fcn8s-atonce_from_caffe.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vZ1RJdXotZkNhSEk) |
 | Ours (using `vgg16_from_caffe.npz`) | 91.0883 | 77.3528 | 65.3433 | 84.4276 | |
