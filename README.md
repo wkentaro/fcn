@@ -52,6 +52,7 @@ cd examples/voc
 
 The accuracy of original implementation is computed with (`evaluate.py`) after converting the caffe model to chainer one
 using `convert_caffe_to_chainermodel.py`.
+You can download vgg16 model from here: [`vgg16_from_caffe.npz`](https://drive.google.com/open?id=0B9P1L--7Wd2vRy1XYnRSa1hNSW8).
 
 **FCN32s**
 
