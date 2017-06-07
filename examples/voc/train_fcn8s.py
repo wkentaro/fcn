@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import datetime
+import os
 import os.path as osp
 import subprocess
 
@@ -17,7 +18,9 @@ here = osp.dirname(osp.abspath(__file__))
 
 @click.command(context_settings={'help_option_names': ['-h', '--help']})
 @click.option('-g', '--gpu', type=int, required=True)
-def main(gpu):
+@click.option('--fcn16s-file',
+              default=fcn.data.download_fcn16s_chainermodel(check_md5=False))
+def main(gpu, fcn16s_file):
     # 0. config
 
     cmd = 'git log -n1 --format="%h"'
@@ -28,6 +31,10 @@ def main(gpu):
         timestamp,
     )
     out = osp.join(here, 'logs', out)
+    if not osp.exists(out):
+        os.makedirs(out)
+    with open(osp.join(out, 'config.yaml'), 'w') as f:
+        f.write('fcn16s_file: %s\n' % fcn16s_file)
 
     # 1. dataset
 
@@ -45,7 +52,6 @@ def main(gpu):
     n_class = len(dataset_train.class_names)
 
     fcn16s = fcn.models.FCN16s()
-    fcn16s_file = fcn.data.download_fcn16s_chainermodel(check_md5=False)
     chainer.serializers.load_npz(fcn16s_file, fcn16s)
 
     model = fcn.models.FCN8s(n_class=n_class)
