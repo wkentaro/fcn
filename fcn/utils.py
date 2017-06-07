@@ -4,16 +4,13 @@ from __future__ import print_function
 
 import cStringIO as StringIO
 import hashlib
-import json
 import math
 import os
 import os.path as osp
-import re
 import shlex
 import subprocess
 import sys
 import tarfile
-import tempfile
 import zipfile
 
 import matplotlib.pyplot as plt
@@ -21,108 +18,8 @@ import numpy as np
 
 
 # -----------------------------------------------------------------------------
-# CV Util
-# -----------------------------------------------------------------------------
-
-def apply_mask(img, mask, crop=False, fill_black=True):
-    if fill_black:
-        img[mask == 0] = 0
-
-    if crop:
-        where = np.argwhere(mask)
-        (y_start, x_start), (y_stop, x_stop) = where.min(0), where.max(0) + 1
-        img = img[y_start:y_stop, x_start:x_stop]
-
-    return img
-
-
-def resize_img_with_max_size(img, max_size=500*500):
-    """Resize image with max size (height x width)"""
-    from skimage.transform import rescale
-    height, width = img.shape[:2]
-    scale = max_size / (height * width)
-    resizing_scale = 1
-    if scale < 1:
-        resizing_scale = np.sqrt(scale)
-        img = rescale(img, resizing_scale, preserve_range=True)
-        img = img.astype(np.uint8)
-    return img, resizing_scale
-
-
-# -----------------------------------------------------------------------------
 # Chainer Util
 # -----------------------------------------------------------------------------
-
-def copy_chainermodel(src, dst):
-    from chainer import link
-    assert isinstance(src, link.Chain)
-    assert isinstance(dst, link.Chain)
-    print('Copying layers %s -> %s:' %
-          (src.__class__.__name__, dst.__class__.__name__))
-    for child in src.children():
-        if child.name not in dst.__dict__:
-            continue
-        dst_child = dst[child.name]
-        if type(child) != type(dst_child):
-            continue
-        if isinstance(child, link.Chain):
-            copy_chainermodel(child, dst_child)
-        if isinstance(child, link.Link):
-            match = True
-            for a, b in zip(child.namedparams(), dst_child.namedparams()):
-                if a[0] != b[0]:
-                    match = False
-                    break
-                if a[1].data.shape != b[1].data.shape:
-                    match = False
-                    break
-            if not match:
-                print('Ignore %s because of parameter mismatch.' % child.name)
-                continue
-            for a, b in zip(child.namedparams(), dst_child.namedparams()):
-                b[1].data = a[1].data
-            print(' layer: %s -> %s' % (child.name, dst_child.name))
-
-
-def draw_computational_graph(*args, **kwargs):
-    """Draw computational graph.
-
-    @param output: output ps file.
-    """
-    from chainer.computational_graph import build_computational_graph
-    output = kwargs.pop('output')
-    if len(args) > 2:
-        variable_style = args[2]
-    else:
-        variable_style = kwargs.get(
-            'variable_style',
-            {'shape': 'octagon', 'fillcolor': '#E0E0E0', 'style': 'filled'},
-        )
-        kwargs['variable_style'] = variable_style
-    if len(args) > 3:
-        function_style = args[3]
-    else:
-        function_style = kwargs.get(
-            'function_style',
-            {'shape': 'record', 'fillcolor': '#6495ED', 'style': 'filled'},
-        )
-        kwargs['function_style'] = function_style
-    dotfile = tempfile.mktemp()
-    with open(dotfile, 'w') as f:
-        f.write(build_computational_graph(*args, **kwargs).dump())
-    ext = osp.splitext(output)[-1][1:]  # ex) .ps -> ps
-    cmd = 'dot -T{0} {1} > {2}'.format(ext, dotfile, output)
-    subprocess.call(cmd, shell=True)
-
-
-def append_log_to_json(log, log_file):
-    if osp.exists(log_file):
-        logs = json.load(open(log_file))
-    else:
-        logs = []
-    logs.append(log)
-    with open(log_file, 'w') as f:
-        json.dump(logs, f, indent=4, sort_keys=True)
 
 
 def batch_to_vars(batch, device=-1):
@@ -166,8 +63,7 @@ def extract_file(path, to_directory='.'):
 
 
 def download(client, url, output, quiet=False):
-    cmd = '{client} {url} -O {output}'.format(client=client, url=url,
-                                              output=output)
+    cmd = 'gdown {url} -O {output}'.format(url=url, output=output)
     if quiet:
         cmd += ' --quiet'
     subprocess.call(shlex.split(cmd))
@@ -178,19 +74,8 @@ def check_md5(path, md5):
     return is_same
 
 
-def is_google_drive_url(url):
-    m = re.match('^https?://drive.google.com/uc\?id=.*$', url)
-    return m is not None
-
-
-def download_data(pkg_name, path, url, md5, download_client=None,
-                  extract=False, quiet=True):
+def download_data(pkg_name, path, url, md5, extract=False, quiet=True):
     """Install test data checking md5 and rosbag decompress if needed."""
-    if download_client is None:
-        if is_google_drive_url(url):
-            download_client = 'gdown'
-        else:
-            download_client = 'wget'
     # prepare cache dir
     cache_dir = osp.join(osp.expanduser('~/data'), pkg_name)
     if not osp.exists(cache_dir):
@@ -227,7 +112,7 @@ def download_data(pkg_name, path, url, md5, download_client=None,
         else:
             os.remove(cache_file)
     print("Downloading file from '{url}'...".format(url=url))
-    download(download_client, url, cache_file, quiet=quiet)
+    download(url, cache_file, quiet=quiet)
     os.symlink(cache_file, path)
     if extract:
         print("Extracting '{path}'...".format(path=path))
