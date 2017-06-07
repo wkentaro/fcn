@@ -55,31 +55,31 @@ using `convert_caffe_to_chainermodel.py`.
 
 **FCN32s**
 
-| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
-|:--------------:|:--------:|:--------------:|:-------:|:-------:|
-| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) | 90.4810 | 76.4824 | 63.6261 | 83.4580 |
-| Ours (using `vgg16_from_caffe.npz`) | **90.5668** | **76.8740** | **63.8180** | **83.5067** |
+| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
+|:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) | 90.4810 | 76.4824 | 63.6261 | 83.4580 | [download](https://drive.google.com/open?id=0B9P1L--7Wd2vTElpa1p3WFNDczQ) |
+| Ours (using [`vgg16_from_caffe.npz`](https://drive.google.com/open?id=0B9P1L--7Wd2vRy1XYnRSa1hNSW8)) | **90.5668** | **76.8740** | **63.8180** | **83.5067** | |
 
 <img src="examples/voc/static/fcn32s_iters.gif" width="30%" /> <img src="examples/voc/static/fcn32s_iter00092000.jpg" width="30%" />
 
 **FCN16s**
 
-| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
-|:--------------:|:--------:|:--------------:|:-------:|:-------:|
-| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn16s) | 90.9971 | **78.0710** | 65.0050 | 84.2614 |
-| Ours (using `fcn32s_from_caffe.npz`) | 90.9671 | 78.0617 | 65.0911 | 84.2604 |
-| Ours (using `fcn32s_iter00092000.npz`) | **91.1009** | 77.2522 | **65.3628** | **84.3675** |
+| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
+|:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn16s) | 90.9971 | **78.0710** | 65.0050 | 84.2614 | [download](https://drive.google.com/open?id=0B9P1L--7Wd2vcnBiXzZTcG9FU3c) |
+| Ours (using `fcn32s_from_caffe.npz`) | 90.9671 | 78.0617 | 65.0911 | 84.2604 | |
+| Ours (using `fcn32s_iter00092000.npz`) | **91.1009** | 77.2522 | **65.3628** | **84.3675** | |
 
 **FCN8s**
 
-| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
-|:--------------:|:--------:|:--------------:|:-------:|:-------:|
-| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s) | 91.2212 | **77.6146** | **65.5126** | 84.5445 |
-| Ours (using `fcn16s_from_caffe.npz`) | **91.2513** | 77.1490 | 65.4789 | **84.5460** |
+| Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC | Model File |
+|:--------------:|:--------:|:--------------:|:-------:|:-------:|:----------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s) | 91.2212 | **77.6146** | **65.5126** | 84.5445 | [download](https://drive.google.com/open?id=0B9P1L--7Wd2vb0cxV0VhcG1Lb28) |
+| Ours (using `fcn16s_from_caffe.npz`) | **91.2513** | 77.1490 | 65.4789 | **84.5460** | |
 
 **FCN8sAtOnce**
 
 | Implementation | Accuracy | Accuracy Class | Mean IU | FWAVACC |
 |:--------------:|:--------:|:--------------:|:-------:|:-------:|
-| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | **91.1288** | **78.4979** | **65.3998** | **84.4326** |
-| Ours (using `vgg16_from_caffe.npz`) | 91.0883 | 77.3528 | 65.3433 | 84.4276 |
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | **91.1288** | **78.4979** | **65.3998** | **84.4326** | |
+| Ours (using [`vgg16_from_caffe.npz`](https://drive.google.com/open?id=0B9P1L--7Wd2vRy1XYnRSa1hNSW8)) | 91.0883 | 77.3528 | 65.3433 | 84.4276 | |
