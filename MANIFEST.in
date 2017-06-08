@@ -1,2 +1,2 @@
-include requirements.txt README.rst
+include requirements.txt README.md
 recursive-include static *
