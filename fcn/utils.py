@@ -313,14 +313,14 @@ def _visualize_segmentation(lbl, n_class=None, img=None, bg_label=0):
         labels = labels[labels != bg_label]
         colors = cmap[labels]
 
-    vizs = []
+    vizs = [img]
     viz0 = label2rgb(lbl, colors=colors, bg_label=bg_label)
     vizs.append(img_as_ubyte(viz0))
-    tile_shape = (1, 1)
+    tile_shape = (1, 2)
     if img is not None:
         viz1 = label2rgb(lbl, img, colors=colors, bg_label=bg_label)
         vizs.append(img_as_ubyte(viz1))
-        tile_shape = (1, 2)
+        tile_shape = (1, 3)
 
     return get_tile_image(vizs, tile_shape=tile_shape)
 
