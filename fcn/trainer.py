@@ -97,11 +97,9 @@ class Trainer(object):
             'valid/fwavacc': acc[3],
         }
         # finalize
-        chainer.using_config('train', True)
         return log
 
     def train(self):
-        chainer.using_config('train', True)
         for iteration, batch in tqdm.tqdm(enumerate(self.iter_train),
                                           desc='train', total=self.max_iter,
                                           ncols=80):
