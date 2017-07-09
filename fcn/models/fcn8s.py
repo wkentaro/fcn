@@ -180,6 +180,7 @@ class FCN8s(chainer.Chain):
         self.score = score
 
         if t is None:
+            assert not chainer.config.train
             return
 
         loss = F.softmax_cross_entropy(score, t, normalize=False)
