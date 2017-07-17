@@ -64,7 +64,8 @@ def infer(n_class):
         label_titles = dict(
             enumerate(fcn.datasets.VOC2012ClassSeg.class_names))
         viz = fcn.utils.visualize_segmentation(
-            lbl_pred, img, n_class, label_titles)
+            lbl_pred=lbl_pred, img=img, n_class=n_class,
+            label_names=label_titles)
         out_file = osp.join(args.out_dir, osp.basename(file))
         skimage.io.imsave(out_file, viz)
         print('==> wrote to: %s' % out_file)
