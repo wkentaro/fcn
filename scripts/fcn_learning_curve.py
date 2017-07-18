@@ -14,8 +14,13 @@ import pandas as pd
 import seaborn as sns
 
 
-def learning_curve(json_file, output_interval):
-    df = pd.read_json(json_file)
+def learning_curve(log_file, output_interval):
+    if log_file.endswith('.json'):
+        df = pd.read_json(log_file)
+    elif log_file.endswith('.csv'):
+        df = pd.read_csv(log_file)
+    else:
+        raise ValueError
 
     colors = sns.husl_palette(3, l=.5, s=.5)
 
@@ -24,9 +29,9 @@ def learning_curve(json_file, output_interval):
     # initialize DataFrame for train
     columns = [
         'iteration',
-        'loss',
-        'accuracy',
-        'iu',
+        'train/loss',
+        'train/acc',
+        'train/mean_iu',
     ]
     df_train = df[columns]
     # get min/max
@@ -49,9 +54,9 @@ def learning_curve(json_file, output_interval):
     # initialize DataFrame for val
     columns = [
         'iteration',
-        'validation/loss',
-        'validation/accuracy',
-        'validation/iu',
+        'valid/loss',
+        'valid/acc',
+        'valid/mean_iu',
     ]
     df_val = df[columns]
     df_val = df_val.dropna()
@@ -73,32 +78,32 @@ def learning_curve(json_file, output_interval):
         plt.subplot(231)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-        plt.plot(df_train_step['iteration'], df_train_step['loss'], '-',
+        plt.plot(df_train_step['iteration'], df_train_step['train/loss'], '-',
                  markersize=1, color=colors[0], alpha=.5, label='train loss')
         plt.xlim((0, row_max['iteration']))
-        plt.ylim((0, row_max['loss']))
+        plt.ylim((0, row_max['train/loss']))
         plt.xlabel('iteration')
         plt.ylabel('train loss')
 
         # train accuracy
         plt.subplot(232)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
-        plt.plot(df_train_step['iteration'], df_train_step['accuracy'],
+        plt.plot(df_train_step['iteration'], df_train_step['train/acc'],
                  '-', markersize=1, color=colors[1], alpha=.5,
                  label='train accuracy')
         plt.xlim((0, row_max['iteration']))
-        plt.ylim((0, row_max['accuracy']))
+        plt.ylim((0, row_max['train/acc']))
         plt.xlabel('iteration')
         plt.ylabel('train overall accuracy')
 
         # train mean iu
         plt.subplot(233)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
-        plt.plot(df_train_step['iteration'], df_train_step['iu'],
+        plt.plot(df_train_step['iteration'], df_train_step['train/mean_iu'],
                  '-', markersize=1, color=colors[2], alpha=.5,
-                 label='train accuracy')
+                 label='train mean_iu')
         plt.xlim((0, row_max['iteration']))
-        plt.ylim((0, row_max['iu']))
+        plt.ylim((0, row_max['train/mean_iu']))
         plt.xlabel('iteration')
         plt.ylabel('train mean IU')
 
@@ -112,10 +117,10 @@ def learning_curve(json_file, output_interval):
         plt.subplot(234)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-        plt.plot(df_val_step['iteration'], df_val_step['validation/loss'],
+        plt.plot(df_val_step['iteration'], df_val_step['valid/loss'],
                  'o-', color=colors[0], alpha=.5, label='val loss')
         plt.xlim((0, row_max['iteration']))
-        plt.ylim((0, row_max['validation/loss']))
+        plt.ylim((0, row_max['valid/loss']))
         plt.xlabel('iteration')
         plt.ylabel('val loss')
 
@@ -123,24 +128,24 @@ def learning_curve(json_file, output_interval):
         plt.subplot(235)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
         plt.plot(df_val_step['iteration'],
-                 df_val_step['validation/accuracy'],
+                 df_val_step['valid/acc'],
                  'o-', color=colors[1], alpha=.5, label='val accuracy')
         plt.xlim((0, row_max['iteration']))
-        plt.ylim((0, row_max['validation/accuracy']))
+        plt.ylim((0, row_max['valid/acc']))
         plt.xlabel('iteration')
         plt.ylabel('val overall accuracy')
 
         # val mean iu
         plt.subplot(236)
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
-        plt.plot(df_val_step['iteration'], df_val_step['validation/iu'],
+        plt.plot(df_val_step['iteration'], df_val_step['valid/mean_iu'],
                  'o-', color=colors[2], alpha=.5, label='val mean IU')
         plt.xlim((0, row_max['iteration']))
-        plt.ylim((0, row_max['validation/iu']))
+        plt.ylim((0, row_max['valid/mean_iu']))
         plt.xlabel('iteration')
         plt.ylabel('val mean IU')
 
-        fig_file = '{}_{}.png'.format(osp.splitext(json_file)[0], iter_stop)
+        fig_file = '{}_{}.png'.format(osp.splitext(log_file)[0], iter_stop)
         plt.savefig(fig_file)
         print('Saved to %s' % fig_file)
 
