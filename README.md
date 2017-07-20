@@ -43,6 +43,7 @@ Training
 ```bash
 cd examples/voc
 ./download_dataset.py
+./download_models.py
 
 ./train_fcn32s.py --gpu 0
 # ./train_fcn16s.py --gpu 0
