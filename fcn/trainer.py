@@ -16,6 +16,34 @@ from fcn import utils
 
 class Trainer(object):
 
+    """Training class for FCN models.
+
+    Parameters
+    ----------
+    device: int
+        GPU id, negative values represents use of CPU.
+    model: chainer.Chain
+        NN model.
+    optimizer: chainer.Optimizer
+        Optimizer.
+    iter_train: chainer.Iterator
+        Dataset itarator for training dataset.
+    iter_valid: chainer.Iterator
+        Dataset itarator for validation dataset.
+    out: str
+        Log output directory.
+    max_iter: int
+        Max iteration to stop training iterations.
+    max_elapsed_time: float
+        Max elapsed_time to stop training iterations.
+    interval_validate: None or int
+        If None, validation is never run.
+
+    Returns
+    -------
+    None
+    """
+
     def __init__(
             self,
             device,
@@ -26,6 +54,7 @@ class Trainer(object):
             out,
             max_iter,
             max_elapsed_time=float('inf'),
+            interval_validate=4000,
             ):
         self.device = device
         self.model = model
@@ -37,6 +66,7 @@ class Trainer(object):
         self.iteration = 0
         self.max_iter = max_iter
         self.max_elapsed_time = max_elapsed_time
+        self.interval_validate = interval_validate
         self.log_headers = [
             'epoch',
             'iteration',
@@ -58,6 +88,18 @@ class Trainer(object):
             f.write(','.join(self.log_headers) + '\n')
 
     def validate(self, n_viz=9):
+        """Validate current model using validation dataset.
+
+        Parameters
+        ----------
+        n_viz: int
+            Number fo visualization.
+
+        Returns
+        -------
+        log: dict
+            Log values.
+        """
         iter_valid = copy.copy(self.iter_valid)
         losses, lbl_trues, lbl_preds = [], [], []
         vizs = []
@@ -104,6 +146,16 @@ class Trainer(object):
         return log
 
     def train(self):
+        """Train the network using the training dataset.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         stamp_start = time.time()
         for iteration, batch in tqdm.tqdm(enumerate(self.iter_train),
                                           desc='train', total=self.max_iter,
@@ -115,7 +167,8 @@ class Trainer(object):
             # validate #
             ############
 
-            if self.iteration % 4000 == 0:
+            if self.interval_validate and \
+                    self.iteration % self.interval_validate == 0:
                 log = collections.defaultdict(str)
                 log_valid = self.validate()
                 log.update(log_valid)
