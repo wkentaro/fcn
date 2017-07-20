@@ -2,6 +2,7 @@ import collections
 import copy
 import os
 import os.path as osp
+import time
 
 import chainer
 import numpy as np
@@ -37,6 +38,7 @@ class Trainer(object):
         self.log_headers = [
             'epoch',
             'iteration',
+            'elapsed_time',
             'train/loss',
             'train/acc',
             'train/acc_cls',
@@ -100,6 +102,7 @@ class Trainer(object):
         return log
 
     def train(self):
+        stamp_start = time.time()
         for iteration, batch in tqdm.tqdm(enumerate(self.iter_train),
                                           desc='train', total=self.max_iter,
                                           ncols=80):
@@ -116,6 +119,7 @@ class Trainer(object):
                 log.update(log_valid)
                 log['epoch'] = self.iter_train.epoch
                 log['iteration'] = iteration
+                log['elapsed_time'] = time.time() - stamp_start
                 with open(osp.join(self.out, 'log.csv'), 'a') as f:
                     f.write(','.join(str(log[h]) for h in self.log_headers) +
                             '\n')
@@ -154,6 +158,7 @@ class Trainer(object):
                 }
                 log['epoch'] = self.iter_train.epoch
                 log['iteration'] = iteration
+                log['elapsed_time'] = time.time() - stamp_start
                 log.update(log_train)
                 with open(osp.join(self.out, 'log.csv'), 'a') as f:
                     f.write(','.join(str(log[h]) for h in self.log_headers) +
