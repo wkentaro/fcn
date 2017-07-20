@@ -37,7 +37,7 @@ class Trainer(object):
     max_elapsed_time: float
         Max elapsed_time to stop training iterations.
     interval_validate: None or int
-        If None, validation is never run.
+        If None, validation is never run. (default: 4000)
 
     Returns
     -------
