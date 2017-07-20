@@ -25,6 +25,7 @@ class Trainer(object):
             iter_valid,
             out,
             max_iter,
+            max_elapsed_time=float('inf'),
             ):
         self.device = device
         self.model = model
@@ -35,6 +36,7 @@ class Trainer(object):
         self.epoch = 0
         self.iteration = 0
         self.max_iter = max_iter
+        self.max_elapsed_time = max_elapsed_time
         self.log_headers = [
             'epoch',
             'iteration',
@@ -165,4 +167,6 @@ class Trainer(object):
                             '\n')
 
             if iteration >= self.max_iter:
+                break
+            if (time.time() - stamp_start) > self.max_elapsed_time:
                 break
