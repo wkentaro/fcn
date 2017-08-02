@@ -4,13 +4,20 @@ import os.path as osp
 import gdown
 
 
+def md5sum(filename, blocksize=65536):
+    hash = hashlib.md5()
+    with open(filename, 'rb') as f:
+        for block in iter(lambda: f.read(blocksize), b''):
+            hash.update(block)
+    return hash.hexdigest()
+
+
 def cached_download(url, path, md5=None, quiet=False):
 
     def check_md5(path, md5, quiet=False):
         if not quiet:
             print('Checking md5 of file: {}'.format(path))
-        is_same = hashlib.md5(open(path, 'rb').read()).hexdigest() == md5
-        return is_same
+        return md5sum(path) == md5
 
     if osp.exists(path) and not md5:
         return path
