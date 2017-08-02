@@ -11,7 +11,7 @@
 ## Training
 
 ```bash
-./download_dataset.py
+./download_datasets.py
 ./train_fcn32s.py --gpu 0
 ```
 
