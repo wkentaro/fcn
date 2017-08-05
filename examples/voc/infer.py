@@ -13,8 +13,9 @@ import fcn
 
 
 def infer(n_class):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-g', '--gpu', default=0, type=int)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-g', '--gpu', default=0, type=int, help='GPU id')
     parser.add_argument('-m', '--model-file')
     parser.add_argument('-i', '--img-files', nargs='+', required=True)
     parser.add_argument('-o', '--out-dir', required=True)
