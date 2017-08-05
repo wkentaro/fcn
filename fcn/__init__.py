@@ -1,8 +1,11 @@
-import fcn.data  # NOQA
-import fcn.datasets  # NOQA
-import fcn.models  # NOQA
-import fcn.trainer # NOQA
-import fcn.utils  # NOQA
+# flake8: noqa
+
+from . import data
+from . import datasets
+from . import initializers
+from . import models
+from . import trainer
+from . import utils
 
 
-Trainer = fcn.trainer.Trainer
+Trainer = trainer.Trainer

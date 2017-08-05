@@ -1,10 +1,9 @@
 import chainer
 import chainer.functions as F
-from chainer import initializers
 import chainer.links as L
 import numpy as np
 
-from fcn import utils
+from .. import initializers
 
 
 class FCN32s(chainer.Chain):
@@ -13,55 +12,38 @@ class FCN32s(chainer.Chain):
 
     def __init__(self, n_class=21):
         self.n_class = n_class
-        initialW = initializers.Zero()
-        initialb = initializers.Zero()
-        super(FCN32s, self).__init__(
-            conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100,
-                                    initialW=initialW, initial_bias=initialb),
-            conv1_2=L.Convolution2D(64, 64, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+        kwargs = {
+            'initialW': chainer.initializers.Zero(),
+            'initial_bias': chainer.initializers.Zero(),
+        }
+        super(FCN32s, self).__init__()
+        with self.init_scope():
+            self.conv1_1 = L.Convolution2D(3, 64, 3, 1, 100, **kwargs)
+            self.conv1_2 = L.Convolution2D(64, 64, 3, 1, 1, **kwargs)
 
-            conv2_1=L.Convolution2D(64, 128, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv2_2=L.Convolution2D(128, 128, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv2_1 = L.Convolution2D(64, 128, 3, 1, 1, **kwargs)
+            self.conv2_2 = L.Convolution2D(128, 128, 3, 1, 1, **kwargs)
 
-            conv3_1=L.Convolution2D(128, 256, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv3_2=L.Convolution2D(256, 256, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv3_3=L.Convolution2D(256, 256, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv3_1 = L.Convolution2D(128, 256, 3, 1, 1, **kwargs)
+            self.conv3_2 = L.Convolution2D(256, 256, 3, 1, 1, **kwargs)
+            self.conv3_3 = L.Convolution2D(256, 256, 3, 1, 1, **kwargs)
 
-            conv4_1=L.Convolution2D(256, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv4_2=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv4_3=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv4_1 = L.Convolution2D(256, 512, 3, 1, 1, **kwargs)
+            self.conv4_2 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
+            self.conv4_3 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
 
-            conv5_1=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv5_2=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv5_3=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv5_1 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
+            self.conv5_2 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
+            self.conv5_3 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
 
-            fc6=L.Convolution2D(512, 4096, 7, stride=1, pad=0,
-                                initialW=initialW, initial_bias=initialb),
-            fc7=L.Convolution2D(4096, 4096, 1, stride=1, pad=0,
-                                initialW=initialW, initial_bias=initialb),
+            self.fc6 = L.Convolution2D(512, 4096, 7, 1, 0, **kwargs)
+            self.fc7 = L.Convolution2D(4096, 4096, 1, 1, 0, **kwargs)
 
-            score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0,
-                                     initialW=initialW, initial_bias=initialb),
+            self.score_fr = L.Convolution2D(4096, n_class, 1, 1, 0, **kwargs)
 
-            upscore=L.Deconvolution2D(n_class, n_class, 64, stride=32, pad=0,
-                                      nobias=True),
-        )
-        # initialize weights for deconv layer
-        filt = utils.get_upsampling_filter(64)
-        self.upscore.W.data[...] = 0
-        self.upscore.W.data[range(n_class), range(n_class), :, :] = filt
+            self.upscore = L.Deconvolution2D(
+                n_class, n_class, 64, 32, 0, nobias=True,
+                initialW=initializers.UpsamplingDeconvWeight())
 
     def __call__(self, x, t=None):
         # conv1
