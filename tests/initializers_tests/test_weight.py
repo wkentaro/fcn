@@ -7,7 +7,7 @@ from nose.tools import assert_equal
 import numpy as np
 import skimage.io
 
-from fcn import utils
+from fcn import initializers
 
 
 here = osp.dirname(osp.abspath(__file__))
@@ -21,7 +21,7 @@ def test_get_upsampling_filter():
     c2 = 3
     ksize = 4
 
-    filt = utils.get_upsampling_filter(ksize)
+    filt = initializers.weight._get_upsampling_filter(ksize)
     link = chainer.links.Deconvolution2D(
         c1, c2, ksize, stride=2, pad=0, nobias=True)
     link.W.data[...] = 0
