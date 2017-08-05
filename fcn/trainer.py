@@ -10,8 +10,7 @@ import skimage.io
 import skimage.util
 import tqdm
 
-import fcn
-from fcn import utils
+from . import utils
 
 
 class Trainer(object):
@@ -130,7 +129,7 @@ class Trainer(object):
                            'iter%08d.jpg' % self.iteration)
         if not osp.exists(osp.dirname(out_viz)):
             os.makedirs(osp.dirname(out_viz))
-        viz = fcn.utils.get_tile_image(vizs)
+        viz = utils.get_tile_image(vizs)
         skimage.io.imsave(out_viz, viz)
         # generate log
         acc = utils.label_accuracy_score(

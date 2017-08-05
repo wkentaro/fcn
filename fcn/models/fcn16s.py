@@ -1,75 +1,51 @@
 import chainer
 import chainer.functions as F
-from chainer import initializers
 import chainer.links as L
 import numpy as np
 
-from fcn import utils
+from .. import initializers
 
 
 class FCN16s(chainer.Chain):
 
-    """Full Convolutional Network 16s"""
-
     def __init__(self, n_class=21):
         self.n_class = n_class
-        initialW = initializers.Zero()
-        initialb = initializers.Zero()
-        super(self.__class__, self).__init__(
-            conv1_1=L.Convolution2D(3, 64, 3, stride=1, pad=100,
-                                    initialW=initialW, initial_bias=initialb),
-            conv1_2=L.Convolution2D(64, 64, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+        kwargs = {
+            'initialW': chainer.initializers.Zero(),
+            'initial_bias': chainer.initializers.Zero(),
+        }
+        super(FCN16s, self).__init__()
+        with self.init_scope():
+            self.conv1_1 = L.Convolution2D(3, 64, 3, 1, 100, **kwargs)
+            self.conv1_2 = L.Convolution2D(64, 64, 3, 1, 1, **kwargs)
 
-            conv2_1=L.Convolution2D(64, 128, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv2_2=L.Convolution2D(128, 128, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv2_1 = L.Convolution2D(64, 128, 3, 1, 1, **kwargs)
+            self.conv2_2 = L.Convolution2D(128, 128, 3, 1, 1, **kwargs)
 
-            conv3_1=L.Convolution2D(128, 256, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv3_2=L.Convolution2D(256, 256, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv3_3=L.Convolution2D(256, 256, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv3_1 = L.Convolution2D(128, 256, 3, 1, 1, **kwargs)
+            self.conv3_2 = L.Convolution2D(256, 256, 3, 1, 1, **kwargs)
+            self.conv3_3 = L.Convolution2D(256, 256, 3, 1, 1, **kwargs)
 
-            conv4_1=L.Convolution2D(256, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv4_2=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv4_3=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv4_1 = L.Convolution2D(256, 512, 3, 1, 1, **kwargs)
+            self.conv4_2 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
+            self.conv4_3 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
 
-            conv5_1=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv5_2=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
-            conv5_3=L.Convolution2D(512, 512, 3, stride=1, pad=1,
-                                    initialW=initialW, initial_bias=initialb),
+            self.conv5_1 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
+            self.conv5_2 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
+            self.conv5_3 = L.Convolution2D(512, 512, 3, 1, 1, **kwargs)
 
-            fc6=L.Convolution2D(512, 4096, 7, stride=1, pad=0,
-                                initialW=initialW, initial_bias=initialb),
-            fc7=L.Convolution2D(4096, 4096, 1, stride=1, pad=0,
-                                initialW=initialW, initial_bias=initialb),
+            self.fc6 = L.Convolution2D(512, 4096, 7, 1, 0, **kwargs)
+            self.fc7 = L.Convolution2D(4096, 4096, 1, 1, 0, **kwargs)
 
-            score_fr=L.Convolution2D(4096, n_class, 1, stride=1, pad=0,
-                                     initialW=initialW, initial_bias=initialb),
-            score_pool4=L.Convolution2D(512, n_class, 1, stride=1, pad=0,
-                                        initialW=initialW,
-                                        initial_bias=initialb),
+            self.score_fr = L.Convolution2D(4096, n_class, 1, 1, 0, **kwargs)
+            self.score_pool4 = L.Convolution2D(512, n_class, 1, 1, 0, **kwargs)
 
-            upscore2=L.Deconvolution2D(n_class, n_class, 4, stride=2,
-                                       nobias=True),
-            upscore16=L.Deconvolution2D(n_class, n_class, 32, stride=16,
-                                        nobias=True),
-        )
-        # initialize weights for deconv layer
-        filt = utils.get_upsampling_filter(4)
-        self.upscore2.W.data[...] = 0
-        self.upscore2.W.data[range(n_class), range(n_class), :, :] = filt
-        filt = utils.get_upsampling_filter(32)
-        self.upscore16.W.data[...] = 0
-        self.upscore16.W.data[range(n_class), range(n_class), :, :] = filt
+            self.upscore2 = L.Deconvolution2D(
+                n_class, n_class, 4, 2, nobias=True,
+                initialW=initializers.UpsamplingDeconvWeight())
+            self.upscore16 = L.Deconvolution2D(
+                n_class, n_class, 32, 16, nobias=True,
+                initialW=initializers.UpsamplingDeconvWeight())
 
     def __call__(self, x, t=None):
         # conv1
@@ -136,7 +112,8 @@ class FCN16s(chainer.Chain):
 
         # score_pool4c
         h = score_pool4[:, :,
-                        5:5+upscore2.data.shape[2], 5:5+upscore2.data.shape[3]]
+                        5:5 + upscore2.data.shape[2],
+                        5:5 + upscore2.data.shape[3]]
         score_pool4c = h  # 1/16
 
         # fuse_pool4
@@ -148,7 +125,7 @@ class FCN16s(chainer.Chain):
         upscore16 = h  # 1/1
 
         # score
-        h = upscore16[:, :, 27:27+x.data.shape[2], 27:27+x.data.shape[3]]
+        h = upscore16[:, :, 27:27 + x.data.shape[2], 27:27 + x.data.shape[3]]
         score = h  # 1/1
         self.score = score
 
