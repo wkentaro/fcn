@@ -195,7 +195,7 @@ class FCN8s(chainer.Chain):
             except Exception:
                 continue
             assert l1.W.shape == l2.W.shape
-            l2.W.data = l1.W.data
+            l2.W.data[...] = l1.W.data[...]
             if l2.b is not None:
                 assert l1.b.shape == l2.b.shape
-                l2.b.data = l1.b.data
+                l2.b.data[...] = l1.b.data[...]

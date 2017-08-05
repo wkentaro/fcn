@@ -122,12 +122,12 @@ class FCN32s(chainer.Chain):
                 l2 = getattr(self, l.name)
                 assert l1.W.shape == l2.W.shape
                 assert l1.b.shape == l2.b.shape
-                l2.W.data = l1.W.data
-                l2.b.data = l1.b.data
+                l2.W.data[...] = l1.W.data[...]
+                l2.b.data[...] = l1.b.data[...]
             elif l.name in ['fc6', 'fc7']:
                 l1 = getattr(vgg16, l.name)
                 l2 = getattr(self, l.name)
                 assert l1.W.size == l2.W.size
                 assert l1.b.size == l2.b.size
-                l2.W.data = l1.W.data.reshape(l2.W.shape)
-                l2.b.data = l1.b.data.reshape(l2.b.shape)
+                l2.W.data[...] = l1.W.data.reshape(l2.W.shape)[...]
+                l2.b.data[...] = l1.b.data.reshape(l2.b.shape)[...]
