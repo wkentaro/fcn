@@ -41,16 +41,16 @@ class FCN8s(chainer.Chain):
 
             self.upscore2 = L.Deconvolution2D(
                 n_class, n_class, 4, 2, 0, nobias=True,
-                initialW=initializers.UpsamplingDeconvWeight)
+                initialW=initializers.UpsamplingDeconvWeight())
             self.upscore8 = L.Deconvolution2D(
                 n_class, n_class, 16, 8, 0, nobias=True,
-                initialW=initializers.UpsamplingDeconvWeight)
+                initialW=initializers.UpsamplingDeconvWeight())
 
             self.score_pool3 = L.Convolution2D(256, n_class, 1, 1, 0, **kwargs)
             self.score_pool4 = L.Convolution2D(512, n_class, 1, 1, 0, **kwargs)
             self.upscore_pool4 = L.Deconvolution2D(
                 n_class, n_class, 4, 2, 0, nobias=True,
-                initialW=initializers.UpsamplingDeconvWeight)
+                initialW=initializers.UpsamplingDeconvWeight())
 
     def __call__(self, x, t=None):
         # conv1
