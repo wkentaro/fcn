@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime
 import os
 import os.path as osp
@@ -7,7 +8,6 @@ import subprocess
 
 import chainer
 from chainer import cuda
-import click
 
 import fcn
 from fcn import datasets
@@ -16,11 +16,19 @@ from fcn import datasets
 here = osp.dirname(osp.abspath(__file__))
 
 
-@click.command(context_settings={'help_option_names': ['-h', '--help']})
-@click.option('-g', '--gpu', type=int, required=True)
-@click.option('--fcn16s-file',
-              default=fcn.data.download_fcn16s_chainermodel(check_md5=False))
-def main(gpu, fcn16s_file):
+def main():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-g', '--gpu', type=int, required=True, help='GPU id')
+    parser.add_argument(
+        '--fcn16s-file',
+        default=fcn.data.download_fcn16s_chainermodel(check_md5=False),
+        help='Pretrained model file of FCN16s')
+    args = parser.parse_args()
+
+    gpu = args.gpu
+    fcn16s_file = args.fcn16s_file
+
     # 0. config
 
     cmd = 'git log -n1 --format="%h"'
