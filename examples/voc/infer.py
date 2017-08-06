@@ -47,8 +47,7 @@ def infer(n_class):
     for file in args.img_files:
         # input
         img = skimage.io.imread(file)
-        lbl_dummy = np.zeros(img.shape[:2], dtype=np.int32)
-        input, _ = fcn.datasets.VOC2012ClassSeg.transform(img, lbl_dummy)
+        input, = fcn.datasets.transform_lsvrc2012_vgg16((img,))
         input = input[np.newaxis, :, :, :]
         if args.gpu >= 0:
             input = chainer.cuda.to_gpu(input)
