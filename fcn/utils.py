@@ -1,10 +1,11 @@
 from __future__ import division
 
-import cStringIO as StringIO
 import math
+import warnings
 
-import matplotlib.pyplot as plt
+import cv2
 import numpy as np
+import scipy.ndimage
 
 
 # -----------------------------------------------------------------------------
@@ -30,7 +31,13 @@ def bitget(byteval, idx):
     return ((byteval & (1 << idx)) != 0)
 
 
-def labelcolormap(N=256):
+def labelcolormap(*args, **kwargs):
+    warnings.warn('labelcolormap is renamed to label_colormap.',
+                  DeprecationWarning)
+    return label_colormap(*args, **kwargs)
+
+
+def label_colormap(N=256):
     cmap = np.zeros((N, 3))
     for i in xrange(0, N):
         id = i
@@ -47,7 +54,14 @@ def labelcolormap(N=256):
     return cmap
 
 
-def visualize_labelcolormap(cmap):
+def visualize_labelcolormap(*args, **kwargs):
+    warnings.warn(
+        'visualize_labelcolormap is renamed to visualize_label_colormap',
+        DeprecationWarning)
+    return visualize_label_colormap(*args, **kwargs)
+
+
+def visualize_label_colormap(cmap):
     n_colors = len(cmap)
     ret = np.zeros((n_colors, 10 * 10, 3))
     for i in xrange(n_colors):
@@ -60,7 +74,7 @@ def get_label_colortable(n_labels, shape):
     rows, cols = shape
     if rows * cols < n_labels:
         raise ValueError
-    cmap = labelcolormap(n_labels)
+    cmap = label_colormap(n_labels)
     table = np.zeros((rows * cols, 50, 50, 3), dtype=np.uint8)
     for lbl_id, color in enumerate(cmap):
         color_uint8 = (color * 255).astype(np.uint8)
@@ -202,75 +216,66 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     return _tile_images(imgs, tile_shape, result_img)
 
 
-def _visualize_segmentation(lbl, n_class=None, img=None, bg_label=0):
-    from distutils.version import StrictVersion
-    import skimage
-    from skimage.color import label2rgb
-    from skimage.util import img_as_ubyte
-    n_class = len(np.unique(lbl)) if n_class is None else n_class
-    cmap = labelcolormap(n_class)
-    if StrictVersion(skimage.__version__) <= StrictVersion('0.12.3'):
-        colors = cmap[1:]
+def label2rgb(lbl, img=None, label_names=None, n_labels=None,
+              alpha=0.3, thresh_suppress=0):
+
+    if label_names is None:
+        if n_labels is None:
+            n_labels = lbl.max() + 1  # +1 for bg_label 0
     else:
-        labels = np.unique(lbl)
-        labels = labels[labels != bg_label]
-        colors = cmap[labels]
+        if n_labels is None:
+            n_labels = len(label_names)
+        else:
+            assert n_labels == len(label_names)
+    cmap = label_colormap(n_labels)
+    cmap = (cmap * 255).astype(np.uint8)
 
-    vizs = [img]
-    viz0 = label2rgb(lbl, colors=colors, bg_label=bg_label)
-    vizs.append(img_as_ubyte(viz0))
-    tile_shape = (1, 2)
+    lbl_viz = cmap[lbl]
+    lbl_viz[lbl == -1] = (0, 0, 0)  # unlabeled
+
     if img is not None:
-        viz1 = label2rgb(lbl, img, colors=colors, bg_label=bg_label)
-        vizs.append(img_as_ubyte(viz1))
-        tile_shape = (1, 3)
+        img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        img_gray = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2RGB)
+        lbl_viz = alpha * lbl_viz + (1 - alpha) * img_gray
+        lbl_viz = lbl_viz.astype(np.uint8)
 
-    return get_tile_image(vizs, tile_shape=tile_shape)
+    if label_names is None:
+        return lbl_viz
 
+    np.random.seed(1234)
+    for label in np.unique(lbl):
+        if label == -1:
+            continue  # unlabeled
 
-def _visualize_segmentation_legend(label, label_titles, n_class=None,
-                                   img=None, bg_label=0):
-    """Convert label to rgb with label titles.
-
-    @param label_title: label title for each labels.
-    @type label_title: dict
-    """
-    from PIL import Image
-    from scipy.misc import fromimage
-    from skimage.transform import resize
-    n_class = len(label_titles) if n_class is None else n_class
-    colors = labelcolormap(n_class)
-    label_viz = _visualize_segmentation(
-        label, n_class, img=img, bg_label=bg_label)
-
-    # plot label titles on image using matplotlib
-    plt.subplots_adjust(left=0, right=1, top=1, bottom=0,
-                        wspace=0, hspace=0)
-    plt.margins(0, 0)
-    plt.gca().xaxis.set_major_locator(plt.NullLocator())
-    plt.gca().yaxis.set_major_locator(plt.NullLocator())
-    plt.axis('off')
-    # plot image
-    plt.imshow(label_viz)
-    # plot legend
-    plt_handlers = []
-    plt_titles = []
-    for label_value in np.unique(label):
-        if label_value not in label_titles:
+        mask = lbl == label
+        if 1. * mask.sum() / mask.size < thresh_suppress:
             continue
-        fc = colors[label_value]
-        p = plt.Rectangle((0, 0), 1, 1, fc=fc)
-        plt_handlers.append(p)
-        plt_titles.append(label_titles[label_value])
-    plt.legend(plt_handlers, plt_titles, loc='lower right', framealpha=0.5)
-    # convert plotted figure to np.ndarray
-    f = StringIO.StringIO()
-    plt.savefig(f, bbox_inches='tight', pad_inches=0)
-    result_img_pil = Image.open(f)
-    result_img = fromimage(result_img_pil, mode='RGB')
-    result_img = resize(result_img, label_viz.shape, preserve_range=True)
-    result_img = result_img.astype(label_viz.dtype)
-    return result_img
+        mask = (mask * 255).astype(np.uint8)
+        y, x = scipy.ndimage.center_of_mass(mask)
+        y, x = map(int, [y, x])
+
+        if lbl[y, x] != label:
+            Y, X = np.where(mask)
+            point_index = np.random.randint(0, len(Y))
+            y, x = Y[point_index], X[point_index]
+
+        text = label_names[label]
+        font_face = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.7
+        thickness = 2
+        text_size, baseline = cv2.getTextSize(
+            text, font_face, font_scale, thickness)
+
+        def get_text_color(color):
+            if color[0] * 0.299 + color[1] * 0.587 + color[2] * 0.114 > 170:
+                return (0, 0, 0)
+            return (255, 255, 255)
+
+        color = get_text_color(lbl_viz[y, x])
+        cv2.putText(lbl_viz, text,
+                    (x - text_size[0] // 2, y),
+                    font_face, font_scale, color, thickness)
+    return lbl_viz
 
 
 def visualize_segmentation(**kwargs):
@@ -286,8 +291,9 @@ def visualize_segmentation(**kwargs):
         Label predicted.
     n_class: int
         Number of classes.
-    label_names: dict
-        Names of each label value. Key is label_value and value is its name.
+    label_names: dict or list
+        Names of each label value.
+        Key or index is label_value and value is its name.
 
     Returns
     -------
@@ -300,6 +306,9 @@ def visualize_segmentation(**kwargs):
     n_class = kwargs.get('n_class')
     label_names = kwargs.get('label_names')
 
+    if lbl_true is None and lbl_pred is None:
+        raise ValueError('lbl_true or lbl_pred must be not None.')
+
     if lbl_true is not None:
         mask = lbl_true == -1
         lbl_true[mask] = 0
@@ -309,20 +318,26 @@ def visualize_segmentation(**kwargs):
     vizs = []
 
     if lbl_true is not None:
-        if label_names:
-            viz_true = _visualize_segmentation_legend(
-                lbl_true, label_names, n_class, img)
-        else:
-            viz_true = _visualize_segmentation(lbl_true, n_class, img)
-        vizs.append(viz_true)
+        viz_trues = [
+            img,
+            label2rgb(lbl_true, label_names=label_names, n_labels=n_class),
+            label2rgb(lbl_true, img, label_names=label_names,
+                      n_labels=n_class),
+        ]
+        vizs.append(get_tile_image(viz_trues, (1, 3)))
 
     if lbl_pred is not None:
-        if label_names:
-            viz_pred = _visualize_segmentation_legend(
-                lbl_pred, label_names, n_class, img)
-        else:
-            viz_pred = _visualize_segmentation(lbl_pred, n_class, img)
-        vizs.append(viz_pred)
+        viz_preds = [
+            img,
+            label2rgb(lbl_pred, label_names=label_names, n_labels=n_class),
+            label2rgb(lbl_pred, img, label_names=label_names,
+                      n_labels=n_class),
+        ]
+        vizs.append(get_tile_image(viz_preds, (1, 3)))
 
-    img_array = get_tile_image(vizs)
-    return img_array
+    if len(vizs) == 1:
+        return vizs[0]
+    elif len(vizs) == 2:
+        return get_tile_image(vizs, (2, 1))
+    else:
+        raise RuntimeError
