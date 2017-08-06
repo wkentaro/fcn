@@ -1,12 +1,18 @@
+import os.path as osp
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
 
+from .. import data
 from .. import initializers
 
 
 class FCN16s(chainer.Chain):
+
+    pretrained_model = osp.expanduser(
+        '~/data/models/chainer/fcn16s_from_caffe.npz')
 
     def __init__(self, n_class=21):
         self.n_class = n_class
@@ -149,3 +155,11 @@ class FCN16s(chainer.Chain):
             if l1.b is not None:
                 assert l1.b.shape == l2.b.shape
                 l2.b.data[...] = l1.b.data[...]
+
+    @classmethod
+    def download(cls):
+        return data.cached_download(
+            url='https://drive.google.com/uc?id=0B9P1L--7Wd2vcnBiXzZTcG9FU3c',
+            path=cls.pretrained_model,
+            md5='7c9b50a1a8c6c20d3855d4823bbea61e',
+        )

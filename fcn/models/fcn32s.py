@@ -1,12 +1,18 @@
+import os.path as osp
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
 
+from .. import data
 from .. import initializers
 
 
 class FCN32s(chainer.Chain):
+
+    pretrained_model = osp.expanduser(
+        '~/data/models/chainer/fcn32s_from_caffe.npz')
 
     def __init__(self, n_class=21):
         self.n_class = n_class
@@ -112,6 +118,14 @@ class FCN32s(chainer.Chain):
         if np.isnan(float(loss.data)):
             raise ValueError('Loss is nan.')
         return loss
+
+    @classmethod
+    def download(cls):
+        return data.cached_download(
+            url='https://drive.google.com/uc?id=0B9P1L--7Wd2vTElpa1p3WFNDczQ',
+            path=cls.pretrained_model,
+            md5='b7f0a2e66229ccdb099c0a60b432e8cf',
+        )
 
     def init_from_vgg16(self, vgg16):
         for l in self.children():

@@ -1,9 +1,16 @@
+import os.path as osp
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
 
+from .. import data
+
 
 class VGG16(chainer.Chain):
+
+    pretrained_model = osp.expanduser(
+        '~/data/models/chainer/vgg16_from_caffe.npz')
 
     def __init__(self, n_class=1000):
         super(VGG16, self).__init__()
@@ -31,7 +38,8 @@ class VGG16(chainer.Chain):
             self.fc8 = L.Linear(4096, n_class)
 
     def __call__(self, x, t=None):
-        h = F.relu(self.conv1_1(x))
+        h = x
+        h = F.relu(self.conv1_1(h))
         h = F.relu(self.conv1_2(h))
         h = F.max_pooling_2d(h, 2, stride=2)
 
@@ -59,12 +67,20 @@ class VGG16(chainer.Chain):
         h = self.fc8(h)
         fc8 = h
 
-        self.pred = F.softmax(h)
+        self.proba = F.softmax(fc8)
 
         if t is None:
             assert not chainer.config.train
             return
 
         self.loss = F.softmax_cross_entropy(fc8, t)
-        self.accuracy = F.accuracy(self.pred, t)
+        self.accuracy = F.accuracy(self.proba, t)
         return self.loss
+
+    @classmethod
+    def download(cls):
+        return data.cached_download(
+            url='https://drive.google.com/uc?id=0B9P1L--7Wd2vRy1XYnRSa1hNSW8',
+            path=cls.pretrained_model,
+            md5='54a0cddc1392ccc4056bbeecbb30f3d4',
+        )

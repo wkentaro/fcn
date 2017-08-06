@@ -21,8 +21,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-g', '--gpu', type=int, required=True, help='GPU id')
     parser.add_argument(
-        '--fcn32s-file',
-        default=fcn.data.download_fcn32s_chainermodel(check_md5=False),
+        '--fcn32s-file', default=fcn.models.FCN32s.pretrained_model,
         help='Pretrained model file of FCN32s')
     args = parser.parse_args()
 

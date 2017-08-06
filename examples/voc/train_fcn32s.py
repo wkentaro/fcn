@@ -49,9 +49,8 @@ def main():
 
     n_class = len(dataset_train.class_names)
 
-    vgg_path = fcn.data.download_vgg16_chainermodel(check_md5=False)
     vgg = fcn.models.VGG16()
-    chainer.serializers.load_npz(vgg_path, vgg)
+    chainer.serializers.load_npz(vgg.pretrained_model, vgg)
 
     model = fcn.models.FCN32s(n_class=n_class)
     model.init_from_vgg16(vgg)

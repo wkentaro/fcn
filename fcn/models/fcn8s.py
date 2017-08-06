@@ -1,12 +1,17 @@
+import os.path as osp
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
 
+from .. import data
 from .. import initializers
 
 
 class FCN8s(chainer.Chain):
+
+    pretrained_model = osp.expanduser('~/data/models/chainer/fcn8s_from_caffe.npz')
 
     def __init__(self, n_class=21):
         self.n_class = n_class
@@ -173,8 +178,21 @@ class FCN8s(chainer.Chain):
                 assert l1.b.shape == l2.b.shape
                 l2.b.data[...] = l1.b.data[...]
 
+    @classmethod
+    def download(cls):
+        return data.cached_download(
+            url='https://drive.google.com/uc?id=0B9P1L--7Wd2vb0cxV0VhcG1Lb28',
+            path=cls.pretrained_model,
+            md5='256c2a8235c1c65e62e48d3284fbd384',
+        )
+
 
 class FCN8sAtOnce(FCN8s):
+
+    pretrained_model = None
+
+    def download(cls):
+        raise NotImplementedError
 
     def __call__(self, x, t=None):
         # conv1
