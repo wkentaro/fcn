@@ -7,7 +7,6 @@ import PIL.Image
 import scipy.io
 
 from .. import data
-from .. import utils
 
 
 DATASETS_DIR = osp.expanduser('~/data/datasets/VOC')
@@ -111,7 +110,7 @@ class VOC2012ClassSeg(VOCClassSegBase):
         path = osp.join(DATASETS_DIR, osp.basename(url))
         md5 = '6cd6e144f989b92b3379bac3b3de84fd'
         data.cached_download(url, path, md5)
-        utils.extract_file(path, to_directory=DATASETS_DIR)
+        data.extract_file(path, to_directory=DATASETS_DIR)
 
 
 class SBDClassSeg(VOCClassSegBase):
@@ -152,4 +151,4 @@ class SBDClassSeg(VOCClassSegBase):
         path = osp.join(DATASETS_DIR, 'benchmark.tar')
         md5 = '2b2af8a6cff7365684e002c08be823a6'
         data.cached_download(url, path, md5)
-        utils.extract_file(path, to_directory=DATASETS_DIR)
+        data.extract_file(path, to_directory=DATASETS_DIR)

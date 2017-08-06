@@ -1,17 +1,7 @@
-from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
 import cStringIO as StringIO
-import hashlib
 import math
-import os
-import os.path as osp
-import shlex
-import subprocess
-import sys
-import tarfile
-import zipfile
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,93 +20,6 @@ def batch_to_vars(batch, device=-1):
         in_arrays = [cuda.to_gpu(x, device=device) for x in in_arrays]
     in_vars = [chainer.Variable(x) for x in in_arrays]
     return in_vars
-
-
-# -----------------------------------------------------------------------------
-# Data Util
-# -----------------------------------------------------------------------------
-
-
-def extract_file(path, to_directory='.'):
-    if path.endswith('.zip'):
-        opener, mode = zipfile.ZipFile, 'r'
-    elif path.endswith('.tar'):
-        opener, mode = tarfile.open, 'r'
-    elif path.endswith('.tar.gz') or path.endswith('.tgz'):
-        opener, mode = tarfile.open, 'r:gz'
-    elif path.endswith('.tar.bz2') or path.endswith('.tbz'):
-        opener, mode = tarfile.open, 'r:bz2'
-    else:
-        raise ValueError("Could not extract '%s' as no appropriate "
-                         "extractor is found" % path)
-
-    cwd = os.getcwd()
-    os.chdir(to_directory)
-    try:
-        file = opener(path, mode)
-        try:
-            file.extractall()
-        finally:
-            file.close()
-    finally:
-        os.chdir(cwd)
-
-
-def download(client, url, output, quiet=False):
-    cmd = 'gdown {url} -O {output}'.format(url=url, output=output)
-    if quiet:
-        cmd += ' --quiet'
-    subprocess.call(shlex.split(cmd))
-
-
-def check_md5(path, md5):
-    is_same = hashlib.md5(open(path, 'rb').read()).hexdigest() == md5
-    return is_same
-
-
-def download_data(pkg_name, path, url, md5, extract=False, quiet=True):
-    """Install test data checking md5 and rosbag decompress if needed."""
-    # prepare cache dir
-    cache_dir = osp.join(osp.expanduser('~/data'), pkg_name)
-    if not osp.exists(cache_dir):
-        os.makedirs(cache_dir)
-    cache_file = osp.join(cache_dir, osp.basename(path))
-    # check if cache exists, and update if necessary
-    print("Checking md5 of '{path}'...".format(path=cache_file))
-    # check real path
-    if osp.exists(path):
-        if check_md5(path, md5):
-            print("File '{0}' is newest.".format(path))
-            if extract:
-                print("Extracting '{path}'...".format(path=path))
-                extract_file(path, to_directory=osp.dirname(path))
-            return
-        else:
-            if not osp.islink(path):
-                # not link and exists so skipping
-                sys.stderr.write("WARNING: '{0}' exists\n".format(path))
-                return
-            os.remove(path)
-    else:
-        if osp.islink(path):
-            os.remove(path)
-    # check cache path
-    if osp.exists(cache_file):
-        if check_md5(cache_file, md5):
-            print("Cache file '{0}' is newest.".format(cache_file))
-            os.symlink(cache_file, path)
-            if extract:
-                print("Extracting '{path}'...".format(path=path))
-                extract_file(path, to_directory=osp.dirname(path))
-            return
-        else:
-            os.remove(cache_file)
-    print("Downloading file from '{url}'...".format(url=url))
-    download(url, cache_file, quiet=quiet)
-    os.symlink(cache_file, path)
-    if extract:
-        print("Extracting '{path}'...".format(path=path))
-        extract_file(path, to_directory=osp.dirname(path))
 
 
 # -----------------------------------------------------------------------------
