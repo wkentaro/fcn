@@ -67,14 +67,14 @@ class VGG16(chainer.Chain):
         h = self.fc8(h)
         fc8 = h
 
-        self.proba = F.softmax(fc8)
+        self.score = fc8
 
         if t is None:
             assert not chainer.config.train
             return
 
         self.loss = F.softmax_cross_entropy(fc8, t)
-        self.accuracy = F.accuracy(self.proba, t)
+        self.accuracy = F.accuracy(self.score, t)
         return self.loss
 
     @classmethod
