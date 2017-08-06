@@ -1,3 +1,5 @@
-from .voc import VOC2011ClassSeg  # NOQA
-from .voc import VOC2012ClassSeg  # NOQA
-from .voc import SBDClassSeg  # NOQA
+# flake8: noqa
+from .transforms import transform_lsvrc2012_vgg16
+from .voc import VOC2011ClassSeg
+from .voc import VOC2012ClassSeg
+from .voc import SBDClassSeg

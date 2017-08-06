@@ -10,6 +10,7 @@ import skimage.io
 import skimage.util
 import tqdm
 
+from . import datasets
 from . import utils
 
 
@@ -33,8 +34,6 @@ class Trainer(object):
         Log output directory.
     max_iter: int
         Max iteration to stop training iterations.
-    max_elapsed_time: float
-        Max elapsed_time to stop training iterations.
     interval_validate: None or int
         If None, validation is never run. (default: 4000)
 
@@ -52,7 +51,6 @@ class Trainer(object):
             iter_valid,
             out,
             max_iter,
-            max_elapsed_time=float('inf'),
             interval_validate=4000,
             ):
         self.device = device
@@ -64,7 +62,6 @@ class Trainer(object):
         self.epoch = 0
         self.iteration = 0
         self.max_iter = max_iter
-        self.max_elapsed_time = max_elapsed_time
         self.interval_validate = interval_validate
         self.log_headers = [
             'epoch',
@@ -106,20 +103,20 @@ class Trainer(object):
         desc = 'valid [iteration=%08d]' % self.iteration
         for batch in tqdm.tqdm(iter_valid, desc=desc, total=len(dataset),
                                ncols=80, leave=False):
+            img, lbl_true = zip(*batch)
+            batch = map(datasets.transform_lsvrc2012_vgg16, batch)
             with chainer.no_backprop_mode(), \
-                 chainer.using_config('train', False):
+                    chainer.using_config('train', False):
                 in_vars = utils.batch_to_vars(batch, device=self.device)
                 loss = self.model(*in_vars)
             losses.append(float(loss.data))
             score = self.model.score
-            img, lbl_true = zip(*batch)
             lbl_pred = chainer.functions.argmax(score, axis=1)
             lbl_pred = chainer.cuda.to_cpu(lbl_pred.data)
             for im, lt, lp in zip(img, lbl_true, lbl_pred):
                 lbl_trues.append(lt)
                 lbl_preds.append(lp)
                 if len(vizs) < n_viz:
-                    im, lt = dataset.untransform(im, lt)
                     viz = utils.visualize_segmentation(
                         lbl_pred=lp, lbl_true=lt,
                         img=im, n_class=self.model.n_class)
@@ -189,6 +186,7 @@ class Trainer(object):
             # train #
             #########
 
+            batch = map(datasets.transform_lsvrc2012_vgg16, batch)
             in_vars = utils.batch_to_vars(batch, device=self.device)
             self.model.zerograds()
             loss = self.model(*in_vars)
@@ -219,6 +217,4 @@ class Trainer(object):
                             '\n')
 
             if iteration >= self.max_iter:
-                break
-            if (time.time() - stamp_start) > self.max_elapsed_time:
                 break

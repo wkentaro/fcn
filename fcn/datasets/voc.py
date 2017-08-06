@@ -38,14 +38,12 @@ class VOCClassSegBase(chainer.dataset.DatasetMixin):
         'train',
         'tv/monitor',
     ])
-    mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
-    def __init__(self, year, split='train', transform=True):
+    def __init__(self, year, split='train'):
         self.split = split
-        self._transform = transform
 
         # VOC20XX is subset of VOC2012
-        dataset_dir = osp.expanduser('~/data/datasets/VOC/VOCdevkit/VOC2012')
+        dataset_dir = osp.join(DATASETS_DIR, 'VOCdevkit/VOC2012')
         self.files = collections.defaultdict(list)
         for split in ['train', 'val']:
             imgsets_file = osp.join(
@@ -74,25 +72,6 @@ class VOCClassSegBase(chainer.dataset.DatasetMixin):
         lbl = PIL.Image.open(lbl_file)
         lbl = np.array(lbl, dtype=np.int32)
         lbl[lbl == 255] = -1
-        if self._transform:
-            return self.transform(img, lbl)
-        else:
-            return img, lbl
-
-    @classmethod
-    def transform(cls, img, lbl):
-        img = img[:, :, ::-1]  # RGB -> BGR
-        img = img.astype(np.float32)
-        img -= cls.mean_bgr
-        img = img.transpose(2, 0, 1)
-        return img, lbl
-
-    @classmethod
-    def untransform(cls, img, lbl):
-        img = img.transpose(1, 2, 0)
-        img += cls.mean_bgr
-        img = img.astype(np.uint8)
-        img = img[:, :, ::-1]
         return img, lbl
 
     @staticmethod
@@ -102,15 +81,14 @@ class VOCClassSegBase(chainer.dataset.DatasetMixin):
 
 class VOC2011ClassSeg(VOCClassSegBase):
 
-    def __init__(self, split='train', transform=True):
-        super(VOC2011ClassSeg, self).__init__(
-            year=2011, split=split, transform=transform)
+    def __init__(self, split='train'):
+        super(VOC2011ClassSeg, self).__init__(year=2011, split=split)
         pkg_root = osp.join(osp.dirname(osp.realpath(__file__)), '..')
         imgsets_file = osp.join(
             pkg_root, 'external/fcn.berkeleyvision.org',
             'data/pascal/seg11valid.txt')
         # VOC2011 is subset of VOC2012
-        dataset_dir = osp.expanduser('~/data/datasets/VOC/VOCdevkit/VOC2012')
+        dataset_dir = osp.join(DATASETS_DIR, 'VOCdevkit/VOC2012')
         for did in open(imgsets_file):
             did = did.strip()
             img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
@@ -124,9 +102,8 @@ class VOC2011ClassSeg(VOCClassSegBase):
 
 class VOC2012ClassSeg(VOCClassSegBase):
 
-    def __init__(self, split='train', transform=True):
-        super(VOC2012ClassSeg, self).__init__(
-            year=2012, split=split, transform=transform)
+    def __init__(self, split='train'):
+        super(VOC2012ClassSeg, self).__init__(year=2012, split=split)
 
     @staticmethod
     def download():
@@ -139,12 +116,10 @@ class VOC2012ClassSeg(VOCClassSegBase):
 
 class SBDClassSeg(VOCClassSegBase):
 
-    def __init__(self, split='train', transform=True):
+    def __init__(self, split='train'):
         self.split = split
-        self._transform = transform
 
-        dataset_dir = osp.expanduser(
-            '~/data/datasets/VOC/benchmark_RELEASE/dataset')
+        dataset_dir = osp.join(DATASETS_DIR, 'benchmark_RELEASE/dataset')
         self.files = collections.defaultdict(list)
         for split in ['train', 'val']:
             imgsets_file = osp.join(dataset_dir, '%s.txt' % split)
@@ -168,10 +143,7 @@ class SBDClassSeg(VOCClassSegBase):
         mat = scipy.io.loadmat(lbl_file)
         lbl = mat['GTcls'][0]['Segmentation'][0].astype(np.int32)
         lbl[lbl == 255] = -1
-        if self._transform:
-            return self.transform(img, lbl)
-        else:
-            return img, lbl
+        return img, lbl
 
     @staticmethod
     def download():
