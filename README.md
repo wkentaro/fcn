@@ -24,12 +24,10 @@ Inference
 Inference is done as below:
 
 ```bash
-# Download sample image
-wget https://farm2.staticflickr.com/1522/26471792680_a485afb024_z_d.jpg -O sample.jpg
-
 # forwaring of the networks
-fcn_infer.py --img-files sample.jpg --gpu -1  # cpu mode
-fcn_infer.py --img-files sample.jpg  # gpu mode
+img_file=https://farm2.staticflickr.com/1522/26471792680_a485afb024_z_d.jpg
+fcn_infer.py --img-files $img_file --gpu -1 -o /tmp  # cpu mode
+fcn_infer.py --img-files $img_file --gpu 0 -o /tmp   # gpu mode
 ```
 
 <img src="static/fcn8s_26471792680.jpg" width="80%" >
