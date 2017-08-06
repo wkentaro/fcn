@@ -11,7 +11,8 @@ from .. import initializers
 
 class FCN8s(chainer.Chain):
 
-    pretrained_model = osp.expanduser('~/data/models/chainer/fcn8s_from_caffe.npz')
+    pretrained_model = osp.expanduser(
+        '~/data/models/chainer/fcn8s_from_caffe.npz')
 
     def __init__(self, n_class=21):
         self.n_class = n_class
