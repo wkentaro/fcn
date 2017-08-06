@@ -24,7 +24,7 @@ def infer(n_class):
     # model
 
     if args.model_file is None:
-        args.model_file = fcn.data.download_fcn8s_chainermodel()
+        args.model_file = fcn.models.FCN8s.download()
 
     match = re.match('^fcn(32|16|8)s.*$', osp.basename(args.model_file))
     if match is None:
