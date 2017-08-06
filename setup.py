@@ -27,10 +27,7 @@ setup(
     name='fcn',
     version=version,
     packages=find_packages(),
-    scripts=[
-        'scripts/fcn_infer.py',
-        'scripts/fcn_learning_curve.py',
-    ],
+    scripts=['scripts/fcn_infer.py'],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
     long_description=open('README.md').read(),
