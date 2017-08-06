@@ -25,7 +25,7 @@ install:
   - sudo python setup.py develop
 
 script:
-  - sudo -H pip install flake8 hacking
+  - sudo -H pip install flake8
   - flake8 .
   - sudo -H pip install pytest
   - pytest -vs tests
