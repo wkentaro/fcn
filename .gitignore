@@ -1,8 +1,10 @@
-*.egg-info
-
+# python
 *.py[cdo]
-
+*.egg-info/
 build/
 dist/
+
+# pytest
+.cache/
 
 logs/

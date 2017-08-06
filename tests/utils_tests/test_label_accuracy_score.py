@@ -2,8 +2,6 @@
 
 import os.path as osp
 
-from nose.tools import assert_equal
-from nose.tools import assert_true
 import numpy as np
 import PIL.Image
 import skimage.io
@@ -34,17 +32,17 @@ def test_label_accuracy_score():
 
     acc, acc_cls, mean_iu, fwavacc = utils.label_accuracy_score(
         [lbl_gt], [lbl_gt], n_class=21)
-    assert_equal(acc, 1)
-    assert_equal(acc_cls, 1)
-    assert_equal(mean_iu, 1)
-    assert_equal(fwavacc, 1)
+    assert acc == 1
+    assert acc_cls == 1
+    assert mean_iu == 1
+    assert fwavacc == 1
 
     acc, acc_cls, mean_iu, fwavacc = utils.label_accuracy_score(
         lbl_gt, lbl_pred, n_class=21)
-    assert_true(0.9 <= acc <= 1)
-    assert_true(0.9 <= acc_cls <= 1)
-    assert_true(0.9 <= mean_iu <= 1)
-    assert_true(0.9 <= fwavacc <= 1)
+    assert 0.9 <= acc <= 1
+    assert 0.9 <= acc_cls <= 1
+    assert 0.9 <= mean_iu <= 1
+    assert 0.9 <= fwavacc <= 1
 
     return img, lbl_gt, lbl_pred, acc, acc_cls, mean_iu, fwavacc
 

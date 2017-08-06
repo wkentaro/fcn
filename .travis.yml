@@ -27,5 +27,5 @@ install:
 script:
   - sudo -H pip install flake8 hacking
   - flake8 .
-  - sudo -H pip install nose
-  - nosetests -vs tests
+  - sudo -H pip install pytest
+  - pytest -vs tests

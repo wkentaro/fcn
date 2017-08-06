@@ -3,7 +3,6 @@
 import os.path as osp
 
 import chainer
-from nose.tools import assert_equal
 import numpy as np
 import skimage.io
 
@@ -38,7 +37,7 @@ def test_get_upsampling_filter():
     dst = dst.transpose(1, 2, 0)
     dst = dst.astype(np.uint8)
 
-    assert_equal(dst.shape, (752, 1002, 3))
+    assert dst.shape == (752, 1002, 3)
 
     return src, dst
 

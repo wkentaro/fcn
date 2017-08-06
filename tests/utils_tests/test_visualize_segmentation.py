@@ -2,8 +2,6 @@
 
 import os.path as osp
 
-from nose.tools import assert_equal
-from nose.tools import assert_is_instance
 import numpy as np
 import PIL.Image
 import skimage.io
@@ -37,9 +35,9 @@ def test_label_accuracy_score():
 
     img_h, img_w = img.shape[:2]
 
-    assert_is_instance(viz, np.ndarray)
-    assert_equal(viz.shape, (img_h * 2, img_w * 3, 3))
-    assert_equal(viz.dtype, np.uint8)
+    assert isinstance(viz, np.ndarray)
+    assert viz.shape == (img_h * 2, img_w * 3, 3)
+    assert viz.dtype == np.uint8
 
     return viz
 
