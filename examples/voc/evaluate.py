@@ -41,7 +41,8 @@ def main():
 
     lbl_preds, lbl_trues = [], []
     for i in tqdm.trange(len(dataset)):
-        datum, lbl_true = dataset.get_example(i)
+        datum, lbl_true = fcn.datasets.transform_lsvrc2012_vgg16(
+            dataset.get_example(i))
         x_data = np.expand_dims(datum, axis=0)
         if args.gpu >= 0:
             x_data = cuda.to_gpu(x_data)

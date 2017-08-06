@@ -190,10 +190,8 @@ class FCN8s(chainer.Chain):
 
 class FCN8sAtOnce(FCN8s):
 
-    pretrained_model = None
-
-    def download(cls):
-        raise NotImplementedError
+    pretrained_model = osp.expanduser(
+        '~/data/models/chainer/fcn8s-atonce_from_caffe.npz')
 
     def __call__(self, x, t=None):
         # conv1
@@ -322,3 +320,11 @@ class FCN8sAtOnce(FCN8s):
                 assert l1.b.size == l2.b.size
                 l2.W.data[...] = l1.W.data.reshape(l2.W.shape)[...]
                 l2.b.data[...] = l1.b.data.reshape(l2.b.shape)[...]
+
+    @classmethod
+    def download(cls):
+        return data.cached_download(
+            url='https://drive.google.com/uc?id=0B9P1L--7Wd2vZ1RJdXotZkNhSEk',
+            path=cls.pretrained_model,
+            md5='5f3ffdc7fae1066606e1ef45cfda548f',
+        )

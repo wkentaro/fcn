@@ -17,12 +17,12 @@ def md5sum(filename, blocksize=65536):
 
 def cached_download(url, path, md5=None, quiet=False):
 
-    def check_md5(path, md5, quiet=False):
-        if not quiet:
-            print('[{:s}] Checking md5 ({:s})'.format(path, md5))
+    def check_md5(path, md5):
+        print('[{:s}] Checking md5 ({:s})'.format(path, md5))
         return md5sum(path) == md5
 
     if osp.exists(path) and not md5:
+        print('[{:s}] File exists ({:s})'.format(path, md5sum(path)))
         return path
     elif osp.exists(path) and md5 and check_md5(path, md5):
         return path
