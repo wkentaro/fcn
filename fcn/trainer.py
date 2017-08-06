@@ -141,6 +141,15 @@ class Trainer(object):
         # finalize
         return log
 
+    def _save_model(self):
+        out_model_dir = osp.join(self.out, 'models')
+        if not osp.exists(out_model_dir):
+            os.makedirs(out_model_dir)
+        model_name = self.model.__class__.__name__
+        out_model = osp.join(out_model_dir, '%s_iter%08d.npz' %
+                             (model_name, self.iteration))
+        chainer.serializers.save_npz(out_model, self.model)
+
     def train(self):
         """Train the network using the training dataset.
 
@@ -174,13 +183,7 @@ class Trainer(object):
                 with open(osp.join(self.out, 'log.csv'), 'a') as f:
                     f.write(','.join(str(log[h]) for h in self.log_headers) +
                             '\n')
-                out_model_dir = osp.join(self.out, 'models')
-                if not osp.exists(out_model_dir):
-                    os.makedirs(out_model_dir)
-                out_model = osp.join(
-                    out_model_dir, '%s_iter%08d.npz' %
-                    (self.model.__class__.__name__, self.iteration))
-                chainer.serializers.save_npz(out_model, self.model)
+                self._save_model()
 
             #########
             # train #
@@ -217,4 +220,5 @@ class Trainer(object):
                             '\n')
 
             if iteration >= self.max_iter:
+                self._save_model()
                 break
