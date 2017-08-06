@@ -8,8 +8,6 @@ from .. import initializers
 
 class FCN32s(chainer.Chain):
 
-    """Full Convolutional Network 32s"""
-
     def __init__(self, n_class=21):
         self.n_class = n_class
         kwargs = {
