@@ -27,6 +27,9 @@ def cached_download(url, path, md5=None, quiet=False):
     elif osp.exists(path) and md5 and check_md5(path, md5):
         return path
     else:
+        dirpath = osp.dirname(path)
+        if not osp.exists(dirpath):
+            os.makedirs(dirpath)
         return gdown.download(url, path, quiet=quiet)
 
 
