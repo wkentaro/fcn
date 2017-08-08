@@ -3,9 +3,14 @@ from __future__ import division
 import math
 import warnings
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    cv2 = None
+
 import numpy as np
 import scipy.ndimage
+import skimage.color
 
 
 # -----------------------------------------------------------------------------
@@ -70,7 +75,8 @@ def visualize_label_colormap(cmap):
 
 
 def get_label_colortable(n_labels, shape):
-    import cv2
+    if cv2 is None:
+        raise RuntimeError('get_label_colortable requires OpenCV (cv2)')
     rows, cols = shape
     if rows * cols < n_labels:
         raise ValueError
@@ -234,12 +240,19 @@ def label2rgb(lbl, img=None, label_names=None, n_labels=None,
     lbl_viz[lbl == -1] = (0, 0, 0)  # unlabeled
 
     if img is not None:
-        img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        img_gray = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2RGB)
+        img_gray = skimage.color.rgb2gray(img)
+        img_gray = skimage.color.gray2rgb(img_gray)
         lbl_viz = alpha * lbl_viz + (1 - alpha) * img_gray
         lbl_viz = lbl_viz.astype(np.uint8)
 
     if label_names is None:
+        return lbl_viz
+
+    # cv2 is required only if label_names is not None
+    import cv2
+    if cv2 is None:
+        warnings.warn('label2rgb with label_names requires OpenCV (cv2), '
+                      'so ignoring label_names values.')
         return lbl_viz
 
     np.random.seed(1234)
