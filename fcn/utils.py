@@ -48,9 +48,9 @@ def label_colormap(N=256):
         id = i
         r, g, b = 0, 0, 0
         for j in xrange(0, 8):
-            r = np.bitwise_or(r, (bitget(id, 0) << 7-j))
-            g = np.bitwise_or(g, (bitget(id, 1) << 7-j))
-            b = np.bitwise_or(b, (bitget(id, 2) << 7-j))
+            r = np.bitwise_or(r, (bitget(id, 0) << 7 - j))
+            g = np.bitwise_or(g, (bitget(id, 1) << 7 - j))
+            b = np.bitwise_or(b, (bitget(id, 2) << 7 - j))
             id = (id >> 3)
         cmap[i, 0] = r
         cmap[i, 1] = g
@@ -101,7 +101,7 @@ def _fast_hist(label_true, label_pred, n_class):
     mask = (label_true >= 0) & (label_true < n_class)
     hist = np.bincount(
         n_class * label_true[mask].astype(int) +
-        label_pred[mask], minlength=n_class**2).reshape(n_class, n_class)
+        label_pred[mask], minlength=n_class ** 2).reshape(n_class, n_class)
     return hist
 
 
@@ -147,8 +147,8 @@ def centerize(src, dst_shape, margin_color=None):
         pad_vertical = (dst_h - h) // 2
     if w < dst_w:
         pad_horizontal = (dst_w - w) // 2
-    centerized[pad_vertical:pad_vertical+h,
-               pad_horizontal:pad_horizontal+w] = src
+    centerized[pad_vertical:pad_vertical + h,
+               pad_horizontal:pad_horizontal + w] = src
     return centerized
 
 
@@ -176,8 +176,8 @@ def _tile_images(imgs, tile_shape, concatenated_image):
             if i >= len(imgs):
                 pass
             else:
-                concatenated_image[y*one_height:(y+1)*one_height,
-                                   x*one_width:(x+1)*one_width, ] = imgs[i]
+                concatenated_image[y * one_height:(y + 1) * one_height,
+                                   x * one_width:(x + 1) * one_width] = imgs[i]
     return concatenated_image
 
 
@@ -224,7 +224,6 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
 
 def label2rgb(lbl, img=None, label_names=None, n_labels=None,
               alpha=0.3, thresh_suppress=0):
-
     if label_names is None:
         if n_labels is None:
             n_labels = lbl.max() + 1  # +1 for bg_label 0

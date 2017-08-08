@@ -49,9 +49,9 @@ def main():
     dataset_valid = datasets.VOC2011ClassSeg(split='seg11valid')
 
     iter_train = chainer.iterators.MultiprocessIterator(
-        dataset_train, batch_size=1, shared_mem=10**7)
+        dataset_train, batch_size=1, shared_mem=10 ** 7)
     iter_valid = chainer.iterators.MultiprocessIterator(
-        dataset_valid, batch_size=1, shared_mem=10**7,
+        dataset_valid, batch_size=1, shared_mem=10 ** 7,
         repeat=False, shuffle=False)
 
     # 2. model

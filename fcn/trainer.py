@@ -51,8 +51,7 @@ class Trainer(object):
             iter_valid,
             out,
             max_iter,
-            interval_validate=4000,
-            ):
+            interval_validate=4000):
         self.device = device
         self.model = model
         self.optimizer = optimizer
