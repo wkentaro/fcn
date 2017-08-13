@@ -241,6 +241,7 @@ def label2rgb(lbl, img=None, label_names=None, n_labels=None,
     if img is not None:
         img_gray = skimage.color.rgb2gray(img)
         img_gray = skimage.color.gray2rgb(img_gray)
+        img_gray *= 255
         lbl_viz = alpha * lbl_viz + (1 - alpha) * img_gray
         lbl_viz = lbl_viz.astype(np.uint8)
 
