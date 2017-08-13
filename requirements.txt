@@ -3,7 +3,6 @@ gdown
 matplotlib
 numpy
 pandas
-PyYaml
 scikit-image
 scikit-learn
 scipy
