@@ -28,7 +28,7 @@ before_install:
   - conda info -a
 
 install:
-  - conda create --name=fcn python=2.7 -q -y
+  - conda create --name=fcn python=$TRAVIS_PYTHON_VERSION -q -y
   - for req in $(cat requirements.txt); do
       if conda install --dry-run gdown &>/dev/null; then
         conda install -q -y $req;
