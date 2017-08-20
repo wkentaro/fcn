@@ -36,7 +36,7 @@ install:
         pip install -q $req;
       fi
     done
-  - python setup.py develop
+  - python setup.py install
 
 before_script:
   - pip install -q hacking pytest
