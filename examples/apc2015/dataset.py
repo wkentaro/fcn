@@ -95,8 +95,9 @@ class APC2015Dataset(fcn.datasets.SegmentationDatasetBase):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
+    import six
     dataset = APC2015Dataset('val')
-    for i in xrange(len(dataset)):
+    for i in six.moves.range(len(dataset)):
         labelviz = dataset.visualize_example(i)
         plt.imshow(labelviz)
         plt.show()

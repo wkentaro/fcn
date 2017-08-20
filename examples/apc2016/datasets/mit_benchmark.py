@@ -99,10 +99,11 @@ class APC2016mit_benchmarkDataset(APC2016DatasetBase):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
+    import six
     dataset_train = APC2016mit_benchmarkDataset('train')
     dataset_val = APC2016mit_benchmarkDataset('val')
     print('train: %d, val: %d' % (len(dataset_train), len(dataset_val)))
-    for i in xrange(len(dataset_val)):
+    for i in six.moves.range(len(dataset_val)):
         viz = dataset_val.visualize_example(i)
         plt.imshow(viz)
         plt.show()

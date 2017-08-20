@@ -10,6 +10,7 @@ except ImportError:
 
 import numpy as np
 import scipy.ndimage
+import six
 import skimage.color
 
 
@@ -44,10 +45,10 @@ def labelcolormap(*args, **kwargs):
 
 def label_colormap(N=256):
     cmap = np.zeros((N, 3))
-    for i in xrange(0, N):
+    for i in six.moves.range(0, N):
         id = i
         r, g, b = 0, 0, 0
-        for j in xrange(0, 8):
+        for j in six.moves.range(0, 8):
             r = np.bitwise_or(r, (bitget(id, 0) << 7 - j))
             g = np.bitwise_or(g, (bitget(id, 1) << 7 - j))
             b = np.bitwise_or(b, (bitget(id, 2) << 7 - j))
@@ -69,7 +70,7 @@ def visualize_labelcolormap(*args, **kwargs):
 def visualize_label_colormap(cmap):
     n_colors = len(cmap)
     ret = np.zeros((n_colors, 10 * 10, 3))
-    for i in xrange(n_colors):
+    for i in six.moves.range(n_colors):
         ret[i, ...] = cmap[i]
     return ret.reshape((n_colors * 10, 10, 3))
 
@@ -170,8 +171,8 @@ def _tile_images(imgs, tile_shape, concatenated_image):
         else:
             concatenated_image = np.zeros(
                 (one_height * y_num, one_width * x_num), dtype=np.uint8)
-    for y in range(y_num):
-        for x in range(x_num):
+    for y in six.moves.range(y_num):
+        for x in six.moves.range(x_num):
             i = x + y * x_num
             if i >= len(imgs):
                 pass

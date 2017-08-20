@@ -10,6 +10,7 @@ import fcn
 import matplotlib
 import numpy as np
 import pandas
+import six
 import skimage.color
 import skimage.io
 
@@ -44,7 +45,7 @@ def main():
 
     records = []
     cmap = fcn.utils.labelcolormap(n_class)
-    for i in xrange(len(dataset)):
+    for i in six.moves.range(len(dataset)):
         sub_dir = osp.join(out_dir, '%06d' % i)
         if osp.exists(sub_dir):
             continue
@@ -83,7 +84,7 @@ def main():
         skimage.io.imsave(osp.join(sub_dir, 'lbl_true.jpg'), viz_true)
 
         prob = softmax(score)
-        for c in xrange(prob.shape[0]):
+        for c in six.moves.range(prob.shape[0]):
             cls_prob = prob[c]
             viz_prob = matplotlib.cm.jet(cls_prob)
             viz_prob = fcn.utils.apply_mask(viz_prob, bin_mask, crop=True)
