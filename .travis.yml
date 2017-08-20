@@ -31,9 +31,9 @@ install:
   - conda create --name=fcn python=2.7 -q -y
   - for req in $(cat requirements.txt); do
       if conda install --dry-run gdown &>/dev/null; then
-        conda install $req;
+        conda install -q -y $req;
       else
-        pip install $req;
+        pip install -q $req;
       fi
     done
   - python setup.py develop
