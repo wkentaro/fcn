@@ -1,31 +1,46 @@
-sudo: required
+sudo: false
 
 dist: trusty
 
-language: generic
+language: python
 
 cache:
-  directories:
-    - $HOME/.cache/pip
-    - $HOME/.ccache
+  - ccache
+  - pip
+
+matrix:
+  include:
+    - python: 2.7
+    - python: 3.5
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq liblapack-dev
-  - sudo apt-get install -y -qq libhdf5-dev
-  - sudo apt-get install -y -qq python-dev
-  - sudo apt-get install -y -qq python-opencv
-  - sudo apt-get install -y -qq python-tk  # for matplotlib
-  - sudo -H pip install -U -q pip setuptools
+  # install miniconda
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
 
 install:
+  - conda create --name=fcn python=2.7 -q -y
   - for req in $(cat requirements.txt); do
-      sudo pip install $req;
+      if conda install --dry-run gdown &>/dev/null; then
+        conda install $req;
+      else
+        pip install $req;
+      fi
     done
-  - sudo python setup.py develop
+  - python setup.py develop
+
+before_script:
+  - pip install -q hacking pytest
 
 script:
-  - sudo -H pip install flake8
   - flake8 .
-  - sudo -H pip install pytest
   - pytest -vs tests
