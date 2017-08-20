@@ -30,7 +30,7 @@ before_install:
 install:
   - conda create --name=fcn python=$TRAVIS_PYTHON_VERSION -q -y
   - for req in $(cat requirements.txt); do
-      if conda install --dry-run gdown &>/dev/null; then
+      if conda install --dry-run $req &>/dev/null; then
         conda install -q -y $req;
       else
         pip install -q $req;
