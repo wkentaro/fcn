@@ -314,20 +314,28 @@ def visualize_segmentation(**kwargs):
     img_array: ndarray
         Visualized image.
     """
-    img = kwargs.get('img')
-    lbl_true = kwargs.get('lbl_true')
-    lbl_pred = kwargs.get('lbl_pred')
-    n_class = kwargs.get('n_class')
-    label_names = kwargs.get('label_names')
+    img = kwargs.pop('img', None)
+    lbl_true = kwargs.pop('lbl_true', None)
+    lbl_pred = kwargs.pop('lbl_pred', None)
+    n_class = kwargs.pop('n_class', None)
+    label_names = kwargs.pop('label_names', None)
+    if kwargs:
+        raise RuntimeError(
+            'Unexpected keys in kwargs: {}'.format(kwargs.keys()))
 
     if lbl_true is None and lbl_pred is None:
         raise ValueError('lbl_true or lbl_pred must be not None.')
 
+    mask_unlabeled = None
+    viz_unlabeled = None
     if lbl_true is not None:
-        mask = lbl_true == -1
-        lbl_true[mask] = 0
+        mask_unlabeled = lbl_true == -1
+        lbl_true[mask_unlabeled] = 0
+        viz_unlabeled = (
+            np.random.random((lbl_true.shape[0], lbl_true.shape[1], 3)) * 255
+        ).astype(np.uint8)
         if lbl_pred is not None:
-            lbl_pred[mask] = 0
+            lbl_pred[mask_unlabeled] = 0
 
     vizs = []
 
@@ -338,6 +346,8 @@ def visualize_segmentation(**kwargs):
             label2rgb(lbl_true, img, label_names=label_names,
                       n_labels=n_class),
         ]
+        viz_trues[1][mask_unlabeled] = viz_unlabeled[mask_unlabeled]
+        viz_trues[2][mask_unlabeled] = viz_unlabeled[mask_unlabeled]
         vizs.append(get_tile_image(viz_trues, (1, 3)))
 
     if lbl_pred is not None:
@@ -347,6 +357,9 @@ def visualize_segmentation(**kwargs):
             label2rgb(lbl_pred, img, label_names=label_names,
                       n_labels=n_class),
         ]
+        if mask_unlabeled is not None and viz_unlabeled is not None:
+            viz_preds[1][mask_unlabeled] = viz_unlabeled[mask_unlabeled]
+            viz_preds[2][mask_unlabeled] = viz_unlabeled[mask_unlabeled]
         vizs.append(get_tile_image(viz_preds, (1, 3)))
 
     if len(vizs) == 1:
