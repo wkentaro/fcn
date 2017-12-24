@@ -196,7 +196,7 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
         y_num = int(math.sqrt(img_num))
         while x_num * y_num < img_num:
             x_num += 1
-        return x_num, y_num
+        return y_num, x_num
 
     if tile_shape is None:
         tile_shape = get_tile_shape(len(imgs))
