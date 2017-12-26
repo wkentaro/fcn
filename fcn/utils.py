@@ -214,7 +214,8 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
         h_scale, w_scale = max_height / h, max_width / w
         scale = min([h_scale, w_scale])
         h, w = int(scale * h), int(scale * w)
-        img = resize(img, (h, w), preserve_range=True).astype(dtype)
+        img = resize(img, (h, w), mode='reflect',
+                     preserve_range=True).astype(dtype)
         if len(img.shape) == 3:
             img = centerize(img, (max_height, max_width, 3), margin_color)
         else:
