@@ -27,7 +27,7 @@ fcn_infer.py --img-files $img_file --gpu -1 -o /tmp  # cpu mode
 fcn_infer.py --img-files $img_file --gpu 0 -o /tmp   # gpu mode
 ```
 
-<img src="static/fcn8s_26471792680.jpg" width="80%" >
+<img src=".readme/fcn8s_26471792680.jpg" width="80%" >
 
 Original Image: <https://www.flickr.com/photos/faceme/26471792680/>
 
@@ -80,6 +80,6 @@ You can download vgg16 model from here: [`vgg16_from_caffe.npz`](https://drive.g
 | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | **91.1288** | **78.4979** | **65.3998** | **84.4326** | [`fcn8s-atonce_from_caffe.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vZ1RJdXotZkNhSEk) |
 | Ours (using `vgg16_from_caffe.npz`) | 91.0883 | 77.3528 | 65.3433 | 84.4276 | [`fcn8s-atonce_voc_iter00056000.npz`](https://drive.google.com/uc?id=0B9P1L--7Wd2vcl9STGhJY1J4WUE) |
 
-<img src="examples/voc/static/fcn32s_iter00092000.jpg" width="30%" /> <img src="examples/voc/static/fcn16s_iter00100000.jpg" width="30%" /> <img src="examples/voc/static/fcn8s_iter00072000.jpg" width="30%" />
+<img src="examples/voc/.readme/fcn32s_iter00092000.jpg" width="30%" /> <img src="examples/voc/.readme/fcn16s_iter00100000.jpg" width="30%" /> <img src="examples/voc/.readme/fcn8s_iter00072000.jpg" width="30%" />
 
 Left to right, **FCN32s**, **FCN16s** and **FCN8s**, which are fully trained using this repo. See above tables to see the accuracy.
