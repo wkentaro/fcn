@@ -127,8 +127,8 @@ class FCN8s(chainer.Chain):
 
         # score_pool4c
         h = score_pool4[:, :,
-                        5:5 + upscore2.data.shape[2],
-                        5:5 + upscore2.data.shape[3]]
+                        5:5 + upscore2.shape[2],
+                        5:5 + upscore2.shape[3]]
         score_pool4c = h  # 1/16
 
         # fuse_pool4
@@ -141,8 +141,8 @@ class FCN8s(chainer.Chain):
 
         # score_pool4c
         h = score_pool3[:, :,
-                        9:9 + upscore_pool4.data.shape[2],
-                        9:9 + upscore_pool4.data.shape[3]]
+                        9:9 + upscore_pool4.shape[2],
+                        9:9 + upscore_pool4.shape[3]]
         score_pool3c = h  # 1/8
 
         # fuse_pool3
@@ -154,7 +154,7 @@ class FCN8s(chainer.Chain):
         upscore8 = h  # 1/1
 
         # score
-        h = upscore8[:, :, 31:31 + x.data.shape[2], 31:31 + x.data.shape[3]]
+        h = upscore8[:, :, 31:31 + x.shape[2], 31:31 + x.shape[3]]
         score = h  # 1/1
         self.score = score
 
@@ -264,8 +264,8 @@ class FCN8sAtOnce(FCN8s):
 
         # score_pool4c
         h = score_pool4[:, :,
-                        5:5 + upscore2.data.shape[2],
-                        5:5 + upscore2.data.shape[3]]
+                        5:5 + upscore2.shape[2],
+                        5:5 + upscore2.shape[3]]
         score_pool4c = h  # 1/16
 
         # fuse_pool4
@@ -278,8 +278,8 @@ class FCN8sAtOnce(FCN8s):
 
         # score_pool4c
         h = score_pool3[:, :,
-                        9:9 + upscore_pool4.data.shape[2],
-                        9:9 + upscore_pool4.data.shape[3]]
+                        9:9 + upscore_pool4.shape[2],
+                        9:9 + upscore_pool4.shape[3]]
         score_pool3c = h  # 1/8
 
         # fuse_pool3
@@ -291,7 +291,7 @@ class FCN8sAtOnce(FCN8s):
         upscore8 = h  # 1/1
 
         # score
-        h = upscore8[:, :, 31:31 + x.data.shape[2], 31:31 + x.data.shape[3]]
+        h = upscore8[:, :, 31:31 + x.shape[2], 31:31 + x.shape[3]]
         score = h  # 1/1
         self.score = score
 

@@ -106,7 +106,7 @@ class FCN32s(chainer.Chain):
 
         # upscore
         h = self.upscore(score_fr)
-        h = h[:, :, 19:19 + x.data.shape[2], 19:19 + x.data.shape[3]]
+        h = h[:, :, 19:19 + x.shape[2], 19:19 + x.shape[3]]
         score = h  # 1/1
         self.score = score
 

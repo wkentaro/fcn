@@ -118,8 +118,8 @@ class FCN16s(chainer.Chain):
 
         # score_pool4c
         h = score_pool4[:, :,
-                        5:5 + upscore2.data.shape[2],
-                        5:5 + upscore2.data.shape[3]]
+                        5:5 + upscore2.shape[2],
+                        5:5 + upscore2.shape[3]]
         score_pool4c = h  # 1/16
 
         # fuse_pool4
@@ -131,7 +131,7 @@ class FCN16s(chainer.Chain):
         upscore16 = h  # 1/1
 
         # score
-        h = upscore16[:, :, 27:27 + x.data.shape[2], 27:27 + x.data.shape[3]]
+        h = upscore16[:, :, 27:27 + x.shape[2], 27:27 + x.shape[3]]
         score = h  # 1/1
         self.score = score
 
