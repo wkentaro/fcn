@@ -225,7 +225,7 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
 
 
 def label2rgb(lbl, img=None, label_names=None, n_labels=None,
-              alpha=0.3, thresh_suppress=0):
+              alpha=0.5, thresh_suppress=0):
     if label_names is None:
         if n_labels is None:
             n_labels = lbl.max() + 1  # +1 for bg_label 0
