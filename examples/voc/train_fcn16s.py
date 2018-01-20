@@ -30,7 +30,7 @@ def main():
     args.interval_print = 20
     args.interval_eval = 4000
 
-    args.file = osp.realpath(__file__)
+    args.model = 'FCN16s'
     now = datetime.datetime.now()
     args.timestamp = now.isoformat()
     args.out = osp.join(here, 'logs', now.strftime('%Y%m%d_%H%M%S'))
