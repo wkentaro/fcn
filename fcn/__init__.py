@@ -2,6 +2,7 @@
 
 from . import data
 from . import datasets
+from . import extensions
 from . import initializers
 from . import models
 from . import trainer

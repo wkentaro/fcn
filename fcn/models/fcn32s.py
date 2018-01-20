@@ -117,6 +117,7 @@ class FCN32s(chainer.Chain):
         loss = F.softmax_cross_entropy(self.score, t, normalize=False)
         if np.isnan(float(loss.data)):
             raise ValueError('Loss is nan.')
+        chainer.report({'loss': loss}, self)
         return loss
 
     @classmethod
@@ -143,3 +144,15 @@ class FCN32s(chainer.Chain):
                 assert l1.b.size == l2.b.size
                 l2.W.data[...] = l1.W.data.reshape(l2.W.shape)[...]
                 l2.b.data[...] = l1.b.data.reshape(l2.b.shape)[...]
+
+    def predict(self, imgs):
+        lbls = []
+        for img in imgs:
+            with chainer.no_backprop_mode(), \
+                    chainer.using_config('train', False):
+                x = self.xp.asarray(img[None])
+                self.__call__(x)
+                lbl = chainer.functions.argmax(self.score, axis=1)
+            lbl = chainer.cuda.to_cpu(lbl.array[0])
+            lbls.append(lbl)
+        return lbls

@@ -165,6 +165,7 @@ class FCN8s(chainer.Chain):
         loss = F.softmax_cross_entropy(score, t, normalize=False)
         if np.isnan(float(loss.data)):
             raise ValueError('Loss is nan.')
+        chainer.report({'loss': loss}, self)
         return loss
 
     def init_from_fcn16s(self, fcn16s):
@@ -186,6 +187,18 @@ class FCN8s(chainer.Chain):
             path=cls.pretrained_model,
             md5='256c2a8235c1c65e62e48d3284fbd384',
         )
+
+    def predict(self, imgs):
+        lbls = []
+        for img in imgs:
+            with chainer.no_backprop_mode(), \
+                    chainer.using_config('train', False):
+                x = self.xp.asarray(img[None])
+                self.__call__(x)
+                lbl = chainer.functions.argmax(self.score, axis=1)
+            lbl = chainer.cuda.to_cpu(lbl.array[0])
+            lbls.append(lbl)
+        return lbls
 
 
 class FCN8sAtOnce(FCN8s):
@@ -302,6 +315,7 @@ class FCN8sAtOnce(FCN8s):
         loss = F.softmax_cross_entropy(score, t, normalize=False)
         if np.isnan(float(loss.data)):
             raise ValueError('Loss is nan.')
+        chainer.report({'loss': loss}, self)
         return loss
 
     def init_from_vgg16(self, vgg16):

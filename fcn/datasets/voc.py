@@ -43,6 +43,9 @@ class VOCClassSegBase(chainer.dataset.DatasetMixin):
 
         # VOC20XX is subset of VOC2012
         dataset_dir = osp.join(DATASETS_DIR, 'VOCdevkit/VOC2012')
+        if not osp.exists(dataset_dir):
+            self.download()
+
         self.files = collections.defaultdict(list)
         for split in ['train', 'val']:
             imgsets_file = osp.join(
@@ -119,6 +122,9 @@ class SBDClassSeg(VOCClassSegBase):
         self.split = split
 
         dataset_dir = osp.join(DATASETS_DIR, 'benchmark_RELEASE/dataset')
+        if not osp.exists(dataset_dir):
+            self.download()
+
         self.files = collections.defaultdict(list)
         for split in ['train', 'val']:
             imgsets_file = osp.join(dataset_dir, '%s.txt' % split)
