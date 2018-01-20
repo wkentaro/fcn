@@ -66,7 +66,7 @@ def summarize_log(logs_dir, name, params_keys, target_key, objective, show_activ
         elif key in params:
             row.append(params[key])
         elif dfi is not None and key in dfi:
-            if isinstance(df[key], float):
+            if isinstance(dfi[key], float):
                 value = '%.3f' % dfi[key]
                 min_value = df[key].min()
                 max_value = df[key].max()
