@@ -74,8 +74,10 @@ def get_trainer(optimizer, iter_train, iter_valid, iter_valid_raw,
         trigger=(args.interval_eval, 'iteration'))
 
     trainer.extend(extensions.snapshot_object(
-        target=model, filename='model_{.updater.iteration:08}.npz'),
-        trigger=(args.interval_eval, 'iteration'))
+        target=model, filename='model_best.npz'),
+        trigger=chainer.training.triggers.MaxValueTrigger(
+            key='validation/main/miou',
+            trigger=(args.interval_eval, 'iteration')))
 
     assert extensions.PlotReport.available()
     trainer.extend(extensions.PlotReport(
