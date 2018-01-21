@@ -5,17 +5,15 @@ from chainer import training
 import yaml
 
 
-def ParamsReport(params, file_name='params.yaml'):
+class ParamsReport(training.Extension):
 
-    def initializer(trainer):
+    def __init__(self, params, file_name='params.yaml'):
+        self._params = params
+        self._file_name = file_name
+
+    def initialize(self, trainer):
         print('# ' + '-' * 77)
-        pprint.pprint(params)
+        pprint.pprint(self._params)
         print('# ' + '-' * 77)
-        with open(osp.join(trainer.out, file_name), 'w') as f:
-            yaml.safe_dump(params, f, default_flow_style=False)
-
-    @training.make_extension(initializer=initializer)
-    def __call__(trainer):
-        pass
-
-    return __call__
+        with open(osp.join(trainer.out, self._file_name), 'w') as f:
+            yaml.safe_dump(self._params, f, default_flow_style=False)
