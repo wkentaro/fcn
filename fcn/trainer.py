@@ -3,6 +3,7 @@ import copy
 import os
 import os.path as osp
 import time
+import warnings
 
 import chainer
 import numpy as np
@@ -52,6 +53,9 @@ class Trainer(object):
             out,
             max_iter,
             interval_validate=4000):
+        warnings.warn('fcn.Trainer is deprecated.\n'
+                      'Please use chainer.training.Trainer.')
+
         self.device = device
         self.model = model
         self.optimizer = optimizer
