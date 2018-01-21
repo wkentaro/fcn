@@ -5,8 +5,8 @@ import shutil
 
 import chainer
 from chainer import training
-import skimage.io
 import numpy as np
+import skimage.io
 
 import fcn
 
