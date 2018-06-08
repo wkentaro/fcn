@@ -34,7 +34,6 @@ setup(
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
     license='MIT',
-    keywords='machine-learning',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
