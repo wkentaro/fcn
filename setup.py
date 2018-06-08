@@ -8,15 +8,14 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '6.3.0'
+version = '6.3.1'
 
 
 if sys.argv[-1] == 'release':
     commands = [
-        'python setup.py sdist',
-        'twine upload dist/fcn-{0}.tar.gz'.format(version),
-        'git tag v{0}'.format(version),
+        'git tag v{}'.format(version),
         'git push origin master --tag',
+        'python setup.py sdist upload',
     ]
     for cmd in commands:
         subprocess.call(shlex.split(cmd))
