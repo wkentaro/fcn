@@ -170,8 +170,12 @@ def _tile_images(imgs, tile_shape, concatenated_image):
     one_height = imgs[0].shape[0]
     if concatenated_image is None:
         if len(imgs[0].shape) == 3:
+            n_channels = imgs[0].shape[2]
+            assert all(im.shape[2] == n_channels for im in imgs)
             concatenated_image = np.zeros(
-                (one_height * y_num, one_width * x_num, 3), dtype=np.uint8)
+                (one_height * y_num, one_width * x_num, n_channels),
+                dtype=np.uint8,
+            )
         else:
             concatenated_image = np.zeros(
                 (one_height * y_num, one_width * x_num), dtype=np.uint8)
