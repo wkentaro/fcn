@@ -6,5 +6,6 @@ dist/
 
 # pytest
 .cache/
+/.pytest_cache/
 
 logs/
