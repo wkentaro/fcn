@@ -1,2 +1,3 @@
 include requirements.txt README.md
+recursive-include fcn/external/fcn.berkeleyvision.org/data/pascal *
 recursive-include static *
