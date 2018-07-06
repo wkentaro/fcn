@@ -1,5 +1,6 @@
 from __future__ import division
 
+from distutils.version import StrictVersion
 import math
 import warnings
 
@@ -11,7 +12,9 @@ except ImportError:
 import numpy as np
 import scipy.ndimage
 import six
+import skimage
 import skimage.color
+import skimage.transform
 
 
 # -----------------------------------------------------------------------------
@@ -197,7 +200,11 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     @param tile_shape: shape for which images should be concatenated
     @param result_img: numpy array to put result image
     """
-    from skimage.transform import resize
+    def resize(*args, **kwargs):
+        if StrictVersion(skimage.__version__) < StrictVersion('0.13.1'):
+            # anti_aliasing arg cannot be passed to skimage<0.13.1
+            kwargs.pop('anti_aliasing', None)
+        return skimage.transform.resize(*args, **kwargs)
 
     def get_tile_shape(img_num):
         x_num = 0
