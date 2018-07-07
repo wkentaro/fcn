@@ -201,7 +201,7 @@ def get_tile_image(imgs, tile_shape=None, result_img=None, margin_color=None):
     @param result_img: numpy array to put result image
     """
     def resize(*args, **kwargs):
-        if StrictVersion(skimage.__version__) < StrictVersion('0.13.1'):
+        if StrictVersion(skimage.__version__) < StrictVersion('0.14'):
             # anti_aliasing arg cannot be passed to skimage<0.13.1
             kwargs.pop('anti_aliasing', None)
         return skimage.transform.resize(*args, **kwargs)
