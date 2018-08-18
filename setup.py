@@ -8,7 +8,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '6.4.5'
+version = '6.4.6'
 
 
 if sys.argv[-1] == 'release':
