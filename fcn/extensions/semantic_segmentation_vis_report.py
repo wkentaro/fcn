@@ -37,7 +37,7 @@ class SemanticSegmentationVisReport(training.Extension):
         for batch in it:
             img, lbl_true = zip(*batch)
             batch = list(map(self._transform, batch))
-            x = trainer.updater.converter(next(zip(*batch)), self.device)
+            x = trainer.updater.converter(batch, self.device)[0]
             with chainer.using_config('enable_backprop', False), \
                     chainer.using_config('train', False):
                 score = self.pred_func(x)
