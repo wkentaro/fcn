@@ -36,7 +36,7 @@ class SemanticSegmentationVisReport(training.Extension):
         vizs = []
         for batch in it:
             img, lbl_true = zip(*batch)
-            batch = map(self._transform, batch)
+            batch = list(map(self._transform, batch))
             x = trainer.updater.converter(next(zip(*batch)), self.device)
             with chainer.using_config('enable_backprop', False), \
                     chainer.using_config('train', False):
