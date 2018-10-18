@@ -15,7 +15,7 @@ def md5sum(filename, blocksize=65536):
     return hash.hexdigest()
 
 
-def cached_download(url, path, md5=None, quiet=False):
+def cached_download(url, path, md5=None, quiet=False, postprocess=None):
 
     def check_md5(path, md5):
         print('[{:s}] Checking md5 ({:s})'.format(path, md5))
@@ -23,17 +23,21 @@ def cached_download(url, path, md5=None, quiet=False):
 
     if osp.exists(path) and not md5:
         print('[{:s}] File exists ({:s})'.format(path, md5sum(path)))
-        return path
     elif osp.exists(path) and md5 and check_md5(path, md5):
-        return path
+        pass
     else:
         dirpath = osp.dirname(path)
         if not osp.exists(dirpath):
             os.makedirs(dirpath)
-        return gdown.download(url, path, quiet=quiet)
+        gdown.download(url, path, quiet=quiet)
+
+    if postprocess is not None:
+        postprocess(path)
+
+    return path
 
 
-def extract_file(path, to_directory='.'):
+def extract_file(path, to_directory=None):
     if path.endswith('.zip'):
         opener, mode = zipfile.ZipFile, 'r'
     elif path.endswith('.tar'):
@@ -45,6 +49,9 @@ def extract_file(path, to_directory='.'):
     else:
         raise ValueError("Could not extract '%s' as no appropriate "
                          "extractor is found" % path)
+
+    if to_directory is None:
+        to_directory = osp.dirname(path)
 
     cwd = os.getcwd()
     os.chdir(to_directory)
