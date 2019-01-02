@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import distutils.spawn
 import shlex
 import subprocess
 import sys
@@ -7,19 +8,37 @@ import sys
 from setuptools import find_packages
 from setuptools import setup
 
+import github2pypi
+
 
 version = '6.4.8'
 
 
-if sys.argv[-1] == 'release':
+if sys.argv[1] == 'release':
+    if not distutils.spawn.find_executable('twine'):
+        print(
+            'Please install twine:\n\n\tpip install twine\n',
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     commands = [
-        'git tag v{}'.format(version),
+        'git pull origin master',
+        'git tag v{:s}'.format(version),
         'git push origin master --tag',
-        'python setup.py sdist upload',
+        'python setup.py sdist',
+        'twine upload dist/fcn-{:s}.tar.gz'.format(version),
     ]
     for cmd in commands:
-        subprocess.call(shlex.split(cmd))
+        print('+ {}'.format(cmd))
+        subprocess.check_call(shlex.split(cmd))
     sys.exit(0)
+
+
+with open('README.md') as f:
+    long_description = github2pypi.replace_url(
+        slug='wkentaro/fcn', content=f.read()
+    )
 
 
 setup(
@@ -30,7 +49,8 @@ setup(
     scripts=['scripts/fcn_infer.py'],
     install_requires=open('requirements.txt').readlines(),
     description='Fully Convolutional Networks',
-    long_description=open('README.md').read(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
     url='http://github.com/wkentaro/fcn',
