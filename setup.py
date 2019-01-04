@@ -13,7 +13,7 @@ from setuptools import setup
 import github2pypi
 
 
-version = '6.4.12'
+version = '6.4.13'
 
 
 if sys.argv[1] == 'release':
