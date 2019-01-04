@@ -46,7 +46,7 @@ with open('README.md') as f:
 setup(
     name='fcn',
     version=version,
-    packages=find_packages(),
+    packages=find_packages(exclude=['github2pypi']),
     include_package_data=True,
     scripts=['scripts/fcn_infer.py'],
     install_requires=open('requirements.txt').readlines(),
