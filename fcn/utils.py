@@ -1,5 +1,6 @@
 from __future__ import division
 
+import copy
 from distutils.version import LooseVersion
 import math
 import warnings
@@ -347,6 +348,9 @@ def visualize_segmentation(**kwargs):
 
     if lbl_true is None and lbl_pred is None:
         raise ValueError('lbl_true or lbl_pred must be not None.')
+
+    lbl_true = copy.deepcopy(lbl_true)
+    lbl_pred = copy.deepcopy(lbl_pred)
 
     mask_unlabeled = None
     viz_unlabeled = None
