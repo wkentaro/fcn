@@ -11,7 +11,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '6.4.14'
+version = '6.4.15'
 
 
 if sys.argv[1] == 'release':
