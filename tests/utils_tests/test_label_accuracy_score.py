@@ -24,10 +24,23 @@ def test_label_accuracy_score():
 
     lbl_pred = lbl_gt.copy()
     lbl_pred[lbl_pred == -1] = 0
-    lbl_pred = skimage.transform.rescale(lbl_pred, 1 / 16., order=0,
-                                         preserve_range=True)
-    lbl_pred = skimage.transform.resize(lbl_pred, lbl_gt.shape, order=0,
-                                        preserve_range=True)
+    lbl_pred = skimage.transform.rescale(
+        lbl_pred,
+        1 / 16.,
+        order=0,
+        mode='constant',
+        preserve_range=True,
+        anti_aliasing=False,
+        multichannel=True,
+    )
+    lbl_pred = skimage.transform.resize(
+        lbl_pred,
+        lbl_gt.shape,
+        order=0,
+        mode='constant',
+        preserve_range=True,
+        anti_aliasing=False,
+    )
     lbl_pred = lbl_pred.astype(lbl_gt.dtype)
 
     acc, acc_cls, mean_iu, fwavacc = utils.label_accuracy_score(
