@@ -3,7 +3,7 @@ fcn - Fully Convolutional Networks
 
 [![PyPI Version](https://img.shields.io/pypi/v/fcn.svg)](https://pypi.python.org/pypi/fcn)
 [![Python Versions](https://img.shields.io/pypi/pyversions/fcn.svg)](https://pypi.org/project/fcn)
-[![Build Status](https://api.travis-ci.org/wkentaro/fcn.svg?branch=master)](https://travis-ci.org/wkentaro/fcn)
+[![GitHub Actions](https://github.com/wkentaro/fcn/workflows/CI/badge.svg)](https://github.com/wkentaro/fcn/actions)
 
 Chainer implementation of [Fully Convolutional Networks](https://github.com/shelhamer/fcn.berkeleyvision.org).
 
