@@ -50,7 +50,7 @@ def summarize_log(logs_dir, name, params_keys, target_key, objective):
             else:
                 elapsed_time = df['elapsed_time'].max()
                 value = params.get('timestamp', '<none>')
-                if value is not '<none>':
+                if value != '<none>':
                     value = dateutil.parser.parse(value)
                     value += datetime.timedelta(seconds=elapsed_time)
                     now = datetime.datetime.now()
