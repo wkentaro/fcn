@@ -11,6 +11,9 @@ class ParamsReport(training.Extension):
         self._params = params
         self._file_name = file_name
 
+    def __call__(self, trainer):
+        pass
+
     def initialize(self, trainer):
         print('# ' + '-' * 77)
         pprint.pprint(self._params)
