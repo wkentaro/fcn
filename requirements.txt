@@ -1,11 +1,7 @@
 chainer>=2.0.0
-chainercv
 gdown
 tqdm
 numpy
 scipy
-matplotlib
-pandas
 PyYAML
-scikit-learn
 scikit-image
