@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from __future__ import print_function
 
 import distutils.spawn
@@ -11,7 +9,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '6.4.19'
+version = '6.4.20'
 
 
 if sys.argv[1] == 'release':
@@ -78,6 +76,8 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
 )
